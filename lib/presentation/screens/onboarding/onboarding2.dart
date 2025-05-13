@@ -28,16 +28,17 @@ class Onboarding2Screen extends StatelessWidget {
           child: RichText(
             text: TextSpan(
               style: GoogleFonts.roboto(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                height: 1.2,
+                fontSize: 52,
+                fontWeight: FontWeight.w800,
+                color: AppColors.black,
+                height: 1.1,
               ),
               children: [
                 TextSpan(
                   text: 'Together',
                   style: GoogleFonts.roboto(
                     color: AppColors.teal,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const TextSpan(

@@ -30,17 +30,20 @@ class Onboarding3Screen extends StatelessWidget {
           child: RichText(
             text: TextSpan(
               style: GoogleFonts.roboto(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                height: 1.2,
+                fontSize: 52,
+                fontWeight: FontWeight.w800,
+                color: AppColors.black,
+                height: 1.1,
               ),
               children: [
                 TextSpan(
-                  text: 'Join our community',
-                  style: GoogleFonts.roboto(color: AppColors.teal),
+                  text: 'Join our community ',
+                  style: GoogleFonts.roboto(
+                    color: AppColors.teal,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-                const TextSpan(text: ' to make a difference.'),
+                const TextSpan(text: 'to make a difference.'),
               ],
             ),
           ),
@@ -54,7 +57,7 @@ class Onboarding3Screen extends StatelessWidget {
           child: ElevatedButton(
             onPressed: onGetStarted,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.teal,
+              backgroundColor: AppColors.darkGreen,
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 52),
               shape: RoundedRectangleBorder(
@@ -63,7 +66,7 @@ class Onboarding3Screen extends StatelessWidget {
             ),
             child: const Text(
               'Get Started',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 23, fontWeight: FontWeight.w500),
             ),
           ),
         ),
