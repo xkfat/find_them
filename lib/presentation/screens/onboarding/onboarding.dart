@@ -58,9 +58,10 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top navigation row
+            const SizedBox(height: 20),
+
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 41),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

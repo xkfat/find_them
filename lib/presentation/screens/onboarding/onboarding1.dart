@@ -30,7 +30,7 @@ class Onboarding1Screen extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 60),
+        const SizedBox(height: 50),
 
         // Text content
         Padding(
