@@ -51,7 +51,7 @@ class LoginCredentials {
   }
 }
 
-class RegisterData {
+class SignUpData {
   final String username;
   final String password;
   final String passwordConfirmation;
@@ -60,7 +60,7 @@ class RegisterData {
   final String lastName;
   final String phoneNumber;
   
-  RegisterData({
+  SignUpData({
     required this.username,
     required this.password,
     required this.passwordConfirmation,

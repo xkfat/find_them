@@ -10,40 +10,40 @@ class AppTextStyles {
   static const FontWeight bold = FontWeight.w700;
   
   
-  static TextStyle get headingLargeLight => GoogleFonts.dmSans(
+  static TextStyle get headingLargeLight => GoogleFonts.inter(
     fontSize: 28,
     fontWeight: bold,
     color: AppColors.darkGrey,
     letterSpacing: -0.5,
   );
   
-  static TextStyle get headingMediumLight => GoogleFonts.dmSans(
+  static TextStyle get headingMediumLight => GoogleFonts.inter(
     fontSize: 24,
     fontWeight: bold,
     color: AppColors.darkGrey,
     letterSpacing: -0.5,
   );
   
-  static TextStyle get headingSmallLight => GoogleFonts.dmSans(
+  static TextStyle get headingSmallLight => GoogleFonts.inter(
     fontSize: 20,
     fontWeight: bold,
     color: AppColors.darkGrey,
   );
   
   // Titles - DM Sans
-  static TextStyle get titleLargeLight => GoogleFonts.dmSans(
+  static TextStyle get titleLargeLight => GoogleFonts.inter(
     fontSize: 18,
     fontWeight: semiBold,
     color: AppColors.darkGrey,
   );
   
-  static TextStyle get titleMediumLight => GoogleFonts.dmSans(
+  static TextStyle get titleMediumLight => GoogleFonts.inter(
     fontSize: 16,
     fontWeight: semiBold,
     color: AppColors.darkGrey,
   );
   
-  static TextStyle get titleSmallLight => GoogleFonts.dmSans(
+  static TextStyle get titleSmallLight => GoogleFonts.inter(
     fontSize: 14,
     fontWeight: semiBold,
     color: AppColors.darkGrey,

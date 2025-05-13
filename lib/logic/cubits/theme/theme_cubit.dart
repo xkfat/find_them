@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'theme_state.dart';
 
-class ThemeCubit extends Cubit<ThemeState> {
+class ThemeCubit extends Cubit<ThemeMode> {
   static const themeKey = 'theme_mode';
   
-  ThemeCubit() : super(const ThemeState(ThemeMode.system)) {
+  ThemeCubit() : super(ThemeMode.light) {
     _loadThemePreference();
   }
   
@@ -16,9 +15,10 @@ class ThemeCubit extends Cubit<ThemeState> {
       final savedThemeMode = prefs.getString(themeKey);
       
       if (savedThemeMode != null) {
-        emit(ThemeState(_getThemeModeFromString(savedThemeMode)));
+        emit(_getThemeModeFromString(savedThemeMode));
       }
     } catch (_) {
+      emit(ThemeMode.light);
     }
   }
   
@@ -31,45 +31,42 @@ class ThemeCubit extends Cubit<ThemeState> {
   }
   
   String _getStringFromThemeMode(ThemeMode mode) {
-    switch (mode) {
-      case ThemeMode.light:
-        return 'light';
-      case ThemeMode.dark:
-        return 'dark';
-      case ThemeMode.system:
-      default:
-        return 'system';
-    }
+    return switch (mode) {
+      ThemeMode.light => 'light',
+      ThemeMode.dark => 'dark',
+      ThemeMode.system => 'light', 
+    };
   }
   
   ThemeMode _getThemeModeFromString(String themeString) {
-    switch (themeString) {
-      case 'light':
-        return ThemeMode.light;
-      case 'dark':
-        return ThemeMode.dark;
-      case 'system':
-      default:
-        return ThemeMode.system;
-    }
+    return switch (themeString) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.light, 
+    };
   }
   
   Future<void> setThemeMode(ThemeMode mode) async {
-    if (state.themeMode != mode) {
-      emit(ThemeState(mode));
+    if (mode == ThemeMode.system) {
+      mode = ThemeMode.light;
+    }
+    
+    if (state != mode) {
+      emit(mode);
       await _saveThemePreference(mode);
     }
   }
   
   Future<void> setLightMode() async => await setThemeMode(ThemeMode.light);
   Future<void> setDarkMode() async => await setThemeMode(ThemeMode.dark);
-  Future<void> setSystemMode() async => await setThemeMode(ThemeMode.system);
   
   Future<void> toggleTheme() async {
-    if (state.themeMode == ThemeMode.light) {
+    if (state == ThemeMode.light) {
       await setDarkMode();
     } else {
       await setLightMode();
     }
   }
+  
+  bool get isDarkMode => state == ThemeMode.dark;
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:find_them/core/routes/route_constants.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
-import '../../presentation/screens/onboarding/onboarding_screen.dart';
+import '../../presentation/screens/onboarding/onboarding1.dart';
+import '../../presentation/screens/onboarding/onboarding2.dart';
+import '../../presentation/screens/onboarding/onboarding3.dart';
 import '../../presentation/screens/auth/login_screen.dart';
 import '../../presentation/screens/auth/signup_screen.dart';
 import '../../presentation/screens/auth/sms_verification_screen.dart.dart';
@@ -10,36 +12,35 @@ import '../../presentation/widgets/placeholder_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    final args = settings.arguments;
-
     switch (settings.name) {
       case RouteConstants.splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
 
       case RouteConstants.onboarding:
+        return MaterialPageRoute(builder: (_) => const Onboarding1Screen());
+
+      /* case RouteConstants.login:
+        return MaterialPageRoute(builder: (_) => const LoginScreen()); */
+      /*  case RouteConstants.signup:
+        return MaterialPageRoute(
+          builder: (_) => const PlaceholderScreen(screenName: 'SignupScreen()'),
+        );
+*/
+
+      /* case RouteConstants.resetPassword:
         return MaterialPageRoute(
           builder:
-              (_) => const PlaceholderScreen(screenName: 'OnboardingScreen()'),
+              (_) =>
+                  const ResetPasswordScreen()
         );
-     /* case RouteConstants.login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen()); */
-      case RouteConstants.signup:
-        return MaterialPageRoute(builder: (_) => const PlaceholderScreen(screenName:  'SignupScreen()'));
-
-     /* case RouteConstants.verifyPhone:
-        final phoneNumber = args is String ? args : '';
-        return MaterialPageRoute(
-          builder: (_) => const PlaceholderScreen(screenName: 'VerifyPhoneScreen(phoneNumber: phoneNumber),'
-        ));
 */
-      case RouteConstants.resetPassword:
-        return MaterialPageRoute(builder: (_) => const PlaceholderScreen(screenName:  'ResetPasswordScreen()'));
-
+      /*
       case RouteConstants.home:
-        return MaterialPageRoute(builder: (_) => const PlaceholderScreen(screenName:  'HomeScreen()'));
-
-
-/*
+        return MaterialPageRoute(
+          builder: (_) => const PlaceholderScreen(screenName: 'HomeScreen()'),
+        );
+*/
+      /*
       case RouteConstants.map:
         return MaterialPageRoute(builder: (_) => const MapScreen());
 

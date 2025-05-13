@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/routes/route_constants.dart';
 import 'dart:async';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,14 +12,17 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
+    startTimer();
     super.initState();
-    _navigateToNextScreen();
   }
 
-  void _navigateToNextScreen() {
-    Timer(const Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacementNamed(RouteConstants.onboarding);
-    });
+  startTimer() {
+    var duration = Duration(seconds: 5);
+    return Timer(duration, route);
+  }
+
+  route(){
+    Navigator.of(context).pushReplacementNamed(RouteConstants.onboarding);
   }
 
   @override
@@ -30,8 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Image.asset(
           'assets/images/app__logo.png',
-          height: 200,
-          width: 200,
+         
         ),
       ),
     );

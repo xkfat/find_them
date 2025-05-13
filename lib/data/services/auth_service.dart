@@ -18,11 +18,11 @@ class AuthService {
   Future<AuthData?> _getAuthData() async {
     final prefs = await SharedPreferences.getInstance();
     final encodedData = prefs.getString(_authDataKey);
-    
+
     if (encodedData == null) {
       return null;
     }
-    
+
     try {
       final decodedData = json.decode(encodedData);
       return AuthData.fromJson(decodedData);
@@ -44,7 +44,7 @@ class AuthService {
         ApiConstants.login,
         data: credentials.toJson(),
       );
-      
+
       final authData = AuthData.fromJson(response.data);
       await _saveAuthData(authData);
       return authData;
@@ -53,18 +53,18 @@ class AuthService {
     }
   }
 
-  Future<AuthData> register(RegisterData data) async {
+  Future<AuthData> signup(SignUpData data) async {
     try {
       Response response = await dio.post(
         ApiConstants.signup,
         data: data.toJson(),
       );
-      
+
       final authData = AuthData.fromJson(response.data);
       await _saveAuthData(authData);
       return authData;
     } catch (e) {
-      throw Exception('Registration failed: ${e.toString()}');
+      throw Exception('Signup failed: ${e.toString()}');
     }
   }
 
@@ -98,7 +98,7 @@ class AuthService {
         ApiConstants.tokenRefresh,
         data: {'refresh': refreshToken},
       );
-      
+
       final authData = await _getAuthData();
       if (authData != null) {
         final updatedAuthData = AuthData(
@@ -107,7 +107,7 @@ class AuthService {
           user: authData.user,
           expiryTime: DateTime.now().add(Duration(minutes: 60)),
         );
-        
+
         await _saveAuthData(updatedAuthData);
         return true;
       }
