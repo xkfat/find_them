@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:find_them/core/routes/route_constants.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
-import '../../presentation/screens/onboarding/onboarding1.dart';
+import '../../presentation/screens/onboarding/onboarding.dart';
 import '../../presentation/screens/onboarding/onboarding2.dart';
 import '../../presentation/screens/onboarding/onboarding3.dart';
 import '../../presentation/screens/auth/login_screen.dart';
@@ -17,7 +17,7 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SplashScreen());
 
       case RouteConstants.onboarding:
-        return MaterialPageRoute(builder: (_) => const Onboarding1Screen());
+        return MaterialPageRoute(builder: (_) => const OnboardingWrapper());
 
       /* case RouteConstants.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen()); */

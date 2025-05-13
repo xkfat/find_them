@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/themes/app_colors.dart';
 import 'onboarding1.dart';
 import 'onboarding2.dart';
@@ -23,9 +22,12 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
     super.dispose();
   }
 
-  void _skipToSignUp() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const SignUpOptions()),
+  void _showSignUpOptions() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const SignUpOptions(),
     );
   }
 
@@ -36,38 +38,68 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
         curve: Curves.easeInOut,
       );
     } else {
-      _skipToSignUp();
+      _showSignUpOptions();
+    }
+  }
+
+  void _previousPage() {
+    if (_currentPage > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       body: SafeArea(
         child: Column(
           children: [
-            // Skip Button
+            // Top navigation row
             Padding(
-              padding: const EdgeInsets.only(top: 16, right: 24),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: _skipToSignUp,
-                  style: TextButton.styleFrom(
-                    minimumSize: Size.zero,
-                    padding: EdgeInsets.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text(
-                    'Skip',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.black,
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Back button (only visible after first page)
+                  _currentPage > 0
+                      ? GestureDetector(
+                        onTap: _previousPage,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                            size: 16,
+                          ),
+                        ),
+                      )
+                      : const SizedBox(width: 32), // Placeholder for alignment
+                  // Skip button
+                  TextButton(
+                    onPressed: _showSignUpOptions,
+                    style: TextButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: EdgeInsets.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text(
+                      'Skip',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
 
@@ -80,34 +112,65 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
                     _currentPage = page;
                   });
                 },
-                children: const [
-                  Onboarding1Screen(),
+                children: [
+                  Onboarding1Screen(onNextPage: _nextPage),
                   Onboarding2Screen(),
-                  Onboarding3Screen(),
+                  Onboarding3Screen(onGetStarted: _showSignUpOptions),
                 ],
               ),
             ),
 
-            // Page indicator dots
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                3,
-                (index) => Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? const Color(0xFF064A3E) // darkGreen
-                        : const Color(0xFFD1D1D1), // grey
-                    shape: BoxShape.circle,
+            // Page indicator dots and next button
+            Padding(
+              padding: const EdgeInsets.only(bottom: 32),
+              child: Column(
+                children: [
+                  // Page indicator dots
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      3,
+                      (index) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color:
+                              _currentPage == index
+                                  ? AppColors.darkGreen
+                                  : AppColors.grey,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+
+                  // Next button (only shown on first two screens)
+                  if (_currentPage < 2)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: ElevatedButton(
+                        onPressed: _nextPage,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.teal,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(200, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Next',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
-
-            const SizedBox(height: 32),
           ],
         ),
       ),

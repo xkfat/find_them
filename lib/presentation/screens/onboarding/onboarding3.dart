@@ -1,41 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/themes/app_colors.dart';
-import '../../widgets/signup_options_box.dart';
 
 class Onboarding3Screen extends StatelessWidget {
-  const Onboarding3Screen({super.key});
+  final VoidCallback onGetStarted;
+
+  const Onboarding3Screen({super.key, required this.onGetStarted});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Back button
-        Padding(
-          padding: const EdgeInsets.only(left: 24, top: 16),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                  size: 16,
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 32),
+        const SizedBox(height: 42),
 
         // Image
         Padding(
@@ -62,13 +38,9 @@ class Onboarding3Screen extends StatelessWidget {
               children: [
                 TextSpan(
                   text: 'Join our community',
-                  style: GoogleFonts.roboto(
-                    color: AppColors.teal,
-                  ),
+                  style: GoogleFonts.roboto(color: AppColors.teal),
                 ),
-                const TextSpan(
-                  text: ' to make a difference.',
-                ),
+                const TextSpan(text: ' to make a difference.'),
               ],
             ),
           ),
@@ -80,11 +52,7 @@ class Onboarding3Screen extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const SignUpOptions()),
-              );
-            },
+            onPressed: onGetStarted,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.teal,
               foregroundColor: Colors.white,
@@ -95,10 +63,7 @@ class Onboarding3Screen extends StatelessWidget {
             ),
             child: const Text(
               'Get Started',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ),
         ),

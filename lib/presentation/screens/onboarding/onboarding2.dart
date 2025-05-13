@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/themes/app_colors.dart';
@@ -10,32 +9,7 @@ class Onboarding2Screen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Back button (visible on second screen)
-        Padding(
-          padding: const EdgeInsets.only(left: 24, top: 16),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                  size: 16,
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 32),
+        const SizedBox(height: 42),
 
         // Image
         Padding(
