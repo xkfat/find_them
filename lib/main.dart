@@ -1,21 +1,28 @@
 import 'package:find_them/core/routes/app_router.dart';
 import 'package:flutter/material.dart';
-import 'logic/cubits/theme/theme_cubit.dart';
-import 'core/constants/themes/app_theme.dart';
-import 'core/routes/route_constants.dart';
-import 'core/routes/navigation_helper.dart';
+import 'package:find_them/logic/cubits/theme/theme_cubit.dart';
+import 'package:find_them/logic/cubits/auth/auth_cubit.dart';
+import 'package:find_them/core/constants/themes/app_theme.dart';
+import 'package:find_them/core/routes/route_constants.dart';
+import 'package:find_them/core/routes/navigation_helper.dart';
+import 'package:find_them/data/services/api_service.dart';
+import 'package:find_them/data/services/auth_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter/services.dart';
 
-void main() {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-  SystemChrome.setPreferredOrientations([
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  FlutterNativeSplash.preserve(
+    widgetsBinding: WidgetsFlutterBinding.ensureInitialized(),
+  );
+  
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  
   runApp(const MyApp());
 }
 
@@ -27,16 +34,26 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late final ApiService _apiService;
+  late final AuthService _authService;
+
   @override
   void initState() {
     super.initState();
+    
+    _apiService = ApiService();
+    _authService = AuthService(_apiService);
+    
     FlutterNativeSplash.remove();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ThemeCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
+        BlocProvider<AuthCubit>(create: (context) => AuthCubit(_authService)),
+      ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, state) {
           return MaterialApp(

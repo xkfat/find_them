@@ -117,7 +117,9 @@ class SignUpOptions extends StatelessWidget {
                     width: 350,
                     height: 54,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(RouteConstants.login);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.teal,
                         padding: EdgeInsets.zero,

@@ -32,8 +32,8 @@ class AppRouter {
         );
 
         */
-      /* case RouteConstants.login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen()); */
+       case RouteConstants.login:
+        return MaterialPageRoute(builder: (_) => const LoginScreen()); 
       /*  case RouteConstants.signup:
         return MaterialPageRoute(
           builder: (_) => const PlaceholderScreen(screenName: 'SignupScreen()'),

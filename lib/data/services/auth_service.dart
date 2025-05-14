@@ -15,7 +15,9 @@ class AuthService {
     dio = _apiService.dio;
   }
 
-  Future<AuthData?> _getAuthData() async {
+  /// Get authentication data from storage
+  /// Made public for use by AuthCubit
+  Future<AuthData?> getAuthData() async {
     final prefs = await SharedPreferences.getInstance();
     final encodedData = prefs.getString(_authDataKey);
 
@@ -72,6 +74,7 @@ class AuthService {
     try {
       await dio.post(ApiConstants.logout);
     } catch (e) {
+      // Log error but continue with local logout
     } finally {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_authDataKey);
@@ -80,7 +83,7 @@ class AuthService {
   }
 
   Future<bool> isAuthenticated() async {
-    final authData = await _getAuthData();
+    final authData = await getAuthData();
     if (authData == null || authData.isExpired) {
       final refreshToken = authData?.refreshToken;
       if (refreshToken != null) {
@@ -99,7 +102,7 @@ class AuthService {
         data: {'refresh': refreshToken},
       );
 
-      final authData = await _getAuthData();
+      final authData = await getAuthData();
       if (authData != null) {
         final updatedAuthData = AuthData(
           token: response.data['access'],
@@ -118,7 +121,28 @@ class AuthService {
   }
 
   Future<User?> getCurrentUser() async {
-    final authData = await _getAuthData();
+    final authData = await getAuthData();
     return authData?.user;
+  }
+
+  Future<bool> changePassword(
+    String oldPassword,
+    String newPassword,
+    String confirmPassword,
+  ) async {
+    try {
+      Response response = await dio.post(
+        ApiConstants.changePassword,
+        data: {
+          'old_password': oldPassword,
+          'new_password': newPassword,
+          'new_password2': confirmPassword,
+        },
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
   }
 }
