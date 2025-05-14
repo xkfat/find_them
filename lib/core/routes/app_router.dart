@@ -12,6 +12,8 @@ import '../../presentation/widgets/placeholder_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
+    //final args = settings.arguments;
+
     switch (settings.name) {
       case RouteConstants.splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
@@ -19,6 +21,17 @@ class AppRouter {
       case RouteConstants.onboarding:
         return MaterialPageRoute(builder: (_) => const OnboardingWrapper());
 
+      case RouteConstants.signup:
+        return MaterialPageRoute(builder: (_) => const SignupScreen());
+
+      /*
+      case RouteConstants.verifyPhone:
+        final phoneNumber = args as String;
+        return MaterialPageRoute(
+          builder: (_) => SmsVerificationScreen(phoneNumber: phoneNumber),
+        );
+
+        */
       /* case RouteConstants.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen()); */
       /*  case RouteConstants.signup:

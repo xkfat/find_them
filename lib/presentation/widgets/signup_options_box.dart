@@ -1,3 +1,4 @@
+import 'package:find_them/core/routes/route_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/themes/app_colors.dart';
@@ -86,7 +87,9 @@ class SignUpOptions extends StatelessWidget {
                     width: 350,
                     height: 54,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(RouteConstants.signup);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.darkGreen,
                         padding: EdgeInsets.zero,
@@ -108,7 +111,6 @@ class SignUpOptions extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // Log in button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 31),
                   child: SizedBox(
