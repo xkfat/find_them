@@ -180,4 +180,6 @@ class AuthCubit extends Cubit<AuthState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_welcomeShownKey, true);
   }
+
+  
 }

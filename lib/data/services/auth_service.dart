@@ -5,11 +5,17 @@ import 'package:find_them/core/constants/api_constants.dart';
 import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/models/user.dart';
 import 'package:find_them/data/services/api_service.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class AuthService {
   late Dio dio;
   static const String _authDataKey = 'auth_data';
   final ApiService _apiService;
+  final firebase_auth.FirebaseAuth _firebaseAuth =
+      firebase_auth.FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   AuthService(this._apiService) {
     dio = _apiService.dio;

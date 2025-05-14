@@ -4,11 +4,125 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/themes/app_colors.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/constants/themes/app_colors.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../../data/services/firebase_auth_service.dart';
+
 class SignUpOptions extends StatelessWidget {
   const SignUpOptions({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final firebaseAuthService = FirebaseAuthService();
+
+    // Function to handle Google sign in
+    void handleGoogleSignIn() async {
+      Navigator.pop(context); // Close the bottom sheet
+
+      try {
+        final userCredential = await firebaseAuthService.signInWithGoogle();
+        if (userCredential != null && userCredential.user != null) {
+          // Get user info
+          final user = userCredential.user!;
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Successfully signed in as ${user.displayName}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // TODO: Navigate to the next screen or login with Django using email/password
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Google sign in cancelled or failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
+    // Function to handle Facebook sign in
+    void handleFacebookSignIn() async {
+      Navigator.pop(context); // Close the bottom sheet
+
+      try {
+        final userCredential = await firebaseAuthService.signInWithFacebook();
+        if (userCredential != null && userCredential.user != null) {
+          // Get user info
+          final user = userCredential.user!;
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Successfully signed in as ${user.displayName}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // TODO: Navigate to the next screen or login with Django using email/password
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Facebook sign in cancelled or failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
+    /*    void handleTwitterSignIn() async {
+      Navigator.pop(context); 
+
+      try {
+        final userCredential = await firebaseAuthService.signInWithTwitter();
+        if (userCredential != null && userCredential.user != null) {
+          final user = userCredential.user!;
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Successfully signed in as ${user.displayName}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Twitter sign in cancelled or failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+*/
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
       minChildSize: 0.7,
@@ -176,7 +290,7 @@ class SignUpOptions extends StatelessWidget {
                         width: 350,
                         height: 54,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: handleFacebookSignIn,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1877F2),
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -215,7 +329,7 @@ class SignUpOptions extends StatelessWidget {
                         width: 350,
                         height: 54,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: handleGoogleSignIn,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             padding: EdgeInsets.zero,
