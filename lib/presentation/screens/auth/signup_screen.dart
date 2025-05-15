@@ -33,6 +33,15 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _passwordError = false;
   bool _confirmPasswordError = false;
 
+  // Field error messages
+  String? _firstNameErrorText;
+  String? _lastNameErrorText;
+  String? _usernameErrorText;
+  String? _emailErrorText;
+  String? _phoneNumberErrorText;
+  String? _passwordErrorText;
+  String? _confirmPasswordErrorText;
+
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _usernameController = TextEditingController();
@@ -95,7 +104,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: Text(
-                    'Please fill in all required fields',
+                    message,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,
@@ -132,57 +141,104 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  void _showFieldSpecificError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade700,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   bool _validateAllFields() {
     bool isValid = true;
 
     setState(() {
       // Check first name
-      _firstNameError = _firstNameController.text.isEmpty;
+      if (_firstNameController.text.isEmpty) {
+        _firstNameError = true;
+        _firstNameErrorText = 'First name is required';
+        isValid = false;
+      } else {
+        _firstNameError = false;
+        _firstNameErrorText = null;
+      }
 
       // Check last name
-      _lastNameError = _lastNameController.text.isEmpty;
+      if (_lastNameController.text.isEmpty) {
+        _lastNameError = true;
+        _lastNameErrorText = 'Last name is required';
+        isValid = false;
+      } else {
+        _lastNameError = false;
+        _lastNameErrorText = null;
+      }
 
       // Check username
-      _usernameError = _usernameController.text.isEmpty;
+      if (_usernameController.text.isEmpty) {
+        _usernameError = true;
+        _usernameErrorText = 'Username is required';
+        isValid = false;
+      } else {
+        _usernameError = false;
+        _usernameErrorText = null;
+      }
 
       // Check email
       if (_emailController.text.isEmpty) {
         _emailError = true;
+        _emailErrorText = 'Email is required';
+        isValid = false;
       } else if (!_emailController.text.contains('@') ||
           !_emailController.text.contains('.')) {
         _emailError = true;
+        _emailErrorText = 'Please enter a valid email address';
+        isValid = false;
       } else {
         _emailError = false;
+        _emailErrorText = null;
       }
 
       // Check phone number
-      _phoneNumberError = _completePhoneNumber.isEmpty;
+      if (_completePhoneNumber.isEmpty) {
+        _phoneNumberError = true;
+        _phoneNumberErrorText = 'Phone number is required';
+        isValid = false;
+      } else {
+        _phoneNumberError = false;
+        _phoneNumberErrorText = null;
+      }
 
       // Check password
-      if (_passwordController.text.isEmpty ||
-          _passwordController.text.length < 6) {
+      if (_passwordController.text.isEmpty) {
         _passwordError = true;
+        _passwordErrorText = 'Password is required';
+        isValid = false;
+      } else if (_passwordController.text.length < 6) {
+        _passwordError = true;
+        _passwordErrorText = 'Password must be at least 6 characters';
+        isValid = false;
       } else {
         _passwordError = false;
+        _passwordErrorText = null;
       }
 
       // Check confirm password
-      if (_confirmPasswordController.text.isEmpty ||
-          _confirmPasswordController.text != _passwordController.text) {
+      if (_confirmPasswordController.text.isEmpty) {
         _confirmPasswordError = true;
+        _confirmPasswordErrorText = 'Please confirm your password';
+        isValid = false;
+      } else if (_confirmPasswordController.text != _passwordController.text) {
+        _confirmPasswordError = true;
+        _confirmPasswordErrorText = 'Passwords do not match';
+        isValid = false;
       } else {
         _confirmPasswordError = false;
+        _confirmPasswordErrorText = null;
       }
     });
-
-    isValid =
-        !_firstNameError &&
-        !_lastNameError &&
-        !_usernameError &&
-        !_emailError &&
-        !_phoneNumberError &&
-        !_passwordError &&
-        !_confirmPasswordError;
 
     return isValid;
   }
@@ -218,6 +274,68 @@ class _SignupScreenState extends State<SignupScreen> {
       _phoneNumberError = false;
       _passwordError = false;
       _confirmPasswordError = false;
+
+      _firstNameErrorText = null;
+      _lastNameErrorText = null;
+      _usernameErrorText = null;
+      _emailErrorText = null;
+      _phoneNumberErrorText = null;
+      _passwordErrorText = null;
+      _confirmPasswordErrorText = null;
+    });
+  }
+
+  void _processErrorMessage(String errorMessage) {
+    errorMessage = errorMessage.toLowerCase();
+    _clearAllErrors();
+
+    setState(() {
+      // Check for user-friendly version of Django REST Framework errors
+      if (errorMessage.contains('username') &&
+          (errorMessage.contains('already') ||
+              errorMessage.contains('taken') ||
+              errorMessage.contains('exists'))) {
+        _usernameError = true;
+        _usernameErrorText = 'Username is already taken';
+        _showFieldSpecificError('Username is already taken');
+      } else if (errorMessage.contains('email') &&
+          (errorMessage.contains('already') ||
+              errorMessage.contains('taken') ||
+              errorMessage.contains('exists'))) {
+        _emailError = true;
+        _emailErrorText = 'Email is already in use';
+        _showFieldSpecificError('Email is already in use');
+      } else if (errorMessage.contains('phone') ||
+          errorMessage.contains('number')) {
+        _phoneNumberError = true;
+        _phoneNumberErrorText = 'Invalid phone number';
+        _showFieldSpecificError('Invalid phone number');
+      } else if (errorMessage.contains('password')) {
+        if (errorMessage.contains('match')) {
+          _confirmPasswordError = true;
+          _confirmPasswordErrorText = 'Passwords don\'t match';
+          _showFieldSpecificError('Passwords don\'t match');
+        } else if (errorMessage.contains('weak') ||
+            errorMessage.contains('common') ||
+            errorMessage.contains('similar') ||
+            errorMessage.contains('short')) {
+          _passwordError = true;
+          _passwordErrorText = 'Password is too weak';
+          _showFieldSpecificError(
+            'Password is too weak - use a stronger password',
+          );
+        } else {
+          _passwordError = true;
+          _passwordErrorText = 'Invalid password';
+          _showFieldSpecificError('Invalid password');
+        }
+      } else {
+        // Generic error, show dialog
+        _showErrorDialog(
+          errorMessage.substring(0, 1).toUpperCase() +
+              errorMessage.substring(1),
+        );
+      }
     });
   }
 
@@ -252,8 +370,8 @@ class _SignupScreenState extends State<SignupScreen> {
             Navigator.of(context).pop();
           }
 
-          // Show error message in rectangular dialog
-          _showErrorDialog(state.message);
+          // Process the error message to set specific field errors
+          _processErrorMessage(state.message);
         } else if (state is AuthPhoneVerificationRequired ||
             state is AuthSmsCodeSent) {
           // Close loading dialog if open
@@ -380,12 +498,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                       return null;
                                     },
                                   ),
-                                  if (_firstNameError)
-                                    const Padding(
-                                      padding: EdgeInsets.only(top: 4, left: 8),
+                                  if (_firstNameError &&
+                                      _firstNameErrorText != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 4,
+                                        left: 8,
+                                      ),
                                       child: Text(
-                                        'First name is required',
-                                        style: TextStyle(
+                                        _firstNameErrorText!,
+                                        style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.red,
                                         ),
@@ -436,12 +558,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                       return null;
                                     },
                                   ),
-                                  if (_lastNameError)
-                                    const Padding(
-                                      padding: EdgeInsets.only(top: 4, left: 8),
+                                  if (_lastNameError &&
+                                      _lastNameErrorText != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 4,
+                                        left: 8,
+                                      ),
                                       child: Text(
-                                        'Last name is required',
-                                        style: TextStyle(
+                                        _lastNameErrorText!,
+                                        style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.red,
                                         ),
@@ -490,12 +616,15 @@ class _SignupScreenState extends State<SignupScreen> {
                             return null;
                           },
                         ),
-                        if (_usernameError)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 4, left: 8),
+                        if (_usernameError && _usernameErrorText != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 8),
                             child: Text(
-                              'Username is required',
-                              style: TextStyle(fontSize: 12, color: Colors.red),
+                              _usernameErrorText!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
                             ),
                           ),
 
@@ -541,12 +670,15 @@ class _SignupScreenState extends State<SignupScreen> {
                             return null;
                           },
                         ),
-                        if (_emailError)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 4, left: 8),
+                        if (_emailError && _emailErrorText != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 8),
                             child: Text(
-                              'Valid email is required',
-                              style: TextStyle(fontSize: 12, color: Colors.red),
+                              _emailErrorText!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
                             ),
                           ),
 
@@ -625,12 +757,15 @@ class _SignupScreenState extends State<SignupScreen> {
                             });
                           },
                         ),
-                        if (_phoneNumberError)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 4, left: 8),
+                        if (_phoneNumberError && _phoneNumberErrorText != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 8),
                             child: Text(
-                              'Phone number is required',
-                              style: TextStyle(fontSize: 12, color: Colors.red),
+                              _phoneNumberErrorText!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
                             ),
                           ),
 
@@ -680,12 +815,15 @@ class _SignupScreenState extends State<SignupScreen> {
                             return null;
                           },
                         ),
-                        if (_passwordError)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 4, left: 8),
+                        if (_passwordError && _passwordErrorText != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 8),
                             child: Text(
-                              'Password must be at least 6 characters',
-                              style: TextStyle(fontSize: 12, color: Colors.red),
+                              _passwordErrorText!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
                             ),
                           ),
 
@@ -735,12 +873,16 @@ class _SignupScreenState extends State<SignupScreen> {
                             return null;
                           },
                         ),
-                        if (_confirmPasswordError)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 4, left: 8),
+                        if (_confirmPasswordError &&
+                            _confirmPasswordErrorText != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 8),
                             child: Text(
-                              'Passwords do not match',
-                              style: TextStyle(fontSize: 12, color: Colors.red),
+                              _confirmPasswordErrorText!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
                             ),
                           ),
 
