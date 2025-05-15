@@ -1,4 +1,5 @@
 import 'package:find_them/core/routes/app_router.dart';
+import 'package:find_them/logic/cubits/auth/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/logic/cubits/theme/theme_cubit.dart';
 import 'package:find_them/logic/cubits/auth/auth_cubit.dart';
@@ -65,19 +66,31 @@ class _MyAppState extends State<MyApp> {
           create: (context) => AuthCubit(_authService, _firebaseAuthService),
         ),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, state) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'FindThem',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: state,
-            navigatorKey: NavigationHelper.navigatorKey,
-            initialRoute: RouteConstants.splash,
-            onGenerateRoute: AppRouter.generateRoute,
-          );
+      child: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          // Handle auth state changes
+          if (state is AuthUnauthenticated) {
+            // Go to onboarding/login flow when unauthenticated
+            NavigationHelper.navigateAndClearStack(RouteConstants.onboarding);
+          } else if (state is AuthAuthenticated) {
+            // Go to home when authenticated
+            NavigationHelper.navigateAndClearStack(RouteConstants.home);
+          }
         },
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, state) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'FindThem',
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: state,
+              navigatorKey: NavigationHelper.navigatorKey,
+              initialRoute: RouteConstants.splash,
+              onGenerateRoute: AppRouter.generateRoute,
+            );
+          },
+        ),
       ),
     );
   }

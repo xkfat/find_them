@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -245,7 +247,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _handleSignup() {
     if (_validateAllFields() && _formKey.currentState!.validate()) {
-      // Form is valid, create the signup data
       final signupData = SignUpData(
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
@@ -255,14 +256,48 @@ class _SignupScreenState extends State<SignupScreen> {
         password: _passwordController.text,
         passwordConfirmation: _confirmPasswordController.text,
       );
-
-      // Use the AuthCubit to handle signup
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.teal),
+          );
+        },
+      );
       context.read<AuthCubit>().signup(signupData);
-      return; // Return early to prevent further validation
-    }
+    } else {
+      List<String> errorMessages = [];
+      if (_firstNameError && _firstNameErrorText != null) {
+        errorMessages.add(_firstNameErrorText!);
+      }
+      if (_lastNameError && _lastNameErrorText != null) {
+        errorMessages.add(_lastNameErrorText!);
+      }
+      if (_usernameError && _usernameErrorText != null) {
+        errorMessages.add(_usernameErrorText!);
+      }
+      if (_emailError && _emailErrorText != null) {
+        errorMessages.add(_emailErrorText!);
+      }
+      if (_phoneNumberError && _phoneNumberErrorText != null) {
+        errorMessages.add(_phoneNumberErrorText!);
+      }
+      if (_passwordError && _passwordErrorText != null) {
+        errorMessages.add(_passwordErrorText!);
+      }
+      if (_confirmPasswordError && _confirmPasswordErrorText != null) {
+        errorMessages.add(_confirmPasswordErrorText!);
+      }
 
-    // Only show dialog if validation fails
-    _showErrorDialog('Please fill in all required fields');
+      // If we have specific errors, show them
+      if (errorMessages.isNotEmpty) {
+        _showErrorDialog(errorMessages.join('\n'));
+      } else {
+        // Default message if no specific errors
+        _showErrorDialog('Please fill in all required fields correctly');
+      }
+    }
   }
 
   void _clearAllErrors() {
@@ -286,56 +321,77 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _processErrorMessage(String errorMessage) {
-    errorMessage = errorMessage.toLowerCase();
     _clearAllErrors();
 
+    Map<String, dynamic> errorMap = {};
+
+    try {
+      if (errorMessage.contains('{') && errorMessage.contains('}')) {
+        final jsonStart = errorMessage.indexOf('{');
+        final jsonEnd = errorMessage.lastIndexOf('}') + 1;
+        final jsonStr = errorMessage.substring(jsonStart, jsonEnd);
+        errorMap = json.decode(jsonStr);
+      }
+    } catch (e) {
+      print("Error parsing JSON: $e");
+    }
+
     setState(() {
-      // Check for user-friendly version of Django REST Framework errors
-      if (errorMessage.contains('username') &&
-          (errorMessage.contains('already') ||
-              errorMessage.contains('taken') ||
-              errorMessage.contains('exists'))) {
+      if (errorMessage.toLowerCase().contains('username') &&
+          (errorMessage.toLowerCase().contains('already') ||
+              errorMessage.toLowerCase().contains('taken'))) {
         _usernameError = true;
         _usernameErrorText = 'Username is already taken';
         _showFieldSpecificError('Username is already taken');
-      } else if (errorMessage.contains('email') &&
-          (errorMessage.contains('already') ||
-              errorMessage.contains('taken') ||
-              errorMessage.contains('exists'))) {
-        _emailError = true;
-        _emailErrorText = 'Email is already in use';
-        _showFieldSpecificError('Email is already in use');
-      } else if (errorMessage.contains('phone') ||
-          errorMessage.contains('number')) {
-        _phoneNumberError = true;
-        _phoneNumberErrorText = 'Invalid phone number';
-        _showFieldSpecificError('Invalid phone number');
-      } else if (errorMessage.contains('password')) {
-        if (errorMessage.contains('match')) {
-          _confirmPasswordError = true;
-          _confirmPasswordErrorText = 'Passwords don\'t match';
-          _showFieldSpecificError('Passwords don\'t match');
-        } else if (errorMessage.contains('weak') ||
-            errorMessage.contains('common') ||
-            errorMessage.contains('similar') ||
-            errorMessage.contains('short')) {
-          _passwordError = true;
-          _passwordErrorText = 'Password is too weak';
-          _showFieldSpecificError(
-            'Password is too weak - use a stronger password',
-          );
-        } else {
-          _passwordError = true;
-          _passwordErrorText = 'Invalid password';
-          _showFieldSpecificError('Invalid password');
-        }
-      } else {
-        // Generic error, show dialog
-        _showErrorDialog(
-          errorMessage.substring(0, 1).toUpperCase() +
-              errorMessage.substring(1),
-        );
+        return;
       }
+
+      if (errorMessage.toLowerCase().contains('email')) {
+        if (errorMessage.toLowerCase().contains('already') ||
+            errorMessage.toLowerCase().contains('taken')) {
+          _emailError = true;
+          _emailErrorText = 'Email is already in use';
+          _showFieldSpecificError('Email is already in use');
+          return;
+        } else if (errorMessage.toLowerCase().contains('valid')) {
+          _emailError = true;
+          _emailErrorText = 'Please enter a valid email address';
+          _showFieldSpecificError('Please enter a valid email address');
+          return;
+        }
+      }
+
+      if (errorMessage.toLowerCase().contains('phone')) {
+        _phoneNumberError = true;
+        _phoneNumberErrorText = 'Invalid phone number format';
+        _showFieldSpecificError('Please enter a valid phone number');
+        return;
+      }
+
+      if (errorMessage.toLowerCase().contains('password')) {
+        if (errorMessage.toLowerCase().contains('match')) {
+          _confirmPasswordError = true;
+          _confirmPasswordErrorText = 'Passwords do not match';
+          _showFieldSpecificError('Passwords do not match');
+          return;
+        } else if (errorMessage.toLowerCase().contains('characters') ||
+            errorMessage.toLowerCase().contains('short')) {
+          _passwordError = true;
+          _passwordErrorText = 'Password must be at least 6 characters';
+          _showFieldSpecificError('Password must be at least 6 characters');
+          return;
+        } else if (errorMessage.toLowerCase().contains('common') ||
+            errorMessage.toLowerCase().contains('weak')) {
+          _passwordError = true;
+          _passwordErrorText = 'Password is too weak or too common';
+          _showFieldSpecificError('Please use a stronger password');
+          return;
+        }
+      }
+
+      _showErrorDialog(
+        errorMessage.substring(0, 1).toUpperCase() + errorMessage.substring(1),
+      );
     });
   }
 
@@ -369,7 +425,7 @@ class _SignupScreenState extends State<SignupScreen> {
           }
 
           _processErrorMessage(state.message);
-        } else if (state is AuthAuthenticated) {
+        } else if (state is AuthSignupSuccessful) {
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
           }
@@ -726,6 +782,14 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           flagsButtonPadding: const EdgeInsets.only(left: 8),
                           showDropdownIcon: true,
+                          validator: (phone) {
+                            if (phone != null && phone.number.isNotEmpty) {
+                              if (!RegExp(r'^[0-9]+$').hasMatch(phone.number)) {
+                                return 'Phone number should contain only digits.';
+                              }
+                            }
+                            return null;
+                          },
                           pickerDialogStyle: PickerDialogStyle(
                             searchFieldInputDecoration: const InputDecoration(
                               hintText: 'Search country',

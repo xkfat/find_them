@@ -9,11 +9,52 @@ import 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final AuthService _authService;
   final FirebaseAuthService _firebaseAuthService;
-
   static const String _welcomeShownKey = 'welcome_shown';
+  bool _testMode = false; // Add this flag
+
+  // Add a method to toggle test mode
+  void setTestMode(bool enabled) {
+    _testMode = enabled;
+    if (enabled) {
+      // Force unauthenticated state when test mode is enabled
+      emit(AuthUnauthenticated());
+    }
+  }
 
   AuthCubit(this._authService, this._firebaseAuthService)
     : super(AuthInitial()) {}
+
+
+ Future<void> checkAuth() async {
+    if (_testMode) {
+      emit(AuthUnauthenticated());
+      return;
+    }
+    emit(AuthLoading());
+    try {
+      print("Checking authentication status");
+      final isAuthenticated = await _authService.isAuthenticated();
+
+      if (isAuthenticated) {
+        print("User is authenticated, getting auth data");
+        final authData = await _authService.getAuthData();
+
+        if (authData != null) {
+          print("Authentication data loaded, user: ${authData.user.username}");
+          emit(AuthAuthenticated(authData));
+        } else {
+          print("No authentication data found");
+          emit(AuthUnauthenticated());
+        }
+      } else {
+        print("User is not authenticated");
+        emit(AuthUnauthenticated());
+      }
+    } catch (e) {
+      print("Authentication check error: $e");
+      emit(AuthUnauthenticated());
+    }
+  }
 
   /*  Future<void> checkAuth() async {
     emit(AuthLoading());
@@ -69,7 +110,7 @@ class AuthCubit extends Cubit<AuthState> {
       print("Signing up new user: ${signupData.username}");
       final authData = await _authService.signup(signupData);
       print("Signup successful");
-      emit(AuthAuthenticated(authData));
+      emit(AuthSignupSuccessful(authData, signupData.phoneNumber));
     } catch (e) {
       print("Signup error: $e");
       emit(AuthError(e.toString()));

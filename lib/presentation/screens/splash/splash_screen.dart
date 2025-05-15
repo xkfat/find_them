@@ -1,5 +1,7 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:find_them/logic/cubits/auth/auth_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/routes/route_constants.dart';
 import 'dart:async';
 
@@ -15,6 +17,15 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     startTimer();
     super.initState();
+    _checkAuthentication();
+  }
+
+  Future<void> _checkAuthentication() async {
+    context.read<AuthCubit>().setTestMode(true);
+
+    await context.read<AuthCubit>().checkAuth();
+
+    route();
   }
 
   Future<void> startTimer() async {
@@ -36,9 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset('assets/images/app__logo.png'),
-            ],
+            children: [Image.asset('assets/images/app__logo.png')],
           ),
         ),
       ),

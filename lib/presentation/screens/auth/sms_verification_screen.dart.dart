@@ -111,12 +111,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
     setState(() {
       _showError = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Code resent'),
-        duration: Duration(seconds: 1),
-      ),
-    );
   }
 
   @override
@@ -127,196 +121,223 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.black, size: 40),
-          onPressed: () => NavigationHelper.goBack(),
-        ),
-      ),
+      appBar: null,
 
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
-            Text(
-              'Enter code',
-              style: GoogleFonts.inter(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
-              ),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              'Please enter the 4 digit code sent to your phone number',
-              style: GoogleFonts.roboto(fontSize: 18, color: AppColors.black),
-            ),
-            const SizedBox(height: 40),
-
-            // Code input
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                4,
-                (index) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: SizedBox(
-                    width: 71,
-                    height: 71,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color:
-                              _showError
-                                  ? Colors.red
-                                  : (_focusNodes[index].hasFocus
-                                      ? AppColors.teal
-                                      : AppColors.grey),
-                          width: 1.5,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
-                        child: TextFormField(
-                          controller: _controllers[index],
-                          focusNode: _focusNodes[index],
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color:
-                                _showError
-                                    ? AppColors.missingRed
-                                    : AppColors.darkGrey,
-                          ),
-                          maxLength: 1,
-                          decoration: const InputDecoration(
-                            counterText: '',
-                            border: InputBorder.none,
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          onChanged: (value) {
-                            if (value.isNotEmpty && index < 3) {
-                              FocusScope.of(
-                                context,
-                              ).requestFocus(_focusNodes[index + 1]);
-                            }
-
-                            if (_showError) {
-                              setState(() {
-                                _showError = false;
-                              });
-                            }
-
-                            if (index == 3 && value.isNotEmpty) {
-                              if (_controllers.every(
-                                (c) => c.text.isNotEmpty,
-                              )) {
-                                Future.delayed(
-                                  const Duration(milliseconds: 100),
-                                  () {
-                                    _verifyCode();
-                                  },
-                                );
-                              }
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 16.0),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.black,
+                  size: 28,
                 ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => NavigationHelper.goBack(),
               ),
             ),
-
-            SizedBox(height: 26),
-
-            // Show error message or expiry timer based on error state
-            Center(
-              child:
-                  _showError
-                      ? Text(
-                        'Wrong code, please try again',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: Colors.red,
-                        ),
-                      )
-                      : const SizedBox.shrink(),
-            ),
-
-            const SizedBox(height: 50),
-
-            Center(
-              child: SizedBox(
-                width: 362,
-                height: 72,
-                child: ElevatedButton(
-                  onPressed: _verifyCode,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.teal,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  child: Text(
-                    'Verify Code',
-                    style: GoogleFonts.inter(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Timer display - moved beneath the Verify button
-            Center(
-              child: Text(
-                'Code expires in $_formattedTime',
-                style: GoogleFonts.inter(fontSize: 16, color: AppColors.grey),
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Resend option
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 16),
                   Text(
-                    "I didn't receive a code",
+                    'Enter code',
                     style: GoogleFonts.inter(
-                      fontSize: 16,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
                       color: AppColors.black,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  TextButton(
-                    onPressed: _canResend ? _resendCode : null,
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  const SizedBox(height: 18),
+                  Text(
+                    'Please enter the 4 digit code sent to your phone number',
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      color: AppColors.black,
                     ),
-                    child: Text(
-                      "Resend",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: _canResend ? AppColors.teal : AppColors.grey,
+                  ),
+                  const SizedBox(height: 40),
+
+                  // Code input
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      4,
+                      (index) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: SizedBox(
+                          width: 71,
+                          height: 71,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color:
+                                    _showError
+                                        ? Colors.red
+                                        : (_focusNodes[index].hasFocus
+                                            ? AppColors.teal
+                                            : AppColors.grey),
+                                width: 1.7,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Center(
+                              child: TextFormField(
+                                controller: _controllers[index],
+                                focusNode: _focusNodes[index],
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      _showError
+                                          ? AppColors.missingRed
+                                          : AppColors.darkGrey,
+                                ),
+                                maxLength: 1,
+                                decoration: const InputDecoration(
+                                  counterText: '',
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  focusedErrorBorder: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                  isDense: true,
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (value) {
+                                  if (value.isNotEmpty && index < 3) {
+                                    FocusScope.of(
+                                      context,
+                                    ).requestFocus(_focusNodes[index + 1]);
+                                  }
+
+                                  if (_showError) {
+                                    setState(() {
+                                      _showError = false;
+                                    });
+                                  }
+
+                                  if (index == 3 && value.isNotEmpty) {
+                                    if (_controllers.every(
+                                      (c) => c.text.isNotEmpty,
+                                    )) {
+                                      Future.delayed(
+                                        const Duration(milliseconds: 100),
+                                        () {
+                                          _verifyCode();
+                                        },
+                                      );
+                                    }
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
+                    ),
+                  ),
+
+                  SizedBox(height: 26),
+
+                  // Show error message or expiry timer based on error state
+                  Center(
+                    child:
+                        _showError
+                            ? Text(
+                              'Wrong code, please try again',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                color: Colors.red,
+                              ),
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+
+                  const SizedBox(height: 50),
+
+                  Center(
+                    child: SizedBox(
+                      width: 362,
+                      height: 72,
+                      child: ElevatedButton(
+                        onPressed: _verifyCode,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.teal,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                        child: Text(
+                          'Verify Code',
+                          style: GoogleFonts.inter(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Timer display - moved beneath the Verify button
+                  Center(
+                    child: Text(
+                      'Code expires in $_formattedTime',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Resend option
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "I didn't receive a code",
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            color: AppColors.black,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        TextButton(
+                          onPressed: _canResend ? _resendCode : null,
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            "Resend",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  _canResend ? AppColors.teal : AppColors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -41,3 +41,13 @@ class AuthSocialAuthStarted extends AuthState {
   @override
   List<Object?> get props => [provider];
 }
+
+class AuthSignupSuccessful extends AuthState {
+  final AuthData authData;
+  final String phoneNumber;
+
+  const AuthSignupSuccessful(this.authData, this.phoneNumber);
+
+  @override
+  List<Object?> get props => [authData, phoneNumber];
+}

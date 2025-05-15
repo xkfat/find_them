@@ -61,7 +61,7 @@ class SignUpOptions extends StatelessWidget {
       }
     }
 
-    return BlocListener<AuthCubit, AuthState>(
+    return /*BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         print("Current AuthState: ${state.runtimeType}");
 
@@ -75,259 +75,263 @@ class SignUpOptions extends StatelessWidget {
 
         if (state is AuthAuthenticated) {
           print("AuthAuthenticated state received - navigating to home");
-          // Navigate directly to home screen and clear stack
           NavigationHelper.navigateAndClearStack(RouteConstants.home);
+        } else if (state is AuthSignupSuccessful) {
+          print(
+            "AuthSignupSuccessful state received - navigating to verification",
+          );
+          final phoneNumber = state.phoneNumber;
+          NavigationHelper.goToVerifyPhone(phoneNumber);
         } else if (state is AuthError) {
           print("AuthError state received: ${state.message}");
           // Show error dialog
           _showErrorDialog(context, state.message);
         }
       },
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.85,
-        minChildSize: 0.7,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.lightMint,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
-            ),
-            child: SingleChildScrollView(
-              controller: scrollController,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(34, 16, 34, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Spacer(),
-                        Container(
-                          width: 50,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: AppColors.darkGreen,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
+      
+      child:
+      */ DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.7,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.lightMint,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
+          ),
+          child: SingleChildScrollView(
+            controller: scrollController,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(34, 16, 34, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Spacer(),
+                      Container(
+                        width: 50,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: AppColors.darkGreen,
+                          borderRadius: BorderRadius.circular(4),
                         ),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              icon: Icon(
-                                PhosphorIcons.xCircle(),
-                                color: AppColors.darkGreen,
-                              ),
-                              onPressed: () => Navigator.pop(context),
-                              padding: EdgeInsets.zero,
+                      ),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: IconButton(
+                            icon: Icon(
+                              PhosphorIcons.xCircle(),
+                              color: AppColors.darkGreen,
                             ),
+                            onPressed: () => Navigator.pop(context),
+                            padding: EdgeInsets.zero,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                  Text(
-                    'Login or sign up',
+                Text(
+                  'Login or sign up',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                    color: AppColors.black,
+                  ),
+                ),
+                const SizedBox(height: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 75),
+                  child: Text(
+                    'Please select your preferred method\nto continue setting up your account',
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25,
-                      color: AppColors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.normal,
+                      color: AppColors.darkGrey,
                     ),
                   ),
-                  const SizedBox(height: 13),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 75),
-                    child: Text(
-                      'Please select your preferred method\nto continue setting up your account',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.darkGrey,
+                ),
+
+                const SizedBox(height: 24),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 31),
+                  child: SizedBox(
+                    width: 350,
+                    height: 54,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(RouteConstants.signup);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.darkGreen,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Text(
+                        'Sign up',
+                        style: GoogleFonts.inter(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                        ),
                       ),
                     ),
                   ),
+                ),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 31),
-                    child: SizedBox(
-                      width: 350,
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(
-                            context,
-                          ).pushNamed(RouteConstants.signup);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.darkGreen,
-                          padding: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 31),
+                  child: SizedBox(
+                    width: 350,
+                    height: 54,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(RouteConstants.login);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.teal,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
                         ),
+                      ),
+                      child: Text(
+                        'Log in',
+                        style: GoogleFonts.inter(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Divider(color: AppColors.white, thickness: 1),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'Sign up',
+                          'Or',
                           style: GoogleFonts.inter(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.normal,
+                            color: AppColors.black,
                           ),
                         ),
                       ),
-                    ),
+                      const Expanded(
+                        child: Divider(color: AppColors.white, thickness: 1),
+                      ),
+                    ],
                   ),
+                ),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 31),
-                    child: SizedBox(
-                      width: 350,
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(RouteConstants.login);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.teal,
-                          padding: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 31),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: 350,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: handleFacebookSignIn,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1877F2),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          'Log in',
-                          style: GoogleFonts.inter(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.white,
+
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 36),
+                              Image.asset(
+                                'assets/icons/facebook.png',
+                                height: 24,
+                                width: 24,
+                              ),
+                              const SizedBox(width: 15),
+                              Text(
+                                'Continue with Facebook',
+                                style: GoogleFonts.inter(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.white,
+                                ),
+                              ),
+
+                              const Spacer(),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                  ),
 
-                  const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        const Expanded(
-                          child: Divider(color: AppColors.white, thickness: 1),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'Or',
-                            style: GoogleFonts.inter(
-                              fontSize: 20,
-                              fontWeight: FontWeight.normal,
-                              color: AppColors.black,
+                      SizedBox(
+                        width: 350,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: handleGoogleSignIn,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                        ),
-                        const Expanded(
-                          child: Divider(color: AppColors.white, thickness: 1),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 31),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          width: 350,
-                          height: 54,
-                          child: ElevatedButton(
-                            onPressed: handleFacebookSignIn,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1877F2),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 36),
+                              Image.asset('assets/icons/google.png'),
+                              const SizedBox(width: 15),
+                              Text(
+                                'Continue with Google',
+                                style: GoogleFonts.inter(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.black,
+                                ),
                               ),
-                            ),
-
-                            child: Row(
-                              children: [
-                                const SizedBox(width: 36),
-                                Image.asset(
-                                  'assets/icons/facebook.png',
-                                  height: 24,
-                                  width: 24,
-                                ),
-                                const SizedBox(width: 15),
-                                Text(
-                                  'Continue with Facebook',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.white,
-                                  ),
-                                ),
-
-                                const Spacer(),
-                              ],
-                            ),
+                              const Spacer(),
+                            ],
                           ),
                         ),
-
-                        const SizedBox(height: 24),
-
-                        SizedBox(
-                          width: 350,
-                          height: 54,
-                          child: ElevatedButton(
-                            onPressed: handleGoogleSignIn,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                const SizedBox(width: 36),
-                                Image.asset('assets/icons/google.png'),
-                                const SizedBox(width: 15),
-                                Text(
-                                  'Continue with Google',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.black,
-                                  ),
-                                ),
-                                const Spacer(),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
 
-                  const SizedBox(height: 24),
-                ],
-              ),
+                const SizedBox(height: 24),
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
