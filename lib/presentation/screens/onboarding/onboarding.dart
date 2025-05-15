@@ -28,7 +28,7 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => const SignUpOptions(),
+        builder: (context) => const SignUpOptions(fromSkip: true),
       );
     } catch (e) {
       print('Error showing signup options: $e');

@@ -354,7 +354,6 @@ class _SignupScreenState extends State<SignupScreen> {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthLoading) {
-          // Show loading dialog
           showDialog(
             context: context,
             barrierDismissible: false,
@@ -365,16 +364,12 @@ class _SignupScreenState extends State<SignupScreen> {
             },
           );
         } else if (state is AuthError) {
-          // Close loading dialog if open
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
           }
 
-          // Process the error message to set specific field errors
           _processErrorMessage(state.message);
-        } else if (state is AuthPhoneVerificationRequired ||
-            state is AuthSmsCodeSent) {
-          // Close loading dialog if open
+        } else if (state is AuthAuthenticated) {
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
           }

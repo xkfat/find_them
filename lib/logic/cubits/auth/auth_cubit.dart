@@ -2,20 +2,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:find_them/core/constants/strings/string_constants.dart';
 import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/services/auth_service.dart';
+import 'package:find_them/data/services/firebase_auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthService _authService;
+  final FirebaseAuthService _firebaseAuthService;
+
   static const String _welcomeShownKey = 'welcome_shown';
 
-  AuthCubit(this._authService) : super(AuthInitial()) {
-    checkAuth();
-  }
+  AuthCubit(this._authService, this._firebaseAuthService)
+    : super(AuthInitial()) {}
 
-  /// Check if the user is authenticated
-  Future<void> checkAuth() async {
+  /*  Future<void> checkAuth() async {
     emit(AuthLoading());
     try {
       print("Checking authentication status");
@@ -42,6 +42,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+*/
   /// Login with username and password
   Future<void> login(String username, String password) async {
     emit(AuthLoading());
@@ -61,91 +62,100 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Register a new user (simplified for testing)
+  /// Register a new user
   Future<void> signup(SignUpData signupData) async {
     emit(AuthLoading());
     try {
       print("Signing up new user: ${signupData.username}");
       final authData = await _authService.signup(signupData);
       print("Signup successful");
-
-      emit(
-        AuthPhoneVerificationRequired(
-          phoneNumber: signupData.phoneNumber,
-          user: authData.user,
-        ),
-      );
-      await sendVerificationSms(signupData.phoneNumber);
+      emit(AuthAuthenticated(authData));
     } catch (e) {
       print("Signup error: $e");
       emit(AuthError(e.toString()));
     }
   }
 
-  Future<void> sendVerificationSms(String phoneNumber) async {
+  /// Sign in with Google
+  Future<void> signInWithGoogle() async {
+    emit(AuthSocialAuthStarted('Google'));
     emit(AuthLoading());
     try {
-      print("Skipping real SMS verification for testing");
-      // Simply emit the code sent state with a fake verification ID
-      await Future.delayed(
-        const Duration(milliseconds: 300),
-      ); // Just for UI feedback
-      emit(
-        AuthSmsCodeSent(
-          verificationId: 'test-verification-id',
-          phoneNumber: phoneNumber,
-        ),
+      print("Starting Google sign-in flow");
+
+      // 1. Use FirebaseAuthService to get Firebase credentials
+      final userCredential = await _firebaseAuthService.signInWithGoogle();
+
+      if (userCredential == null) {
+        print("Google sign-in cancelled by user");
+        emit(AuthUnauthenticated());
+        return;
+      }
+
+      print("Google sign-in successful, authenticating with backend");
+
+      // 2. Use AuthService to exchange Firebase token for your backend token
+      final authData = await _authService.authenticateWithFirebase(
+        userCredential,
       );
-    } catch (e) {
-      print("SMS verification error: $e");
-      emit(AuthError("SMS verification simulation failed"));
-    }
-  }
 
-  /// Verify SMS code entered by user (simplified version)
-  Future<void> verifySmsCode(String verificationId, String smsCode) async {
-    emit(AuthLoading());
-    try {
-      print("Simulating successful SMS verification");
-      // Just for UI feedback, add a small delay
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Get the current user from preferences if available
-      final authData = await _authService.getAuthData();
       if (authData != null) {
+        print(
+          "Backend authentication successful for user: ${authData.user.username}",
+        );
         emit(AuthAuthenticated(authData));
       } else {
-        // If no user is found, just redirect to home
-        emit(AuthUnauthenticated());
+        print("Backend authentication failed");
+        emit(AuthError("Failed to authenticate with the server"));
       }
     } catch (e) {
-      print("SMS verification error: $e");
-      emit(AuthError("SMS verification failed"));
+      print("Google sign-in error: $e");
+      emit(AuthError(e.toString()));
     }
   }
 
-  /// Sign in with Facebook
   Future<void> signInWithFacebook() async {
+    emit(AuthSocialAuthStarted('Facebook'));
     emit(AuthLoading());
     try {
-      print("Starting Facebook sign-in");
-      final authData = await _authService.signInWithFacebook();
+      print("Starting Facebook sign-in flow");
 
-      if (authData != null) {
-        print("Facebook sign-in successful");
-        emit(AuthAuthenticated(authData));
-      } else {
-        // User cancelled the Facebook Sign-in flow
-        print("Facebook sign-in cancelled by user");
-        emit(AuthUnauthenticated());
+      // 1. Use FirebaseAuthService to get Firebase credentials
+      final userCredential = await _firebaseAuthService.signInWithFacebook();
+
+      if (userCredential == null) {
+        print("Facebook sign-in cancelled or failed");
+        emit(AuthError("Facebook sign-in was cancelled or failed"));
+        return;
+      }
+
+      print("Facebook sign-in successful, authenticating with backend");
+
+      try {
+        // 2. Use AuthService to exchange Firebase token for your backend token
+        final authData = await _authService.authenticateWithFirebase(
+          userCredential,
+        );
+
+        if (authData != null) {
+          print(
+            "Backend authentication successful for user: ${authData.user.username}",
+          );
+          emit(AuthAuthenticated(authData));
+        } else {
+          print("Backend authentication failed");
+          emit(AuthError("Failed to authenticate with the server"));
+        }
+      } catch (e) {
+        print("Error authenticating with backend: $e");
+        emit(AuthError("Error connecting to server: ${e.toString()}"));
       }
     } catch (e) {
       print("Facebook sign-in error: $e");
-      emit(AuthError("Facebook sign-in failed: ${e.toString()}"));
+      emit(AuthError("Facebook sign-in error: ${e.toString()}"));
     }
   }
 
-  /// Change user password
   Future<void> changePassword(
     String oldPassword,
     String newPassword,
@@ -190,7 +200,17 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       print("Logging out user");
+
+      // Sign out from Firebase first
+      try {
+        await _firebaseAuthService.signOut();
+      } catch (e) {
+        print("Firebase signout error (non-critical): $e");
+      }
+
+      // Then log out from the backend
       await _authService.logout();
+
       print("Logout successful");
       emit(AuthUnauthenticated());
     } catch (e) {

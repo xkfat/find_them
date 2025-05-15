@@ -7,6 +7,7 @@ import 'package:find_them/core/routes/route_constants.dart';
 import 'package:find_them/core/routes/navigation_helper.dart';
 import 'package:find_them/data/services/api_service.dart';
 import 'package:find_them/data/services/auth_service.dart';
+import 'package:find_them/data/services/firebase_auth_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter/services.dart';
@@ -41,13 +42,16 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late final ApiService _apiService;
   late final AuthService _authService;
+  late final FirebaseAuthService _firebaseAuthService;
 
   @override
   void initState() {
     super.initState();
 
+    // Initialize services
     _apiService = ApiService();
     _authService = AuthService(_apiService);
+    _firebaseAuthService = FirebaseAuthService();
 
     FlutterNativeSplash.remove();
   }
@@ -57,7 +61,9 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
-        BlocProvider<AuthCubit>(create: (context) => AuthCubit(_authService)),
+        BlocProvider<AuthCubit>(
+          create: (context) => AuthCubit(_authService, _firebaseAuthService),
+        ),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, state) {
