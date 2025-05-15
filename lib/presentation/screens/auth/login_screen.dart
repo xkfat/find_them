@@ -22,6 +22,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _errorMessage;
+  bool _usernameError = false;
+  bool _passwordError = false;
 
   @override
   void dispose() {
@@ -132,13 +134,27 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             _isLoading = true;
             _errorMessage = null;
+            _usernameError = false;
+            _passwordError = false;
           });
         } else if (state is AuthError) {
           setState(() {
             _isLoading = false;
             _errorMessage = state.message;
+
+            // Set specific error flags based on the error message
+            if (state.message.toLowerCase().contains('username')) {
+              _usernameError = true;
+              _passwordError = false;
+            } else if (state.message.toLowerCase().contains('password')) {
+              _passwordError = true;
+              _usernameError = false;
+            } else {
+              // For generic errors, highlight both fields
+              _usernameError = true;
+              _passwordError = true;
+            }
           });
-          _showErrorDialog(state.message);
         } else if (state is AuthAuthenticated) {
           setState(() {
             _isLoading = false;
@@ -174,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Main Login Container
                 Container(
                   width: 370,
-                  height: 562,
+                  height: 600,
                   decoration: BoxDecoration(
                     color: AppColors.lightMint,
                     borderRadius: BorderRadius.circular(50),
@@ -214,31 +230,83 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(50),
+                              border:
+                                  _usernameError
+                                      ? Border.all(color: Colors.red, width: 1)
+                                      : null,
                             ),
-                            child: Center(
-                              child: TextFormField(
-                                controller: _usernameController,
-                                decoration: InputDecoration(
-                                  hintText: 'Username',
-                                  prefixIcon: Icon(
-                                    Icons.person_outline,
-                                    color: AppColors.darkGreen,
-                                  ),
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                inputDecorationTheme: InputDecorationTheme(
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  focusedErrorBorder: InputBorder.none,
                                   border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                  ),
+                                  // Remove any outline effects
+                                  outlineBorder: BorderSide.none,
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your username';
-                                  }
-                                  return null;
-                                },
+                              ),
+                              child: Center(
+                                child: TextFormField(
+                                  controller: _usernameController,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  decoration: InputDecoration(
+                                    hintText: 'Username',
+                                    isDense: true,
+                                    prefixIcon: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 8.0,
+                                        right: 8.0,
+                                      ),
+                                      child: Icon(
+                                        Icons.person_outline,
+                                        color: AppColors.darkGreen,
+                                        size: 24,
+                                      ),
+                                    ),
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    focusedErrorBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0,
+                                      horizontal: 20,
+                                    ),
+                                  ),
+                                  cursorColor: AppColors.darkGreen,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return null; // We'll handle errors with the _errorMessage
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                             ),
                           ),
-                          SizedBox(height: 40),
+
+                          // Username error message
+                          if (_usernameError)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4, left: 16),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Wrong username',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                          SizedBox(height: _usernameError ? 20 : 25),
+                          SizedBox(height: 10),
 
                           // Password field
                           Container(
@@ -247,41 +315,93 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(50),
+                              border:
+                                  _passwordError
+                                      ? Border.all(color: Colors.red, width: 1)
+                                      : null,
                             ),
-                            child: Center(
-                              child: TextFormField(
-                                controller: _passwordController,
-                                obscureText: _obscurePassword,
-                                decoration: InputDecoration(
-                                  hintText: 'Password',
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: AppColors.darkGreen,
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                      color: AppColors.darkGreen,
-                                    ),
-                                    onPressed: _togglePasswordVisibility,
-                                  ),
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                inputDecorationTheme: InputDecorationTheme(
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  focusedErrorBorder: InputBorder.none,
                                   border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                  ),
+                                  // Remove any outline effects
+                                  outlineBorder: BorderSide.none,
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your password';
-                                  }
-                                  return null;
-                                },
+                              ),
+                              child: Center(
+                                child: TextFormField(
+                                  controller: _passwordController,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  obscureText: _obscurePassword,
+                                  decoration: InputDecoration(
+                                    hintText: 'Password',
+                                    isDense: true,
+                                    prefixIcon: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 8.0,
+                                        right: 8.0,
+                                      ),
+                                      child: Icon(
+                                        Icons.lock_outline,
+                                        color: AppColors.darkGreen,
+                                        size: 24,
+                                      ),
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                        color: AppColors.darkGreen,
+                                      ),
+                                      onPressed: _togglePasswordVisibility,
+                                    ),
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    focusedErrorBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0,
+                                      horizontal: 20,
+                                    ),
+                                  ),
+                                  cursorColor: AppColors.darkGreen,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return null; // We'll handle errors with the _errorMessage
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                             ),
                           ),
-                          SizedBox(height: 40),
+
+                          // Password error message
+                          if (_passwordError)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4, left: 16),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Wrong password',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                          SizedBox(height: _passwordError ? 20 : 40),
+                          // Login button
 
                           // Login button
                           SizedBox(

@@ -91,8 +91,8 @@ class SignUpOptions extends StatelessWidget {
       }
     }
 
-    /*    void handleTwitterSignIn() async {
-      Navigator.pop(context); 
+    void handleTwitterSignIn() async {
+      Navigator.pop(context);
 
       try {
         final userCredential = await firebaseAuthService.signInWithTwitter();
@@ -122,7 +122,7 @@ class SignUpOptions extends StatelessWidget {
         );
       }
     }
-*/
+
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
       minChildSize: 0.7,
@@ -362,7 +362,7 @@ class SignUpOptions extends StatelessWidget {
                         width: 350,
                         height: 54,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: handleTwitterSignIn,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
                             padding: EdgeInsets.zero,

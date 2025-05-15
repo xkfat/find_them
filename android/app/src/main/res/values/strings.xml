@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FindThem</string>
+    <string name="facebook_app_id">1012882270951960</string>
+    <string name="fb_login_protocol_scheme">fb1012882270951960</string>
+    <string name="facebook_client_token">63e4568a22e32ebb5f83175a38ff11ee</string>
+</resources>
