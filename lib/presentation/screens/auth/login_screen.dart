@@ -28,7 +28,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    // Prefetch resources that might be needed
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     precacheImage(AssetImage('assets/images/login.png'), context);
   }
 
