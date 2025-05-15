@@ -26,6 +26,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _passwordError = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Prefetch resources that might be needed
+    precacheImage(AssetImage('assets/images/login.png'), context);
+  }
+
+  @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
