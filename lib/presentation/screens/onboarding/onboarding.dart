@@ -23,12 +23,25 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
   }
 
   void _showSignUpOptions() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const SignUpOptions(),
-    );
+    try {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => const SignUpOptions(),
+      );
+    } catch (e) {
+      print('Error showing signup options: $e');
+      // Show a fallback solution like a simple dialog
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: Text('Sign Up Options'),
+              content: Text('Error showing options: $e'),
+            ),
+      );
+    }
   }
 
   void _nextPage() {
