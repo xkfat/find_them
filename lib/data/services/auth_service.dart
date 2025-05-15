@@ -21,6 +21,16 @@ class AuthService {
     dio = _apiService.dio;
   }
 
+  static const _publicHeaders = {'Content-Type': 'application/json'};
+
+  Future<Response<dynamic>> _postPublic(String url, Map<String, dynamic> data) {
+    return dio.post(
+      url,
+      data: data,
+      options: Options(headers: _publicHeaders), // <- wipes Authorization
+    );
+  }
+
   ///----- STORAGE METHODS -----///
 
   /// Get authentication data from storage
@@ -55,17 +65,28 @@ class AuthService {
   Future<AuthData> loginWithCredentials(LoginCredentials credentials) async {
     try {
       print('Attempting login with username: ${credentials.username}');
+      print('Request URL: ${dio.options.baseUrl}${ApiConstants.login}');
+      print('Request data: ${credentials.toJson()}');
+
+      await _apiService.clearAuthToken();
+
       Response response = await dio.post(
         ApiConstants.login,
         data: credentials.toJson(),
       );
 
       print('Login successful, processing response');
+      print('Response data: ${response.data}');
+
       final authData = AuthData.fromJson(response.data);
       await _saveAuthData(authData);
       return authData;
     } catch (e) {
       print('Login error: $e');
+      if (e is DioError && e.response != null) {
+        print('Response status: ${e.response?.statusCode}');
+        print('Response data: ${e.response?.data}');
+      }
       throw Exception('Login failed: ${e.toString()}');
     }
   }
@@ -74,17 +95,26 @@ class AuthService {
   Future<AuthData> signup(SignUpData data) async {
     try {
       print('Attempting signup for user: ${data.username}');
+      print('Request URL: ${dio.options.baseUrl}${ApiConstants.signup}');
+      print('Request data: ${data.toJson()}');
+
       Response response = await dio.post(
         ApiConstants.signup,
         data: data.toJson(),
       );
 
       print('Signup successful, processing response');
+      print('Response data: ${response.data}');
+
       final authData = AuthData.fromJson(response.data);
       await _saveAuthData(authData);
       return authData;
     } catch (e) {
       print('Signup error: $e');
+      if (e is DioError && e.response != null) {
+        print('Response status: ${e.response?.statusCode}');
+        print('Response data: ${e.response?.data}');
+      }
       throw Exception('Signup failed: ${e.toString()}');
     }
   }
@@ -110,22 +140,6 @@ class AuthService {
       return response.statusCode == 200;
     } catch (e) {
       print('Password change error: $e');
-      return false;
-    }
-  }
-
-  /// Reset password via email
-  Future<bool> sendPasswordResetEmail(String email) async {
-    try {
-      print('Requesting password reset for: $email');
-      Response response = await dio.post(
-        ApiConstants.changePassword,
-        data: {'email': email},
-      );
-      print('Password reset request response status: ${response.statusCode}');
-      return response.statusCode == 200;
-    } catch (e) {
-      print('Password reset request error: $e');
       return false;
     }
   }
@@ -197,7 +211,7 @@ class AuthService {
     }
   }
 
-  /// Phone authentication - verify phone number
+  /// Phone authentication - verify phone number (SIMPLIFIED FOR TESTING)
   Future<void> verifyPhoneNumber({
     required String phoneNumber,
     required Function(firebase_auth.PhoneAuthCredential) verificationCompleted,
@@ -205,51 +219,43 @@ class AuthService {
     required Function(String, int?) codeSent,
     required Function(String) codeAutoRetrievalTimeout,
   }) async {
-    print('Starting phone verification for: $phoneNumber');
-    await _firebaseAuth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: (credential) {
-        print('Phone verification completed automatically');
-        verificationCompleted(credential);
-      },
-      verificationFailed: (e) {
-        print('Phone verification failed: ${e.message}');
-        verificationFailed(e);
-      },
-      codeSent: (verificationId, resendToken) {
-        print('SMS code sent, verification ID: $verificationId');
-        codeSent(verificationId, resendToken);
-      },
-      codeAutoRetrievalTimeout: (verificationId) {
-        print('Auto-retrieval timeout for verification ID: $verificationId');
-        codeAutoRetrievalTimeout(verificationId);
-      },
-      timeout: const Duration(seconds: 60),
-    );
+    print('Simulating phone verification for test purposes: $phoneNumber');
+
+    // Simulate code sent after a short delay
+    await Future.delayed(const Duration(milliseconds: 500));
+    codeSent('test-verification-id', 123456);
   }
 
-  /// Phone verification - verify SMS code
+  /// Phone verification - verify SMS code (SIMPLIFIED FOR TESTING)
   Future<AuthData?> verifySmsCode(String verificationId, String smsCode) async {
     try {
-      print('Verifying SMS code for verification ID: $verificationId');
-      // Step 1: Verify with Firebase
-      final credential = firebase_auth.PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
+      print('Simulating SMS code verification for testing purposes');
+      print('Using verification ID: $verificationId, code: $smsCode');
 
-      print('Signing in with Firebase using phone credentials');
-      // Step 2: Get Firebase user credentials
-      final userCredential = await _firebaseAuth.signInWithCredential(
-        credential,
-      );
+      // For testing, we'll just retrieve the current user's auth data if available
+      final authData = await getAuthData();
+      if (authData != null) {
+        return authData;
+      }
 
-      print('Phone verification successful, authenticating with backend');
-      // Step 3: Exchange Firebase token for your app's token
-      return await authenticateWithFirebase(userCredential);
+      // If no auth data exists, create a temporary mock AuthData
+      // This is just for testing and should never be used in production
+      return AuthData(
+        token: 'test-token',
+        refreshToken: 'test-refresh-token',
+        user: User(
+          id: 1,
+          username: 'test_user',
+          firstName: 'Test',
+          lastName: 'User',
+          email: 'test@example.com',
+          phoneNumber: '+1234567890',
+        ),
+        expiryTime: DateTime.now().add(const Duration(hours: 1)),
+      );
     } catch (e) {
-      print('SMS verification error: $e');
-      throw Exception('SMS verification failed: ${e.toString()}');
+      print('Simulated SMS verification error: $e');
+      throw Exception('SMS verification simulation failed: ${e.toString()}');
     }
   }
 

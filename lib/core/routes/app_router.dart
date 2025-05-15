@@ -5,6 +5,7 @@ import '../../presentation/screens/onboarding/onboarding.dart';
 import '../../presentation/screens/onboarding/onboarding2.dart';
 import '../../presentation/screens/onboarding/onboarding3.dart';
 import '../../presentation/screens/auth/login_screen.dart';
+import '../../presentation/screens/home/home_screen.dart';
 import '../../presentation/screens/auth/signup_screen.dart';
 import '../../presentation/screens/auth/sms_verification_screen.dart.dart';
 import '../../presentation/screens/auth/reset_pass_screen.dart';
@@ -45,12 +46,10 @@ class AppRouter {
                   const ResetPasswordScreen()
         );
 */
-      /*
+
       case RouteConstants.home:
-        return MaterialPageRoute(
-          builder: (_) => const PlaceholderScreen(screenName: 'HomeScreen()'),
-        );
-*/
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+
       /*
       case RouteConstants.map:
         return MaterialPageRoute(builder: (_) => const MapScreen());

@@ -13,6 +13,8 @@ class ApiService {
       headers: {'Content-Type': 'application/json'},
     );
     dio = Dio(options);
+        dio.options.headers.remove('Authorization');
+
   }
 
   Future<void> setAuthToken(String token) async {

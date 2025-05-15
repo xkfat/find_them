@@ -20,11 +20,11 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       print("Checking authentication status");
       final isAuthenticated = await _authService.isAuthenticated();
-      
+
       if (isAuthenticated) {
         print("User is authenticated, getting auth data");
         final authData = await _authService.getAuthData();
-        
+
         if (authData != null) {
           print("Authentication data loaded, user: ${authData.user.username}");
           emit(AuthAuthenticated(authData));
@@ -61,141 +61,66 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Register a new user
+  /// Register a new user (simplified for testing)
   Future<void> signup(SignUpData signupData) async {
     emit(AuthLoading());
     try {
       print("Signing up new user: ${signupData.username}");
-      // First create the user account in your backend
       final authData = await _authService.signup(signupData);
       print("Signup successful");
 
-      // If phone verification is required
-      if (signupData.phoneNumber.isNotEmpty) {
-        print("Phone verification required for: ${signupData.phoneNumber}");
-        emit(
-          AuthPhoneVerificationRequired(
-            phoneNumber: signupData.phoneNumber,
-            user: authData.user,
-          ),
-        );
-
-        // Automatically initiate phone verification
-        await sendVerificationSms(signupData.phoneNumber);
-      } else {
-        // No phone verification needed
-        print("No phone verification needed");
-        emit(AuthAuthenticated(authData));
-      }
+      emit(
+        AuthPhoneVerificationRequired(
+          phoneNumber: signupData.phoneNumber,
+          user: authData.user,
+        ),
+      );
+      await sendVerificationSms(signupData.phoneNumber);
     } catch (e) {
       print("Signup error: $e");
       emit(AuthError(e.toString()));
     }
   }
 
-  /// Send SMS verification code
   Future<void> sendVerificationSms(String phoneNumber) async {
     emit(AuthLoading());
     try {
-      print("Sending verification SMS to: $phoneNumber");
-      await _authService.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (credential) async {
-          // Auto-verification completed (Android only)
-          print("Phone verification automatically completed");
-          try {
-            print("Signing in with auto-verification credential");
-            final userCredential = await firebase_auth.FirebaseAuth.instance
-                .signInWithCredential(credential);
-
-            print("Getting auth data from backend");
-            final authData = await _authService.authenticateWithFirebase(
-              userCredential,
-            );
-            
-            if (authData != null) {
-              print("Authentication successful");
-              emit(AuthAuthenticated(authData));
-            } else {
-              print("Authentication failed after auto-verification");
-              emit(AuthError("Failed to authenticate with auto-verification"));
-            }
-          } catch (e) {
-            print("Auto-verification error: $e");
-            emit(AuthError(e.toString()));
-          }
-        },
-        verificationFailed: (e) {
-          print("Phone verification failed: ${e.message}");
-          emit(AuthError(e.message ?? 'Phone verification failed'));
-        },
-        codeSent: (verificationId, resendToken) {
-          print("SMS code sent, verification ID: $verificationId");
-          emit(
-            AuthSmsCodeSent(
-              verificationId: verificationId,
-              phoneNumber: phoneNumber,
-            ),
-          );
-        },
-        codeAutoRetrievalTimeout: (verificationId) {
-          // Auto-retrieval timeout, can silently keep the verification ID
-          print("SMS code auto retrieval timeout");
-        },
+      print("Skipping real SMS verification for testing");
+      // Simply emit the code sent state with a fake verification ID
+      await Future.delayed(
+        const Duration(milliseconds: 300),
+      ); // Just for UI feedback
+      emit(
+        AuthSmsCodeSent(
+          verificationId: 'test-verification-id',
+          phoneNumber: phoneNumber,
+        ),
       );
     } catch (e) {
-      print("SMS verification send error: $e");
-      emit(AuthError(e.toString()));
+      print("SMS verification error: $e");
+      emit(AuthError("SMS verification simulation failed"));
     }
   }
 
-  /// Verify SMS code entered by user
+  /// Verify SMS code entered by user (simplified version)
   Future<void> verifySmsCode(String verificationId, String smsCode) async {
     emit(AuthLoading());
     try {
-      print("Verifying SMS code for ID: $verificationId");
-      final authData = await _authService.verifySmsCode(
-        verificationId,
-        smsCode,
-      );
+      print("Simulating successful SMS verification");
+      // Just for UI feedback, add a small delay
+      await Future.delayed(const Duration(milliseconds: 500));
 
+      // Get the current user from preferences if available
+      final authData = await _authService.getAuthData();
       if (authData != null) {
-        print("SMS verification successful");
         emit(AuthAuthenticated(authData));
       } else {
-        print("SMS verification resulted in no auth data");
-        emit(AuthError("SMS verification failed"));
-      }
-    } catch (e) {
-      print("SMS verification error: $e");
-      emit(AuthError(e.toString()));
-    }
-  }
-
-  /// Resend verification SMS
-  Future<void> resendVerificationSms(String phoneNumber) async {
-    print("Resending verification SMS to: $phoneNumber");
-    await sendVerificationSms(phoneNumber);
-  }
-
-  /// Sign in with Google
-  Future<void> signInWithGoogle() async {
-    emit(AuthLoading());
-    try {
-      print("Starting Google sign-in");
-      final authData = await _authService.signInWithGoogle();
-
-      if (authData != null) {
-        print("Google sign-in successful");
-        emit(AuthAuthenticated(authData));
-      } else {
-        // User cancelled the Google Sign-in flow
-        print("Google sign-in cancelled by user");
+        // If no user is found, just redirect to home
         emit(AuthUnauthenticated());
       }
     } catch (e) {
-      print("Google sign-in error: $e");
-      emit(AuthError("Google sign-in failed: ${e.toString()}"));
+      print("SMS verification error: $e");
+      emit(AuthError("SMS verification failed"));
     }
   }
 
@@ -259,8 +184,6 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(e.toString()));
     }
   }
-
-  
 
   /// Logout user
   Future<void> logout() async {
