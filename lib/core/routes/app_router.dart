@@ -1,5 +1,12 @@
+import 'package:find_them/data/models/auth.dart';
+import 'package:find_them/data/repositories/auth_repo.dart';
+import 'package:find_them/data/services/auth_service.dart';
+import 'package:find_them/logic/cubit/authentification_cubit.dart';
+import 'package:find_them/logic/cubit/sign_up_cubit.dart';
+import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/core/routes/route_constants.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
 import '../../presentation/screens/onboarding/onboarding.dart';
 import '../../presentation/screens/onboarding/onboarding2.dart';
@@ -23,17 +30,44 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const OnboardingWrapper());
 
       case RouteConstants.signup:
-        return MaterialPageRoute(builder: (_) => const SignupScreen());
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider(
+                create:
+                    (BuildContext context) =>
+                        SignUpCubit(AuthRepository(AuthService())),
+                child: const SignupScreen(),
+              ),
+        );
 
       case RouteConstants.verifyPhone:
-        final phoneNumber = args as String;
+        final Map<String, dynamic> params = args as Map<String, dynamic>;
+        final String phoneNumber = params['phoneNumber'];
+        final SignUpData? signUpData = params['signUpData'];
+
         return MaterialPageRoute(
-          builder: (_) => SmsVerificationScreen(phoneNumber: phoneNumber),
+          builder:
+              (context) => BlocProvider(
+                create:
+                    (context) =>
+                        SmsVerificationCubit(AuthRepository(AuthService())),
+                child: SmsVerificationScreen(
+                  phoneNumber: phoneNumber,
+                  signUpData: signUpData,
+                ),
+              ),
         );
 
       case RouteConstants.login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
-   
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider(
+                create:
+                    (BuildContext context) =>
+                        AuthentificationCubit(AuthRepository(AuthService())),
+                child: const LoginScreen(),
+              ),
+        );
 
       /* case RouteConstants.resetPassword:
         return MaterialPageRoute(

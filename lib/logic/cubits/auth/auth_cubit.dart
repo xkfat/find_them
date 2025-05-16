@@ -1,15 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:find_them/core/constants/strings/string_constants.dart';
 import 'package:find_them/data/models/auth.dart';
-import 'package:find_them/data/services/auth_service.dart';
-import 'package:find_them/data/services/firebase_auth_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:find_them/data/repositories/auth_repo.dart';
 import 'auth_state.dart';
-
+/*
 class AuthCubit extends Cubit<AuthState> {
-  final AuthService _authService;
-  final FirebaseAuthService _firebaseAuthService;
-  static const String _welcomeShownKey = 'welcome_shown';
+  final AuthRepository _authRepository;
   bool _testMode = false;
 
   void setTestMode(bool enabled) {
@@ -19,11 +15,9 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  AuthCubit(this._authService, this._firebaseAuthService)
-    : super(AuthInitial()) {}
+  AuthCubit(this._authRepository) : super(AuthInitial()) {}
 
-
- Future<void> checkAuth() async {
+  Future<void> checkAuth() async {
     if (_testMode) {
       emit(AuthUnauthenticated());
       return;
@@ -31,11 +25,11 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       print("Checking authentication status");
-      final isAuthenticated = await _authService.isAuthenticated();
+      final isAuthenticated = await _authRepository.isAuthenticated();
 
       if (isAuthenticated) {
         print("User is authenticated, getting auth data");
-        final authData = await _authService.getAuthData();
+        final authData = await _authRepository.getAuthData();
 
         if (authData != null) {
           print("Authentication data loaded, user: ${authData.user.username}");
@@ -54,44 +48,59 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /*  Future<void> checkAuth() async {
+  // Modified method to handle two-step signup
+  Future<void> initiateSignup(SignUpData signupData) async {
     emit(AuthLoading());
     try {
-      print("Checking authentication status");
-      final isAuthenticated = await _authService.isAuthenticated();
+      print("Initiating signup process for: ${signupData.username}");
 
-      if (isAuthenticated) {
-        print("User is authenticated, getting auth data");
-        final authData = await _authService.getAuthData();
+      // Instead of calling the API, we just validate and save the data temporarily
+      // Here you could do local validation or even a preliminary API check
 
-        if (authData != null) {
-          print("Authentication data loaded, user: ${authData.user.username}");
-          emit(AuthAuthenticated(authData));
-        } else {
-          print("No authentication data found");
-          emit(AuthUnauthenticated());
-        }
-      } else {
-        print("User is not authenticated");
-        emit(AuthUnauthenticated());
-      }
+      // For now, just generate a verification code (in a real app, this would be sent via SMS)
+      final verificationCode = "1234"; // Hardcoded for testing
+
+      print("Verification code generated, sending to SMS verification screen");
+      emit(
+        AuthSmsVerificationRequired(
+          signupData,
+          verificationCode: verificationCode,
+        ),
+      );
     } catch (e) {
-      print("Authentication check error: $e");
-      emit(AuthUnauthenticated());
+      print("Signup initiation error: $e");
+      emit(AuthError(e.toString()));
     }
   }
 
-*/
+  // New method to complete signup after SMS verification
+  Future<void> completeSignup(SignUpData signupData, String enteredCode) async {
+    emit(AuthLoading());
+    try {
+      print("Completing signup for user: ${signupData.username}");
+
+      // In a real app, verify the entered code matches what was sent
+      // For testing, we'll accept "1234"
+      if (enteredCode != "1234") {
+        emit(AuthError("Invalid verification code"));
+        return;
+      }
+
+      // Now perform the actual signup API call
+      final authData = await _authRepository.signup(signupData);
+      print("Signup successful");
+      emit(AuthAuthenticated(authData));
+    } catch (e) {
+      print("Signup completion error: $e");
+      emit(AuthError(e.toString()));
+    }
+  }
+
   Future<void> login(String username, String password) async {
     emit(AuthLoading());
     try {
       print("Logging in with username: $username");
-      final credentials = LoginCredentials(
-        username: username,
-        password: password,
-      );
-
-      final authData = await _authService.loginWithCredentials(credentials);
+      final authData = await _authRepository.login(username, password);
       print("Login successful for user: ${authData.user.username}");
       emit(AuthAuthenticated(authData));
     } catch (e) {
@@ -104,7 +113,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       print("Signing up new user: ${signupData.username}");
-      final authData = await _authService.signup(signupData);
+      final authData = await _authRepository.signup(signupData);
       print("Signup successful");
       emit(AuthSignupSuccessful(authData, signupData.phoneNumber));
     } catch (e) {
@@ -118,30 +127,16 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       print("Starting Google sign-in flow");
+      final authData = await _authRepository.signInWithGoogle();
 
-      final userCredential = await _firebaseAuthService.signInWithGoogle();
-
-      if (userCredential == null) {
+      if (authData == null) {
         print("Google sign-in cancelled by user");
         emit(AuthUnauthenticated());
         return;
       }
 
-      print("Google sign-in successful, authenticating with backend");
-
-      final authData = await _authService.authenticateWithFirebase(
-        userCredential,
-      );
-
-      if (authData != null) {
-        print(
-          "Backend authentication successful for user: ${authData.user.username}",
-        );
-        emit(AuthAuthenticated(authData));
-      } else {
-        print("Backend authentication failed");
-        emit(AuthError("Failed to authenticate with the server"));
-      }
+      print("Google sign-in successful for user: ${authData.user.username}");
+      emit(AuthAuthenticated(authData));
     } catch (e) {
       print("Google sign-in error: $e");
       emit(AuthError(e.toString()));
@@ -153,35 +148,16 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       print("Starting Facebook sign-in flow");
+      final authData = await _authRepository.signInWithFacebook();
 
-      final userCredential = await _firebaseAuthService.signInWithFacebook();
-
-      if (userCredential == null) {
+      if (authData == null) {
         print("Facebook sign-in cancelled or failed");
         emit(AuthError("Facebook sign-in was cancelled or failed"));
         return;
       }
 
-      print("Facebook sign-in successful, authenticating with backend");
-
-      try {
-        final authData = await _authService.authenticateWithFirebase(
-          userCredential,
-        );
-
-        if (authData != null) {
-          print(
-            "Backend authentication successful for user: ${authData.user.username}",
-          );
-          emit(AuthAuthenticated(authData));
-        } else {
-          print("Backend authentication failed");
-          emit(AuthError("Failed to authenticate with the server"));
-        }
-      } catch (e) {
-        print("Error authenticating with backend: $e");
-        emit(AuthError("Error connecting to server: ${e.toString()}"));
-      }
+      print("Facebook sign-in successful for user: ${authData.user.username}");
+      emit(AuthAuthenticated(authData));
     } catch (e) {
       print("Facebook sign-in error: $e");
       emit(AuthError("Facebook sign-in error: ${e.toString()}"));
@@ -202,7 +178,7 @@ class AuthCubit extends Cubit<AuthState> {
         return;
       }
 
-      final success = await _authService.changePassword(
+      final success = await _authRepository.changePassword(
         oldPassword,
         newPassword,
         confirmPassword,
@@ -210,7 +186,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       if (success) {
         print("Password changed successfully");
-        final authData = await _authService.getAuthData();
+        final authData = await _authRepository.getAuthData();
         if (authData != null) {
           emit(AuthAuthenticated(authData));
         } else {
@@ -231,15 +207,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       print("Logging out user");
-
-      try {
-        await _firebaseAuthService.signOut();
-      } catch (e) {
-        print("Firebase signout error (non-critical): $e");
-      }
-
-      await _authService.logout();
-
+      await _authRepository.logout();
       print("Logout successful");
       emit(AuthUnauthenticated());
     } catch (e) {
@@ -248,5 +216,59 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
- 
+  void resetSignupProcess() {
+    emit(AuthUnauthenticated());
+  }
+
+  Future<void> validateSignupFields(SignUpData signupData) async {
+    emit(AuthLoading());
+    try {
+      print("Validating signup fields for: ${signupData.username}");
+
+      final result = await _authRepository.validateSignupFields(
+        username: signupData.username,
+        email: signupData.email,
+        phoneNumber: signupData.phoneNumber,
+      );
+
+      if (result.containsKey('error') && result['error'] == true) {
+        // Handle validation errors
+        if (result.containsKey('data')) {
+          final errorData = result['data'];
+          print("Validation errors: $errorData");
+
+          // Convert to the expected format
+          Map<String, List<String>> errors = {};
+          errorData.forEach((key, value) {
+            if (value is List) {
+              errors[key] = List<String>.from(value);
+            } else if (value is String) {
+              errors[key] = [value];
+            }
+          });
+
+          emit(AuthValidationError(errors));
+          return;
+        }
+
+        emit(AuthError(result['message'] ?? 'Validation failed'));
+        return;
+      }
+
+      // If validation passes, proceed to SMS verification
+      print("Field validation successful, sending to SMS verification screen");
+      final verificationCode = "1234"; // Hardcoded for testing
+      emit(
+        AuthSmsVerificationRequired(
+          signupData,
+          verificationCode: verificationCode,
+        ),
+      );
+    } catch (e) {
+      print("Field validation error: $e");
+      emit(AuthError(e.toString()));
+    }
+  }
+
 }
+*/

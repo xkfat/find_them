@@ -51,3 +51,25 @@ class AuthSignupSuccessful extends AuthState {
   @override
   List<Object?> get props => [authData, phoneNumber];
 }
+
+class AuthSmsVerificationRequired extends AuthState {
+  final SignUpData signUpData;
+  final String verificationCode;
+
+  const AuthSmsVerificationRequired(
+    this.signUpData, {
+    this.verificationCode = '',
+  });
+
+  @override
+  List<Object?> get props => [signUpData, verificationCode];
+}
+
+class AuthValidationError extends AuthState {
+  final Map<String, List<String>> errors;
+
+  const AuthValidationError(this.errors);
+
+  @override
+  List<Object?> get props => [errors];
+}

@@ -1,5 +1,4 @@
 import 'package:find_them/core/routes/route_constants.dart';
-import 'package:find_them/core/routes/navigation_helper.dart';
 import 'package:find_them/logic/cubits/auth/auth_state.dart';
 import 'package:find_them/logic/cubits/auth/auth_cubit.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,7 @@ class SignUpOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     final scaffoldContext = context;
 
-    final authCubit = BlocProvider.of<AuthCubit>(context);
+ //   final authCubit = BlocProvider.of<AuthCubit>(context);
 
     void handleGoogleSignIn() async {
       try {
@@ -25,7 +24,7 @@ class SignUpOptions extends StatelessWidget {
 
         _showLoadingDialog(scaffoldContext);
 
-        authCubit.signInWithGoogle();
+      //  authCubit.signInWithGoogle();
       } catch (e) {
         print("Error in handleGoogleSignIn: $e");
         if (scaffoldContext.mounted) {
@@ -40,7 +39,7 @@ class SignUpOptions extends StatelessWidget {
 
         _showLoadingDialog(scaffoldContext);
 
-        authCubit.signInWithFacebook();
+      //  authCubit.signInWithFacebook();
       } catch (e) {
         print("Error in handleFacebookSignIn: $e");
         if (scaffoldContext.mounted) {

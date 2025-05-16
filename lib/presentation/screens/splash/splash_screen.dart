@@ -21,20 +21,17 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthentication() async {
-    context.read<AuthCubit>().setTestMode(true);
-
-    await context.read<AuthCubit>().checkAuth();
-
     route();
   }
 
   Future<void> startTimer() async {
-    await Future.delayed(const Duration(seconds: 1));
+    Timer(const Duration(milliseconds: 3600), () {
+      route();
+    });
+    //  await Future.delayed(const Duration(seconds: 1));
   }
 
-  route() {
-    Navigator.of(context).pushReplacementNamed(RouteConstants.onboarding);
-  }
+  route() {}
 
   @override
   Widget build(BuildContext context) {
