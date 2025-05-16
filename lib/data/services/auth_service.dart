@@ -22,13 +22,11 @@ class AuthService {
     return dio.post(
       url,
       data: data,
-      options: Options(headers: _publicHeaders), // <- wipes Authorization
+      options: Options(headers: _publicHeaders), 
     );
   }
 
-  ///----- STORAGE METHODS -----///
 
-  /// Get authentication data from storage
   Future<AuthData?> getAuthData() async {
     final prefs = await SharedPreferences.getInstance();
     final encodedData = prefs.getString(_authDataKey);
@@ -46,7 +44,6 @@ class AuthService {
     }
   }
 
-  /// Save authentication data to storage
   Future<void> _saveAuthData(AuthData authData) async {
     final prefs = await SharedPreferences.getInstance();
     final encodedData = json.encode(authData.toJson());
@@ -54,9 +51,7 @@ class AuthService {
     await _apiService.setAuthToken(authData.token);
   }
 
-  ///----- DJANGO DIRECT AUTH METHODS -----///
 
-  /// Login with username and password directly to Django
   Future<AuthData> loginWithCredentials(LoginCredentials credentials) async {
     try {
       print('Attempting login with username: ${credentials.username}');
@@ -86,7 +81,6 @@ class AuthService {
     }
   }
 
-  /// Register a new user directly with Django
   Future<AuthData> signup(SignUpData data) async {
     try {
       print('Attempting signup for user: ${data.username}');
@@ -114,7 +108,6 @@ class AuthService {
     }
   }
 
-  /// Change the user's password
   Future<bool> changePassword(
     String oldPassword,
     String newPassword,
@@ -139,13 +132,10 @@ class AuthService {
     }
   }
 
-  ///----- FIREBASE AUTH INTEGRATION -----///
   
-  /// Authenticate with Firebase - Exchange Firebase token for backend token
   Future<AuthData?> authenticateWithFirebase(firebase_auth.UserCredential credential) async {
     try {
       print('Getting Firebase ID token');
-      // Get the Firebase ID token
       final idToken = await credential.user?.getIdToken();
 
       if (idToken == null) {
@@ -154,7 +144,6 @@ class AuthService {
       }
 
       print('Sending Firebase token to backend');
-      // Send to your Django backend
       final response = await dio.post(
         ApiConstants.firebaseAuth,
         data: {
@@ -169,7 +158,6 @@ class AuthService {
       );
 
       print('Backend authentication successful, processing response');
-      // Process Django response
       final authData = AuthData.fromJson(response.data);
       await _saveAuthData(authData);
       return authData;
@@ -179,9 +167,7 @@ class AuthService {
     }
   }
 
-  ///----- AUTHENTICATION STATE METHODS -----///
 
-  /// Check if user is authenticated
   Future<bool> isAuthenticated() async {
     try {
       final authData = await getAuthData();
@@ -208,7 +194,6 @@ class AuthService {
     }
   }
 
-  /// Refresh the authentication token
   Future<bool> _refreshToken(String refreshToken) async {
     try {
       print('Attempting to refresh token');
@@ -237,7 +222,6 @@ class AuthService {
     }
   }
 
-  /// Get the current authenticated user
   Future<User?> getCurrentUser() async {
     try {
       final authData = await getAuthData();
@@ -248,17 +232,14 @@ class AuthService {
     }
   }
 
-  /// Logout the user
   Future<void> logout() async {
     try {
       print('Logging out user');
-      // Attempt to logout from the API
       await dio.post(ApiConstants.logout);
     } catch (e) {
       print('API logout error (continuing with local logout): $e');
     } finally {
       print('Clearing local auth data');
-      // Clear local auth data
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_authDataKey);
       await _apiService.clearAuthToken();

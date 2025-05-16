@@ -11,7 +11,6 @@ class Onboarding2Screen extends StatelessWidget {
       children: [
         const SizedBox(height: 42),
 
-        // Image
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 41),
           child: Image.asset(
@@ -22,7 +21,6 @@ class Onboarding2Screen extends StatelessWidget {
 
         const SizedBox(height: 60),
 
-        // Text
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 41),
           child: RichText(

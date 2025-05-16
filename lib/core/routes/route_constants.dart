@@ -1,5 +1,4 @@
 class RouteConstants {
-  // App routes
   static const String splash = '/';
   static const String onboarding = '/onboarding';
 
@@ -23,5 +22,4 @@ class RouteConstants {
   static const String addFriend = '/friends/add';
   static const String notifications = '/notifications';
 
-  // Other routes...
 }

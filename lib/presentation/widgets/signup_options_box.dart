@@ -15,46 +15,34 @@ class SignUpOptions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Store a reference to the context at build time
     final scaffoldContext = context;
 
-    // Get the AuthCubit from the context
     final authCubit = BlocProvider.of<AuthCubit>(context);
 
-    // Function to handle Google sign in
     void handleGoogleSignIn() async {
       try {
-        // Make sure to use the right context
         Navigator.pop(scaffoldContext); // Close the bottom sheet
 
-        // Show loading dialog using the stored context
         _showLoadingDialog(scaffoldContext);
 
-        // Use AuthCubit
         authCubit.signInWithGoogle();
       } catch (e) {
         print("Error in handleGoogleSignIn: $e");
-        // Show error dialog if context is still mounted
         if (scaffoldContext.mounted) {
           _showErrorDialog(scaffoldContext, "Google sign-in failed: $e");
         }
       }
     }
 
-    // Function to handle Facebook sign in with better error handling
     void handleFacebookSignIn() async {
       try {
-        // Make sure to use the right context
         Navigator.pop(scaffoldContext); // Close the bottom sheet
 
-        // Show loading dialog using the stored context
         _showLoadingDialog(scaffoldContext);
 
-        // Use AuthCubit
         authCubit.signInWithFacebook();
       } catch (e) {
         print("Error in handleFacebookSignIn: $e");
-        // Show error dialog if context is still mounted
         if (scaffoldContext.mounted) {
           _showErrorDialog(scaffoldContext, "Facebook sign-in failed: $e");
         }
@@ -335,7 +323,6 @@ class SignUpOptions extends StatelessWidget {
     );
   }
 
-  // Helper method to show loading dialog
   void _showLoadingDialog(BuildContext context) {
     if (!context.mounted) return;
 
@@ -369,7 +356,6 @@ class SignUpOptions extends StatelessWidget {
     );
   }
 
-  // Helper method to show error dialog
   void _showErrorDialog(BuildContext context, String message) {
     if (!context.mounted) return;
 

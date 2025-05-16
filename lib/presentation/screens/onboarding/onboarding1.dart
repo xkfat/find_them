@@ -13,7 +13,6 @@ class Onboarding1Screen extends StatelessWidget {
       children: [
         const SizedBox(height: 42),
 
-        // Image
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 41),
           child: AspectRatio(
@@ -32,7 +31,6 @@ class Onboarding1Screen extends StatelessWidget {
 
         const SizedBox(height: 50),
 
-        // Text content
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 41),
           child: Column(

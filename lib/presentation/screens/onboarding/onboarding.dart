@@ -32,7 +32,6 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
       );
     } catch (e) {
       print('Error showing signup options: $e');
-      // Show a fallback solution like a simple dialog
       showDialog(
         context: context,
         builder:
@@ -78,7 +77,6 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Back button (only visible after first page)
                   _currentPage > 0
                       ? GestureDetector(
                         onTap: _previousPage,
@@ -95,29 +93,29 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
                           ),
                         ),
                       )
-                      : const SizedBox(width: 32), // Placeholder for alignment
-                  // Skip button
-                  TextButton(
-                    onPressed: _showSignUpOptions,
-                    style: TextButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: EdgeInsets.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text(
-                      'Skip',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
+                      : const SizedBox(width: 32),
+                  _currentPage < 2
+                      ? TextButton(
+                        onPressed: _showSignUpOptions,
+                        style: TextButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text(
+                          'Skip',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.black,
+                          ),
+                        ),
+                      )
+                      : const SizedBox(width: 32),
                 ],
               ),
             ),
 
-            // PageView for onboarding screens
             Expanded(
               child: PageView(
                 controller: _pageController,
@@ -134,12 +132,10 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
               ),
             ),
 
-            // Page indicator dots and next button
             Padding(
               padding: const EdgeInsets.only(bottom: 32),
               child: Column(
                 children: [
-                  // Page indicator dots
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
@@ -159,7 +155,6 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
                     ),
                   ),
 
-                  // Next button (only shown on first two screens)
                 ],
               ),
             ),

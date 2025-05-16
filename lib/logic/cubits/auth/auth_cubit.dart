@@ -10,13 +10,11 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthService _authService;
   final FirebaseAuthService _firebaseAuthService;
   static const String _welcomeShownKey = 'welcome_shown';
-  bool _testMode = false; // Add this flag
+  bool _testMode = false;
 
-  // Add a method to toggle test mode
   void setTestMode(bool enabled) {
     _testMode = enabled;
     if (enabled) {
-      // Force unauthenticated state when test mode is enabled
       emit(AuthUnauthenticated());
     }
   }
@@ -84,7 +82,6 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
 */
-  /// Login with username and password
   Future<void> login(String username, String password) async {
     emit(AuthLoading());
     try {
@@ -103,7 +100,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Register a new user
   Future<void> signup(SignUpData signupData) async {
     emit(AuthLoading());
     try {
@@ -117,14 +113,12 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Sign in with Google
   Future<void> signInWithGoogle() async {
     emit(AuthSocialAuthStarted('Google'));
     emit(AuthLoading());
     try {
       print("Starting Google sign-in flow");
 
-      // 1. Use FirebaseAuthService to get Firebase credentials
       final userCredential = await _firebaseAuthService.signInWithGoogle();
 
       if (userCredential == null) {
@@ -135,7 +129,6 @@ class AuthCubit extends Cubit<AuthState> {
 
       print("Google sign-in successful, authenticating with backend");
 
-      // 2. Use AuthService to exchange Firebase token for your backend token
       final authData = await _authService.authenticateWithFirebase(
         userCredential,
       );
@@ -161,7 +154,6 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       print("Starting Facebook sign-in flow");
 
-      // 1. Use FirebaseAuthService to get Firebase credentials
       final userCredential = await _firebaseAuthService.signInWithFacebook();
 
       if (userCredential == null) {
@@ -173,7 +165,6 @@ class AuthCubit extends Cubit<AuthState> {
       print("Facebook sign-in successful, authenticating with backend");
 
       try {
-        // 2. Use AuthService to exchange Firebase token for your backend token
         final authData = await _authService.authenticateWithFirebase(
           userCredential,
         );
@@ -236,40 +227,26 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Logout user
   Future<void> logout() async {
     emit(AuthLoading());
     try {
       print("Logging out user");
 
-      // Sign out from Firebase first
       try {
         await _firebaseAuthService.signOut();
       } catch (e) {
         print("Firebase signout error (non-critical): $e");
       }
 
-      // Then log out from the backend
       await _authService.logout();
 
       print("Logout successful");
       emit(AuthUnauthenticated());
     } catch (e) {
-      // Even if logout fails, force unauthenticated state
       print("Logout error (forcing unauthenticated state): $e");
       emit(AuthUnauthenticated());
     }
   }
 
-  /// Check if welcome screens have been shown
-  Future<bool> hasShownWelcomeScreens() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_welcomeShownKey) ?? false;
-  }
-
-  /// Mark welcome screens as shown
-  Future<void> setWelcomeScreensShown() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_welcomeShownKey, true);
-  }
+ 
 }

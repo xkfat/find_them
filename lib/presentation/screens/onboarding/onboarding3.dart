@@ -13,7 +13,6 @@ class Onboarding3Screen extends StatelessWidget {
       children: [
         const SizedBox(height: 42),
 
-        // Image
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 41),
           child: Image.asset(
@@ -24,7 +23,6 @@ class Onboarding3Screen extends StatelessWidget {
 
         const SizedBox(height: 60),
 
-        // Text
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 41),
           child: RichText(
@@ -51,7 +49,6 @@ class Onboarding3Screen extends StatelessWidget {
 
         const Spacer(),
 
-        // Get Started Button
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
           child: ElevatedButton(

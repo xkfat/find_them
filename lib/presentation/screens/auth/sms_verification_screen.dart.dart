@@ -38,7 +38,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
     super.initState();
     _showError = widget.showError;
 
-    // Set up focus node listeners
     for (int i = 0; i < 4; i++) {
       _focusNodes[i].addListener(() {
         setState(() {});
@@ -164,7 +163,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Code input
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
@@ -252,7 +250,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
 
                   SizedBox(height: 26),
 
-                  // Show error message or expiry timer based on error state
                   Center(
                     child:
                         _showError
@@ -294,7 +291,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Timer display - moved beneath the Verify button
                   Center(
                     child: Text(
                       'Code expires in $_formattedTime',
@@ -307,7 +303,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
 
                   const SizedBox(height: 12),
 
-                  // Resend option
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

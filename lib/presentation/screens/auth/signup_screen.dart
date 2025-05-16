@@ -26,7 +26,6 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  // Field error states
   bool _firstNameError = false;
   bool _lastNameError = false;
   bool _usernameError = false;
@@ -35,7 +34,6 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _passwordError = false;
   bool _confirmPasswordError = false;
 
-  // Field error messages
   String? _firstNameErrorText;
   String? _lastNameErrorText;
   String? _usernameErrorText;
@@ -158,7 +156,6 @@ class _SignupScreenState extends State<SignupScreen> {
     bool isValid = true;
 
     setState(() {
-      // Check first name
       if (_firstNameController.text.isEmpty) {
         _firstNameError = true;
         _firstNameErrorText = 'First name is required';
@@ -168,7 +165,6 @@ class _SignupScreenState extends State<SignupScreen> {
         _firstNameErrorText = null;
       }
 
-      // Check last name
       if (_lastNameController.text.isEmpty) {
         _lastNameError = true;
         _lastNameErrorText = 'Last name is required';
@@ -178,7 +174,6 @@ class _SignupScreenState extends State<SignupScreen> {
         _lastNameErrorText = null;
       }
 
-      // Check username
       if (_usernameController.text.isEmpty) {
         _usernameError = true;
         _usernameErrorText = 'Username is required';
@@ -188,7 +183,6 @@ class _SignupScreenState extends State<SignupScreen> {
         _usernameErrorText = null;
       }
 
-      // Check email
       if (_emailController.text.isEmpty) {
         _emailError = true;
         _emailErrorText = 'Email is required';
@@ -203,7 +197,6 @@ class _SignupScreenState extends State<SignupScreen> {
         _emailErrorText = null;
       }
 
-      // Check phone number
       if (_completePhoneNumber.isEmpty) {
         _phoneNumberError = true;
         _phoneNumberErrorText = 'Phone number is required';
@@ -213,7 +206,6 @@ class _SignupScreenState extends State<SignupScreen> {
         _phoneNumberErrorText = null;
       }
 
-      // Check password
       if (_passwordController.text.isEmpty) {
         _passwordError = true;
         _passwordErrorText = 'Password is required';
@@ -227,7 +219,6 @@ class _SignupScreenState extends State<SignupScreen> {
         _passwordErrorText = null;
       }
 
-      // Check confirm password
       if (_confirmPasswordController.text.isEmpty) {
         _confirmPasswordError = true;
         _confirmPasswordErrorText = 'Please confirm your password';
@@ -290,11 +281,9 @@ class _SignupScreenState extends State<SignupScreen> {
         errorMessages.add(_confirmPasswordErrorText!);
       }
 
-      // If we have specific errors, show them
       if (errorMessages.isNotEmpty) {
         _showErrorDialog(errorMessages.join('\n'));
       } else {
-        // Default message if no specific errors
         _showErrorDialog('Please fill in all required fields correctly');
       }
     }
@@ -430,10 +419,8 @@ class _SignupScreenState extends State<SignupScreen> {
             Navigator.of(context).pop();
           }
 
-          // Clear all error states
           _clearAllErrors();
 
-          // Navigate to verification screen
           NavigationHelper.goToVerifyPhone(_completePhoneNumber);
         }
       },
@@ -464,7 +451,6 @@ class _SignupScreenState extends State<SignupScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Back button
                         IconButton(
                           icon: const Icon(
                             Icons.arrow_back,
@@ -510,7 +496,6 @@ class _SignupScreenState extends State<SignupScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // First Name column
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -570,7 +555,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                             const SizedBox(width: 16),
 
-                            // Last Name column
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -632,7 +616,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Username field
                         const Text(
                           'Username',
                           style: TextStyle(
@@ -681,7 +664,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Email field
                         const Text(
                           'Email',
                           style: TextStyle(
@@ -714,7 +696,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your email';
                             }
-                            // Basic email validation
                             if (!value.contains('@') || !value.contains('.')) {
                               return 'Please enter a valid email address';
                             }
@@ -802,7 +783,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                           ),
                           onChanged: (phone) {
-                            // Update the complete phone number when it changes
                             setState(() {
                               _completePhoneNumber = phone.completeNumber;
                               _selectedCountryCode = '+${phone.countryCode}';
@@ -810,7 +790,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             });
                           },
                           onCountryChanged: (country) {
-                            // Update the selected country code when it changes
                             setState(() {
                               _selectedCountryCode = '+${country.dialCode}';
                             });
@@ -830,7 +809,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Password field
                         const Text(
                           'Password',
                           style: TextStyle(
@@ -888,7 +866,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Confirm Password field
                         const Text(
                           'Confirm Password',
                           style: TextStyle(
@@ -947,7 +924,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                         const SizedBox(height: 24),
 
-                        // Sign up button
                         SizedBox(
                           width: double.infinity,
                           height: 50,

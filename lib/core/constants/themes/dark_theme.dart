@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
-import 'app_text.dart';
 
 class DarkTheme {
   static ThemeData get theme => ThemeData(
@@ -123,7 +122,6 @@ class DarkTheme {
         return AppColors.darkDivider;
       }),
     ),
-    // Divider theme
     dividerTheme: const DividerThemeData(
       color: AppColors.grey,
       thickness: 1,
@@ -135,19 +133,6 @@ class DarkTheme {
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
     ),
 
-    textTheme: TextTheme(
-      displayLarge: AppTextStyles.headingLargeDark,
-      displayMedium: AppTextStyles.headingMediumDark,
-      displaySmall: AppTextStyles.headingSmallDark,
-      headlineMedium: AppTextStyles.titleLargeDark,
-      headlineSmall: AppTextStyles.titleMediumDark,
-      titleMedium: AppTextStyles.titleSmallDark,
-      bodyLarge: AppTextStyles.bodyLargeDark,
-      bodyMedium: AppTextStyles.bodyMediumDark,
-      bodySmall: AppTextStyles.bodySmallDark,
-      labelLarge: AppTextStyles.labelLargeDark,
-      labelMedium: AppTextStyles.labelMediumDark,
-      labelSmall: AppTextStyles.labelSmallDark,
-    ),
+   
   );
 }

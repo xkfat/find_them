@@ -6,16 +6,14 @@ class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  // Google sign in
   Future<UserCredential?> signInWithGoogle() async {
     try {
       print('Starting Google sign-in flow');
       
-      // Step 1: Sign in with Google
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         print('Google sign-in cancelled by user');
-        return null; // User cancelled
+        return null; 
       }
 
       print('Getting Google authentication');
@@ -26,7 +24,6 @@ class FirebaseAuthService {
       );
 
       print('Signing in with Firebase using Google credentials');
-      // Step 2: Get Firebase user credentials
       return await _auth.signInWithCredential(credential);
     } catch (e) {
       print('Google sign-in error: $e');
@@ -34,12 +31,10 @@ class FirebaseAuthService {
     }
   }
 
- // Facebook sign in
 Future<UserCredential?> signInWithFacebook() async {
   try {
     print('Starting Facebook sign-in flow');
     
-    // Step 1: Sign in with Facebook - use a try-catch specifically for this part
     LoginResult? result;
     try {
       result = await FacebookAuth.instance.login();
@@ -53,13 +48,11 @@ Future<UserCredential?> signInWithFacebook() async {
       return null;
     }
     
-    // Safely check access token
     if (result.accessToken == null || result.accessToken!.tokenString.isEmpty) {
       print('Facebook access token is null or empty');
       return null;
     }
     
-    // Step 2: Create Firebase credential from Facebook token
     try {
       print('Creating Firebase credential from Facebook token');
       final OAuthCredential credential = FacebookAuthProvider.credential(
@@ -67,12 +60,11 @@ Future<UserCredential?> signInWithFacebook() async {
       );
       
       print('Signing in with Firebase using Facebook credentials');
-      // Step 3: Sign in with the credential
       try {
         return await _auth.signInWithCredential(credential);
       } catch (e) {
         print('Firebase credential error: $e');
-        return null; // Return null instead of throwing
+        return null;
       }
     } catch (e) {
       print('Error creating credentials: $e');
@@ -80,10 +72,9 @@ Future<UserCredential?> signInWithFacebook() async {
     }
   } catch (e) {
     print('Facebook sign-in error: $e');
-    return null; // Return null instead of throwing
+    return null; 
   }
 }
-  // Sign out from Firebase
   Future<void> signOut() async {
     try {
       print('Signing out from Google');

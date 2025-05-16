@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
-import 'app_text.dart';
 
 
 
@@ -124,7 +123,6 @@ class LightTheme {
         return AppColors.grey;
       }),
     ),
-    // Divider theme
     dividerTheme: const DividerThemeData(
       color: AppColors.grey,
       thickness: 1,
@@ -137,20 +135,7 @@ class LightTheme {
     ),
 
 
-        textTheme: TextTheme(
-      displayLarge: AppTextStyles.headingLargeLight,
-      displayMedium: AppTextStyles.headingMediumLight,
-      displaySmall: AppTextStyles.headingSmallLight,
-      headlineMedium: AppTextStyles.titleLargeLight,
-      headlineSmall: AppTextStyles.titleMediumLight,
-      titleMedium: AppTextStyles.titleSmallLight,
-      bodyLarge: AppTextStyles.bodyLargeLight,
-      bodyMedium: AppTextStyles.bodyMediumLight,
-      bodySmall: AppTextStyles.bodySmallLight,
-      labelLarge: AppTextStyles.labelLargeLight,
-      labelMedium: AppTextStyles.labelMediumLight,
-      labelSmall: AppTextStyles.labelSmallLight,
-    ),
+       
   );
   
 }
