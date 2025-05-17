@@ -7,7 +7,7 @@ import 'package:find_them/core/constants/themes/app_theme.dart';
 import 'package:find_them/core/routes/route_constants.dart';
 import 'package:find_them/data/services/api_service.dart';
 import 'package:find_them/data/services/auth_service.dart';
-import 'package:find_them/data/services/firebase_auth_service.dart';
+import 'package:find_them/data/services/social_auth_service.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //import 'package:flutter_native_splash/flutter_native_splash.dart';

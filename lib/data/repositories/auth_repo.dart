@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/models/user.dart';
 import 'package:find_them/data/services/auth_service.dart';
-import 'package:find_them/data/services/firebase_auth_service.dart';
+import 'package:find_them/data/services/social_auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 class AuthRepository {
