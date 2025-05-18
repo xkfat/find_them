@@ -19,6 +19,8 @@ class CaseCubit extends Cubit<CaseListState> {
       emit(CaseLoading());
       final cases = await _caseRepository.getCases(
         name: _currentFilters.name,
+        lastSeenLocation: _currentFilters.lastSeenLocation,
+         nameOrLocation: _currentFilters.nameOrLocation, 
         ageMin: _currentFilters.ageMin,
         ageMax: _currentFilters.ageMax,
         gender: _currentFilters.gender,
@@ -64,6 +66,8 @@ Future<void> getCaseDetail(int id) async {
 
    Future<void> updateFilter({
     String? name,
+String? lastSeenLocation,
+     String? nameOrLocation,
     int? ageMin,
     int? ageMax,
     String? gender,
@@ -71,6 +75,8 @@ Future<void> getCaseDetail(int id) async {
     String? startDate,
     String? endDate,
     bool clearName = false,
+ bool clearLastSeenLocation = false,
+    bool clearNameOrLocation = false, 
     bool clearAgeMin = false,
     bool clearAgeMax = false,
     bool clearGender = false,
@@ -80,6 +86,8 @@ Future<void> getCaseDetail(int id) async {
   }) async {
  _currentFilters = _currentFilters.copyWith(
       name: name,
+       lastSeenLocation: lastSeenLocation,
+           nameOrLocation: nameOrLocation, 
       ageMin: ageMin, 
       ageMax: ageMax,
       gender: gender,
@@ -87,6 +95,8 @@ Future<void> getCaseDetail(int id) async {
       startDate: startDate,
       endDate: endDate,
       clearName: clearName,
+      clearLastSeenLocation: clearLastSeenLocation,
+       clearNameOrLocation: clearNameOrLocation, 
       clearAgeMin: clearAgeMin,
       clearAgeMax: clearAgeMax,
       clearGender: clearGender,
@@ -105,5 +115,22 @@ Future<void> getCaseDetail(int id) async {
     }
     await getCases();
   }
+    Future<void> searchByLocation(String location) async {
+    if (location.isEmpty) {
+      _currentFilters = _currentFilters.copyWith(clearLastSeenLocation: true);
+    } else {
+      _currentFilters = _currentFilters.copyWith(lastSeenLocation: location);
+    }
+    await getCases();
+  }
+
+  Future<void> searchByNameOrLocation(String query) async {
+  if (query.isEmpty) {
+    _currentFilters = _currentFilters.copyWith(clearNameOrLocation: true);
+  } else {
+    _currentFilters = _currentFilters.copyWith(nameOrLocation: query);
+  }
+  await getCases();
+}
   
 }

@@ -22,6 +22,8 @@ class CaseService {
 
   Future<List<Case>> getCases({
     String? name,
+    String? lastSeenLocation,
+    String? nameOrLocation,
     int? ageMin,
     int? ageMax,
     String? gender,
@@ -31,7 +33,14 @@ class CaseService {
   }) async {
     try {
       final queryParams = <String, String>{};
-      if (name != null && name.isNotEmpty) queryParams['name'] = name;
+      if (nameOrLocation != null && nameOrLocation.isNotEmpty) {
+        queryParams['name_or_location'] = nameOrLocation;
+      } else {
+        // Original behavior for backwards compatibility
+        if (name != null && name.isNotEmpty) queryParams['name'] = name;
+        if (lastSeenLocation != null && lastSeenLocation.isNotEmpty)
+          queryParams['location'] = lastSeenLocation;
+      }
       if (ageMin != null) queryParams['age_min'] = ageMin.toString();
       if (ageMax != null) queryParams['age_max'] = ageMax.toString();
       if (gender != null && gender.isNotEmpty) queryParams['gender'] = gender;

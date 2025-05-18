@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _searchQuery = query;
     });
-    context.read<CaseCubit>().searchByName(query);
+  context.read<CaseCubit>().searchByNameOrLocation(query);
   }
 
   @override

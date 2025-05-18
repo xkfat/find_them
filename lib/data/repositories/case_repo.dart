@@ -13,6 +13,8 @@ class CaseRepository {
 
    Future<List<Case>> getCases({
     String? name,
+     String? lastSeenLocation,
+      String? nameOrLocation,
     int? ageMin,
     int? ageMax,
     String? gender,
@@ -22,6 +24,8 @@ class CaseRepository {
   }) async {
     return await _caseService.getCases(
       name: name,
+      lastSeenLocation: lastSeenLocation,
+      nameOrLocation: nameOrLocation, 
       ageMin: ageMin,
       ageMax: ageMax,
       gender: gender,
