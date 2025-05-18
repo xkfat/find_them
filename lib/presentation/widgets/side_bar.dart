@@ -1,4 +1,3 @@
-// lib/presentation/widgets/side_bar.dart
 import 'package:flutter/material.dart';
 import '../../core/constants/themes/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,7 +10,7 @@ class SideBar extends StatefulWidget {
 }
 
 class _SideBarState extends State<SideBar> {
-  int _selectedIndex = -1; // No selection by default
+  int _selectedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -26,24 +25,23 @@ class _SideBarState extends State<SideBar> {
       ),
       child: Column(
         crossAxisAlignment:
-            CrossAxisAlignment.start, // Align children to the left
+            CrossAxisAlignment.start, 
         children: [
-          // Profile section with left alignment
           Padding(
             padding: const EdgeInsets.only(
               left: 34,
               top: 90,
-            ), // 34px from the left edge
+            ), 
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 34, // 68x68
+                  radius: 34, 
                   backgroundImage: AssetImage('assets/images/profile.png'),
                 ),
-                const SizedBox(width: 16), // Space between image and text
+                const SizedBox(width: 16), 
                 Column(
                   crossAxisAlignment:
-                      CrossAxisAlignment.start, // Left align the text
+                      CrossAxisAlignment.start, 
                   children: [
                     Text(
                       'Sophia Rose',
@@ -114,7 +112,6 @@ class _SideBarState extends State<SideBar> {
           _selectedIndex = index;
         });
 
-        // Add a small delay before popping to see the selection effect
         Future.delayed(Duration(milliseconds: 150), () {
           Navigator.pop(context);
         });

@@ -1,4 +1,3 @@
-// lib/logic/cubit/social_auth_state.dart
 part of 'social_auth_cubit.dart';
 
 abstract class SocialAuthState {}

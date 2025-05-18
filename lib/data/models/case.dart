@@ -43,7 +43,6 @@ class Case {
     try {
       print("Full JSON: $json");
 
-      // Now extract each field individually with full error handling
       int? parsedId;
       try {
         parsedId = json['id'];
@@ -212,7 +211,6 @@ class Case {
         updates = null;
       }
 
-      // Now create the Case object with all parsed values
       return Case(
         id: parsedId,
         firstName: firstName,

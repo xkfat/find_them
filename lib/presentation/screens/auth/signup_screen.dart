@@ -246,10 +246,8 @@ class _SignupScreenState extends State<SignupScreen> {
       final password = _passwordController.text;
       final passwordConfirmation = _confirmPasswordController.text;
 
-      // Clear any previous error states
       _clearAllErrors();
 
-      // Call the signup method on the cubit
       context.read<SignUpCubit>().signup(
         firstName: firstName,
         lastName: lastName,
@@ -260,7 +258,6 @@ class _SignupScreenState extends State<SignupScreen> {
         passwordConfirmation: passwordConfirmation,
       );
     } else {
-      // Error handling for validation failures
       List<String> errorMessages = [];
       if (_firstNameError && _firstNameErrorText != null) {
         errorMessages.add(_firstNameErrorText!);
@@ -314,19 +311,17 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _handleFieldError(String field, String message) {
     setState(() {
-      _clearAllErrors(); // Clear any existing errors first
+      _clearAllErrors(); 
 
       switch (field.toLowerCase()) {
         case 'username':
           _usernameError = true;
           _usernameErrorText = message;
-          // Scroll to username field if needed
           break;
 
         case 'email':
           _emailError = true;
           _emailErrorText = message;
-          // Scroll to email field if needed
           break;
 
         case 'phone':
@@ -334,38 +329,32 @@ class _SignupScreenState extends State<SignupScreen> {
         case 'phonenumber':
           _phoneNumberError = true;
           _phoneNumberErrorText = message;
-          // Scroll to phone field if needed
           break;
 
         case 'password':
           _passwordError = true;
           _passwordErrorText = message;
-          // Scroll to password field if needed
           break;
 
         case 'confirm_password':
         case 'confirmpassword':
           _confirmPasswordError = true;
           _confirmPasswordErrorText = message;
-          // Scroll to confirm password field if needed
           break;
 
         case 'first_name':
         case 'firstname':
           _firstNameError = true;
           _firstNameErrorText = message;
-          // Scroll to first name field if needed
           break;
 
         case 'last_name':
         case 'lastname':
           _lastNameError = true;
           _lastNameErrorText = message;
-          // Scroll to last name field if needed
           break;
 
         default:
-          // If the field doesn't match any of the above, show a general error dialog
           _showErrorDialog(message);
           break;
       }
@@ -488,7 +477,6 @@ class _SignupScreenState extends State<SignupScreen> {
           backgroundColor: Colors.white,
           body: Stack(
             children: [
-              // Main content - always visible
               SafeArea(
                 child: Center(
                   child: SingleChildScrollView(

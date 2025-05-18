@@ -1,4 +1,3 @@
-// lib/data/services/social_auth_service.dart
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -9,21 +8,16 @@ class SocialAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  // Google Sign In
   Future<Map<String, dynamic>> signInWithGoogle() async {
     try {
-      // Step 1: Get Google account
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         return {'success': false, 'message': 'Sign in canceled'};
       }
 
-      // Step 2: Get authentication details
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
-      // Step 3: Manually create user data without using Firebase
-      // Parse name parts safely
       String fullName = googleUser.displayName ?? '';
       List<String> nameParts = fullName.split(' ');
       String firstName = nameParts.isNotEmpty ? nameParts.first : '';
@@ -42,7 +36,6 @@ class SocialAuthService {
         'username': googleUser.email.split('@').first,
       };
 
-      // Step 4: Authenticate with your server
       bool serverAuth = await _authenticateWithServer(userData);
       return {'success': serverAuth, 'user': userData};
     } catch (e) {
@@ -51,27 +44,21 @@ class SocialAuthService {
     }
   }
 
-  // Facebook Sign In
   Future<Map<String, dynamic>> signInWithFacebook() async {
     try {
-      // Step 1: Logout from any previous Facebook session
       await FacebookAuth.instance.logOut();
 
-      // Step 2: Login to Facebook with permissions
       final LoginResult result = await FacebookAuth.instance.login(
         permissions: ['email', 'public_profile'],
       );
 
       if (result.status == LoginStatus.success) {
-        // Step 3: Get user data from Facebook
         final facebookUserData = await FacebookAuth.instance.getUserData(
           fields: "id,name,email,picture.width(200),first_name,last_name",
         );
 
-        // Get email with null safety
         String email = facebookUserData['email'] ?? '';
 
-        // Step 4: Manually create user data without using Firebase
         Map<String, dynamic> userData = {
           'provider': 'facebook',
           'id': facebookUserData['id'] ?? '',
@@ -88,7 +75,6 @@ class SocialAuthService {
                   : 'fb_${facebookUserData['id'] ?? ''}',
         };
 
-        // Step 5: Authenticate with your server
         bool serverAuth = await _authenticateWithServer(userData);
         return {'success': serverAuth, 'user': userData};
       }
@@ -121,7 +107,6 @@ class SocialAuthService {
       print("Server response code: ${response.statusCode}");
       print("Server response body: ${response.body}");
 
-      // Simply return true if the server accepted the request
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       print("Server Authentication Error: $e");
@@ -149,7 +134,6 @@ Future<bool> updateUserPhone(String phoneNumber, String token) async {
   }
 }
 
-  // Sign out
   Future<void> signOut() async {
     await _auth.signOut();
     await _googleSignIn.signOut();

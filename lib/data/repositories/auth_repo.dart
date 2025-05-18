@@ -41,7 +41,6 @@ class AuthRepository {
 
 
 
-//navigating back after signup
   Future<bool> deleteAccount(String username) async {
   try {
     final response = await _authService.deleteAccount(username);

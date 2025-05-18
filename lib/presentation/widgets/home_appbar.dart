@@ -1,4 +1,3 @@
-// lib/presentation/widgets/home_appbar.dart
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/presentation/widgets/side_bar.dart';
 import 'package:flutter/material.dart';
@@ -57,10 +56,8 @@ class HomeAppBar extends StatelessWidget {
           height: MediaQuery.of(context).size.height,
           child: Row(
             children: [
-              // SideBar on the left
               const SideBar(),
               
-              // Backdrop - clicking this closes the drawer
               Expanded(
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),

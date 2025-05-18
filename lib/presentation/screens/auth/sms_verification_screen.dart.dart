@@ -47,7 +47,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
       });
     }
 
-    // Send verification code when screen initializes
     _sendVerificationCode();
     _startTimer();
   }
@@ -77,7 +76,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
           } else {
             _canResend = true;
             timer.cancel();
-            // Notify cubit that timer has expired
             context.read<SmsVerificationCubit>().handleTimeout();
           }
         });
@@ -102,13 +100,11 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
       String enteredCode = _controllers.map((c) => c.text).join();
 
       if (widget.signUpData != null) {
-        // If we have signup data, complete the signup process
         context.read<SmsVerificationCubit>().completeSignupWithVerification(
           widget.signUpData!,
           enteredCode,
         );
       } else {
-        // Just verify the code
         context.read<SmsVerificationCubit>().verifyCode(enteredCode);
       }
     } else {
@@ -136,7 +132,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
 
   void _goBack() async {
     if (widget.signUpData != null) {
-      // Show confirmation dialog to delete account
       bool? shouldDelete = await showDialog<bool>(
         context: context,
         builder:
@@ -159,8 +154,6 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
       );
 
       if (shouldDelete == true) {
-        // For a real app, delete the account
-        // For this demo, just simulate account deletion
         context.read<SmsVerificationCubit>().deleteAccount(
           widget.signUpData!.username,
         );
@@ -175,19 +168,16 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
     return BlocConsumer<SmsVerificationCubit, SmsVerificationState>(
       listener: (context, state) {
         if (state is SmsVerificationSuccess) {
-          // Show success screen on successful verification
           setState(() {
             _showSuccess = true;
             _showError = false;
           });
         } else if (state is SmsVerificationError) {
-          // Show error message
           setState(() {
             _showError = true;
             _errorMessage = state.error;
           });
         } else if (state is SmsVerificationCodeSent) {
-          // Show snackbar when code is sent
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -195,10 +185,8 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
             ),
           );
         } else if (state is SmsVerificationAccountDeleted) {
-          // Account has been deleted, go back to signup screen
           Navigator.of(context).pop();
         } else if (state is SmsVerificationTimedOut) {
-          // Timer has expired, enable resend button
           setState(() {
             _canResend = true;
           });
@@ -461,12 +449,11 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
             ),
           ),
 
-          // Full-screen loading overlay (optional, if you want it instead of the button indicator)
           if (isLoading &&
-              false) // Set to true if you want a full-screen loading overlay
+              false) 
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black,
                 child: Center(
                   child: CircularProgressIndicator(color: AppColors.teal),
                 ),

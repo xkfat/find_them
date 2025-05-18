@@ -117,7 +117,6 @@ class _CaseCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Photo
               Container(
                 width: 82,
                 height: 82,
@@ -139,12 +138,10 @@ class _CaseCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              // Information
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Full Name
                     Text(
                       caseData.fullName,
                       style: GoogleFonts.inter(
@@ -192,7 +189,6 @@ class _CaseCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        // Last seen
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

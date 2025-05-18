@@ -39,7 +39,6 @@ class CaseService {
       if (nameOrLocation != null && nameOrLocation.isNotEmpty) {
         queryParams['name_or_location'] = nameOrLocation;
       } else {
-        // Original behavior for backwards compatibility
         if (name != null && name.isNotEmpty) queryParams['name'] = name;
         if (lastSeenLocation != null && lastSeenLocation.isNotEmpty)
           queryParams['location'] = lastSeenLocation;

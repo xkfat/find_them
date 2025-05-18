@@ -49,8 +49,8 @@ class CaseFilterState extends Equatable {
       lastSeenLocation:
           clearLastSeenLocation
               ? null
-              : (lastSeenLocation ?? this.lastSeenLocation), // Handle clearing
-      nameOrLocation: clearNameOrLocation ? null : (nameOrLocation ?? this.nameOrLocation),  // Add this
+              : (lastSeenLocation ?? this.lastSeenLocation), 
+      nameOrLocation: clearNameOrLocation ? null : (nameOrLocation ?? this.nameOrLocation),  
 
       ageMin: clearAgeMin ? null : (ageMin ?? this.ageMin),
       ageMax: clearAgeMax ? null : (ageMax ?? this.ageMax),

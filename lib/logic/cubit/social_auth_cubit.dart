@@ -1,4 +1,3 @@
-// lib/logic/cubit/social_auth_cubit.dart
 import 'package:bloc/bloc.dart';
 import 'package:find_them/data/repositories/social_auth_repo.dart';
 
@@ -74,7 +73,6 @@ Future<bool> updatePhoneNumber(String phoneNumber, String token) async {
   if (_isClosed) return false;
   
   try {
-    // Assuming you have a method in your repository
     return await _repository.updateUserPhone(phoneNumber, token);
   } catch (e) {
     print('Error updating phone: $e');

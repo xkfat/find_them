@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(const Duration(milliseconds: 3600), () {
       route();
     });
-    //  await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 1));
   }
 
   route() {}

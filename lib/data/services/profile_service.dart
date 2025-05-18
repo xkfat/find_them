@@ -24,7 +24,7 @@ class ProfileService {
       var data = user.toJson();
       
       if (user.profilePhoto != null && user.profilePhoto!.startsWith('file://')) {
-        final filePath = user.profilePhoto!.replaceFirst('file://', '');
+        final filePath = user.profilePhoto!.replaceFirst('file:', '');
         
         FormData formData = FormData.fromMap(data);
         formData.files.add(

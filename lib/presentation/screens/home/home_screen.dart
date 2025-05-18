@@ -25,7 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Load cases when screen initializes
     context.read<CaseCubit>().getCases();
   }
 
@@ -66,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 10),
 
-          // Search Bar
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 16),
@@ -125,10 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Space between search bar and case list (22 pixels)
           const SizedBox(height: 22),
 
-          // Case List Widget
           Expanded(
             child: BlocBuilder<CaseCubit, CaseListState>(
               builder: (context, state) {

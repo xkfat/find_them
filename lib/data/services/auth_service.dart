@@ -1,4 +1,3 @@
-// lib/data/services/auth_service.dart
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -16,11 +15,9 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   // final ApiService _apiService;
-  // late Dio dio;
   static const String _authDataKey = 'auth_data';
 
   AuthService() {
-    //  dio = _apiService.dio;
   }
   dynamic _response(http.Response response) {
     switch (response.statusCode) {
@@ -186,7 +183,6 @@ class AuthService {
 }
 
   /*
- // Token handling and storage methods
   Future<AuthData?> getAuthData() async {
     final prefs = await SharedPreferences.getInstance();
     final encodedData = prefs.getString(_authDataKey);
@@ -211,7 +207,6 @@ class AuthService {
     await _apiService.setAuthToken(authData.token);
   }
 
-  // API methods
   Future<AuthData> loginWithCredentials(LoginCredentials credentials) async {
     try {
       print('Attempting login with username: ${credentials.username}');
@@ -241,32 +236,8 @@ class AuthService {
     }
   }
 
-  Future<AuthData> signup(SignUpData data) async {
-    try {
-      print('Attempting signup for user: ${data.username}');
-      print('Request URL: ${dio.options.baseUrl}${ApiConstants.signup}');
-      print('Request data: ${data.toJson()}');
 
-      Response response = await dio.post(
-        ApiConstants.signup,
-        data: data.toJson(),
-      );
-
-      print('Signup successful, processing response');
-      print('Response data: ${response.data}');
-
-      final authData = AuthData.fromJson(response.data);
-      await _saveAuthData(authData);
-      return authData;
-    } catch (e) {
-      print('Signup error: $e');
-      if (e is DioError && e.response != null) {
-        print('Response status: ${e.response?.statusCode}');
-        print('Response data: ${e.response?.data}');
-      }
-      throw Exception('Signup failed: ${e.toString()}');
-    }
-  }
+  
 
   Future<AuthData?> authenticateWithFirebase(
     firebase_auth.UserCredential credential,
@@ -408,26 +379,7 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> validateSignupFields({
-    required String username,
-    required String email,
-    String? phoneNumber,
-  }) async {
-    try {
-      print('Validating signup fields');
-      await dio.post(
-        'accounts/validate-fields/', // Use the correct endpoint
-        data: {
-          'username': username,
-          'email': email,
-          if (phoneNumber != null) 'phone_number': phoneNumber,
-        },
-      );
-
-      return {'success': true};
-    } catch (e) {
-      throw e;
-    }
-  }
+  
+  
   */
 }

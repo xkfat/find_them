@@ -73,7 +73,6 @@ class _SignUpOptionsContent extends StatelessWidget {
 
         if (!context.mounted) return;
 
-        // Close any open dialogs
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         }
@@ -86,7 +85,6 @@ class _SignUpOptionsContent extends StatelessWidget {
             print("Home route constant value: ${RouteConstants.home}");
             print("Attempting to navigate to home screen...");
 
-            // Try using MaterialPageRoute directly instead of named route
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const HomeScreen()),
               (route) => false,

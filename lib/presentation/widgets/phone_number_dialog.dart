@@ -38,7 +38,6 @@ class _PhoneNumberDialogState extends State<PhoneNumberDialog> {
       return;
     }
 
-    // Basic validation - you can enhance this
     if (phone.length < 8) {
       setState(() {
         _errorText = 'Please enter a valid phone number';
@@ -51,7 +50,6 @@ class _PhoneNumberDialogState extends State<PhoneNumberDialog> {
       _errorText = null;
     });
 
-    // Submit the phone number
     widget.onPhoneSubmitted(phone);
   }
 

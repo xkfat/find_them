@@ -129,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final username = _usernameController.text.trim();
       final password = _passwordController.text;
 
-      //
+      
       context.read<AuthentificationCubit>().login(username, password);
     }
   }
