@@ -4,6 +4,7 @@ import 'package:find_them/data/services/social_auth_service.dart';
 import 'package:find_them/logic/cubit/social_auth_cubit.dart';
 import 'package:find_them/logic/cubits/auth/auth_state.dart';
 import 'package:find_them/logic/cubits/auth/auth_cubit.dart';
+import 'package:find_them/presentation/screens/home/home_screen.dart';
 import 'package:find_them/presentation/widgets/phone_number_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -69,56 +70,35 @@ class _SignUpOptionsContent extends StatelessWidget {
     return BlocListener<SocialAuthCubit, SocialAuthState>(
       listener: (context, state) {
         print("Current SocialAuthState: ${state.runtimeType}");
+
         if (!context.mounted) return;
 
+        // Close any open dialogs
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         }
 
         if (state is SocialAuthSuccess) {
-          final userData = state.userData;
-          final String? phoneNumber = userData['user']?['phone_number'];
-          final String token = userData['token'];
-          if (phoneNumber == null || phoneNumber.isEmpty) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder:
-                  (context) => PhoneNumberDialog(
-                    userData: userData,
-                    onPhoneSubmitted: (phone) async {
-                      Navigator.pop(context);
-                      _showLoadingDialog(context);
+          print("Authentication successful!");
+          print("State userData: ${state.userData}");
 
-                      final success = await context
-                          .read<SocialAuthCubit>()
-                          .updatePhoneNumber(phone, token);
-                      if (success && context.mounted) {
-                        // Close loading dialog
-                        if (Navigator.of(context).canPop()) {
-                          Navigator.of(context).pop();
-                        }
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          RouteConstants.home,
-                          (route) => false,
-                        );
-                      } else if (context.mounted) {
-                        // Close loading dialog
-                        if (Navigator.of(context).canPop()) {
-                          Navigator.of(context).pop();
-                        }
-                        _showErrorDialog(
-                          context,
-                          'Failed to update phone number. Please try again later.',
-                        );
-                      }
-                    },
-                  ),
+          try {
+            print("Home route constant value: ${RouteConstants.home}");
+            print("Attempting to navigate to home screen...");
+
+            // Try using MaterialPageRoute directly instead of named route
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
             );
-          } else {
-            Navigator.of(
+
+            print("Navigation completed successfully");
+          } catch (e) {
+            print("Navigation error: $e");
+            _showErrorDialog(
               context,
-            ).pushNamedAndRemoveUntil(RouteConstants.home, (route) => false);
+              "Navigation error: $e. Please restart the app.",
+            );
           }
         } else if (state is SocialAuthError) {
           print("SocialAuthError state received: ${state.message}");
@@ -302,7 +282,6 @@ class _SignUpOptionsContent extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-
                             child: Row(
                               children: [
                                 const SizedBox(width: 36),
@@ -320,7 +299,6 @@ class _SignUpOptionsContent extends StatelessWidget {
                                     color: AppColors.white,
                                   ),
                                 ),
-
                                 const Spacer(),
                               ],
                             ),

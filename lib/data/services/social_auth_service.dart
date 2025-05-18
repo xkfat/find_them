@@ -102,7 +102,6 @@ class SocialAuthService {
 
   Future<bool> _authenticateWithServer(Map<String, dynamic> userData) async {
     try {
-      // Simplify the data sent to match your backend expectations
       Map<String, dynamic> authData = {
         'id_token': userData['id_token'] ?? userData['access_token'],
         'provider': userData['provider'],

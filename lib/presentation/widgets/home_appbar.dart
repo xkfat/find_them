@@ -1,7 +1,9 @@
+// lib/presentation/widgets/home_appbar.dart
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:find_them/presentation/widgets/side_bar.dart';
 import 'package:flutter/material.dart';
 
-class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
 
   @override
@@ -22,7 +24,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 size: 24,
                 color: AppColors.darkGreen,
               ),
-              onPressed: () {},
+              onPressed: () {
+                _showSideBar(context);
+              },
             ),
           ),
 
@@ -43,6 +47,32 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  @override
-  Size get preferredSize => const Size.fromHeight(108); 
+  void _showSideBar(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Row(
+            children: [
+              // SideBar on the left
+              const SideBar(),
+              
+              // Backdrop - clicking this closes the drawer
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

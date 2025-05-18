@@ -2,7 +2,6 @@ import 'package:find_them/presentation/widgets/home_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/constants/themes/app_text.dart';
-import 'package:find_them/core/constants/strings/string_constants.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -33,10 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
-      appBar: const HomeAppBar(),
 
       body: Column(
         children: [
+          const HomeAppBar(),
+
           const SizedBox(height: 10),
 
           Center(
