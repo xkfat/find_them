@@ -6,14 +6,13 @@ import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CaseDetailScreen extends StatefulWidget {
   final int caseId;
 
-  const CaseDetailScreen({
-    Key? key,
-    required this.caseId,
-  }) : super(key: key);
+  const CaseDetailScreen({Key? key, required this.caseId}) : super(key: key);
 
   @override
   State<CaseDetailScreen> createState() => _CaseDetailScreenState();
@@ -23,14 +22,86 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch the case details when the screen initializes
-    context.read<CaseCubit>().getCaseWithUpdates(widget.caseId);
+    context.read<CaseCubit>().getCaseDetail(widget.caseId);
+  }
+
+  void _makePhoneCall(String phoneNumber) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+                    launchUrl(phoneUri);
+                  },
+                  icon: const Icon(Icons.phone, color: Colors.white, size: 20),
+                  label: const Text(
+                    'Call +222 31310909',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.teal,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundGrey,
+      backgroundColor: Colors.white,
       body: BlocBuilder<CaseCubit, CaseListState>(
         builder: (context, state) {
           if (state is CaseLoading) {
@@ -41,95 +112,279 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
             final caseData = state.caseData;
             return _buildCaseDetail(context, caseData);
           }
-          
+
           return const Center(child: Text('Case not found'));
         },
       ),
     );
   }
-  
+
   Widget _buildCaseDetail(BuildContext context, Case caseData) {
+    const String phoneNumber = '+22231310909';
+
+    String formattedDate = '';
+    try {
+      final DateTime date = caseData.lastSeenDate;
+      formattedDate = DateFormat('MMMM d, yyyy').format(date);
+    } catch (e) {
+      formattedDate =
+          '${caseData.lastSeenDate.day}/${caseData.lastSeenDate.month}/${caseData.lastSeenDate.year}';
+    }
+
     return SafeArea(
       child: Column(
         children: [
-          // Header with back button
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.only(left: 16, top: 8),
             child: Row(
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () => Navigator.pop(context),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                 ),
               ],
             ),
           ),
-          
-          // Case detail content
+
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Person photo
-                  Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.darkGreen, width: 2),
-                      image: DecorationImage(
-                        image: caseData.photo.isNotEmpty
-                          ? NetworkImage(caseData.photo)
-                          : const AssetImage('assets/images/profile.png') as ImageProvider,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  // Full name
-                  Text(
-                    caseData.fullName,
-                    style: GoogleFonts.inter(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  // Age and Status badges
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildInfoBadge(
-                        caseData.age.toString(),
-                        caseData.gender.value,
-                        Colors.grey[300]!,
-                      ),
-                      const SizedBox(width: 12),
-                      _buildStatusBadge(caseData.status.value),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Days missing/found/investigating badge
-                  _buildDaysInfoBox(caseData),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // Case information section
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
+            child: Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                Positioned(
+                  top: 60,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 364,
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.lighterMint,
                       borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 24),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 70),
+
+                            Text(
+                              caseData.fullName,
+                              style: GoogleFonts.inter(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+
+                            const SizedBox(height: 80),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 30,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _buildAgeBadge(caseData.age.toString()),
+                                  const SizedBox(width: 10),
+                                  _buildStatusBadge(caseData.status.value),
+                                  const SizedBox(width: 10),
+                                  _buildGenderBadge(caseData.gender.value),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 40),
+                            SizedBox(
+                              width: 248,
+                              height: 60,
+                              child: _buildDaysInfoBox(caseData),
+                            ),
+
+                            const SizedBox(height: 26),
+                            const Text(
+                              'Case Information',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+
+                            const SizedBox(height: 26),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 2,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.lighterMint,
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.calendar_today,
+                                            size: 18,
+                                            color: AppColors.darkGreen,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Last seen date:',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              formattedDate,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 16),
+
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.lighterMint,
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.location_on,
+                                            size: 18,
+                                            color: AppColors.darkGreen,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                'Last seen location:',
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                caseData.lastSeenLocation,
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 26),
+                            if (caseData.description.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 2,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Description:',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        caseData.description,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                Positioned(
+                  top: 0,
+                  child: Container(
+                    width: 198,
+                    height: 185,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.darkGreen, width: 2),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
@@ -137,165 +392,73 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                           offset: const Offset(0, 2),
                         ),
                       ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Case Information',
-                          style: AppTextStyles.titleMedium(context).copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildInfoRow('Last seen date:', '${caseData.lastSeenDate.day}/${caseData.lastSeenDate.month}/${caseData.lastSeenDate.year}'),
-                        const SizedBox(height: 8),
-                        _buildInfoRow('Last seen location:', caseData.lastSeenLocation),
-                        
-                        if (caseData.description.isNotEmpty) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            'Description:',
-                            style: AppTextStyles.bodyMedium(context).copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            caseData.description,
-                            style: AppTextStyles.bodyMedium(context),
-                          ),
-                        ],
-                      ],
+                      image: DecorationImage(
+                        image:
+                            caseData.photo.isNotEmpty
+                                ? NetworkImage(caseData.photo)
+                                : const AssetImage('assets/images/profile.png')
+                                    as ImageProvider,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                  
-                  // Updates section
-                  if (caseData.updates != null && caseData.updates!.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Updates',
-                            style: AppTextStyles.titleMedium(context).copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: caseData.updates!.length,
-                            separatorBuilder: (context, index) => const Divider(),
-                            itemBuilder: (context, index) {
-                              final update = caseData.updates![index];
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          update.formattedDate,
-                                          style: AppTextStyles.bodySmall(context).copyWith(
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      update.message,
-                                      style: AppTextStyles.bodyMedium(context),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  
-                  const SizedBox(height: 24),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          
-          // Bottom action buttons
+
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Color(0x1A000000),
                   blurRadius: 4,
-                  offset: const Offset(0, -2),
+                  offset: Offset(0, -1),
                 ),
               ],
             ),
             child: Row(
               children: [
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Share case action
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.teal,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Leave information action - empty for now
+                      },
+                      child: const Text(
+                        'Leave an information',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Share Case',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.darkGreen,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 16),
-                Expanded(
+
+                SizedBox(
+                  height: 48,
+                  width: 48,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Submit information action
-                    },
+                    onPressed: () => _makePhoneCall('+22231310909'),
+                    child: const Icon(Icons.phone, color: Colors.white),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.darkGreen,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: EdgeInsets.zero,
+                      backgroundColor: AppColors.teal,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Submit Information',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -308,28 +471,69 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
     );
   }
 
-  Widget _buildInfoBadge(String age, String gender, Color color) {
+  Widget _buildAgeBadge(String age) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      width: 80,
+      height: 34,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(30),
       ),
-      child: Text(
-        '$age years • $gender',
-        style: GoogleFonts.inter(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
+      child: Center(
+        child: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: age,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              TextSpan(
+                text: ' years old',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-  
+
+  Widget _buildGenderBadge(String gender) {
+    return Container(
+      width: 80,
+      height: 34,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Center(
+        child: Text(
+          gender,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatusBadge(String status) {
     Color badgeColor;
     Color textColor = Colors.white;
-    
+
     switch (status.toLowerCase()) {
       case 'missing':
         badgeColor = AppColors.missingRed;
@@ -344,42 +548,48 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
       default:
         badgeColor = Colors.grey;
     }
-    
+
     String displayStatus = status.replaceAll('_', ' ');
     if (displayStatus == 'under investigation') {
       displayStatus = 'Investigating';
     } else {
-      displayStatus = displayStatus.substring(0, 1).toUpperCase() + displayStatus.substring(1);
+      displayStatus =
+          displayStatus.substring(0, 1).toUpperCase() +
+          displayStatus.substring(1);
     }
-    
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      width: 124,
+      height: 34,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: badgeColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(30),
       ),
-      child: Text(
-        displayStatus,
-        style: GoogleFonts.inter(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: textColor,
+      child: Center(
+        child: Text(
+          displayStatus,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
         ),
       ),
     );
   }
-  
+
   Widget _buildDaysInfoBox(Case caseData) {
     Color backgroundColor;
     Color iconColor;
     IconData iconData;
     String message;
-    
+
     switch (caseData.status.value.toLowerCase()) {
       case 'missing':
         backgroundColor = AppColors.missingRedBackground;
         iconColor = AppColors.missingRed;
-        iconData = Icons.warning_amber_rounded;
+        iconData = Icons.error_outline;
         message = 'Missing for ${caseData.daysMissing} days';
         break;
       case 'under_investigation':
@@ -400,7 +610,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
         iconData = Icons.info;
         message = 'Status: ${caseData.status.value}';
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -409,8 +619,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(iconData, color: iconColor),
+          Icon(iconData, color: iconColor, size: 20),
           const SizedBox(width: 12),
           Text(
             message,
@@ -422,30 +633,6 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
           ),
         ],
       ),
-    );
-  }
-  
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 2,
-          child: Text(
-            label,
-            style: AppTextStyles.bodyMedium(context).copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 3,
-          child: Text(
-            value,
-            style: AppTextStyles.bodyMedium(context),
-          ),
-        ),
-      ],
     );
   }
 }
