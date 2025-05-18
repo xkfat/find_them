@@ -1,4 +1,5 @@
 import 'package:find_them/presentation/widgets/case/case_card.dart';
+import 'package:find_them/presentation/widgets/case/case_filter.dart';
 import 'package:find_them/presentation/widgets/home_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,7 +7,6 @@ import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/constants/themes/app_text.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
-import 'package:find_them/data/models/case.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   int _selectedIndex = 0;
   final TextEditingController _searchController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -50,7 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.backgroundGrey,
+
+      endDrawer: FilterDrawer(
+        onClose: () {
+          Navigator.pop(context);
+        },
+      ),
 
       body: Column(
         children: [
@@ -108,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: AppColors.darkGreen,
                       ),
                       onPressed: () {
-                        // Show filter options
+                        _scaffoldKey.currentState?.openEndDrawer();
                       },
                     ),
                   ],

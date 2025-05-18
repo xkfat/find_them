@@ -1,6 +1,8 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/data/models/case.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -45,6 +47,8 @@ class CaseListWidget extends StatelessWidget {
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: () {
+                final cubit = context.read<CaseCubit>();
+                cubit.clearFilters();
                 onRefresh();
               },
               style: ElevatedButton.styleFrom(
@@ -107,9 +111,11 @@ class _CaseCard extends StatelessWidget {
               Container(
                 width: 82,
                 height: 82,
+
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.darkGreen,
+
                   image:
                       caseData.photo.isNotEmpty
                           ? DecorationImage(
@@ -133,7 +139,8 @@ class _CaseCard extends StatelessWidget {
                       caseData.fullName,
                       style: GoogleFonts.inter(
                         fontSize: 22,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.black,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -155,18 +162,18 @@ class _CaseCard extends StatelessWidget {
                                   color: AppColors.black,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 9),
                               Row(
                                 children: [
                                   const Icon(
                                     PhosphorIcons.calendar_x,
-                                    size: 22.0,
+                                    size: 20,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    '${caseData.lastSeenDate.year}-${caseData.lastSeenDate.month}-${caseData.lastSeenDate.day}',
+                                    '${caseData.lastSeenDate.year}/${caseData.lastSeenDate.month}/${caseData.lastSeenDate.day}',
                                     style: GoogleFonts.inter(
-                                      fontSize: 12,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -188,7 +195,7 @@ class _CaseCard extends StatelessWidget {
                                   color: AppColors.black,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 9),
                               Text(
                                 caseData.lastSeenLocation,
                                 style: GoogleFonts.inter(
