@@ -4,8 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/cupertino.dart';
 
-
-
 class ButtomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -20,8 +18,8 @@ class ButtomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.lightMint,
-        borderRadius: BorderRadius.circular(20), 
+        color: AppColors.lighterMint,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 1),
         ],

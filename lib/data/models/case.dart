@@ -118,41 +118,6 @@ class Case {
     return yearsMissing > 0 ? age + yearsMissing : age;
   }
   
-  Case copyWith({
-    int? id,
-    String? firstName,
-    String? lastName,
-    int? age,
-    Gender? gender,
-    String? photo,
-    String? description,
-    DateTime? lastSeenDate,
-    String? lastSeenLocation,
-    double? latitude,
-    double? longitude,
-    User? reporter,
-    CaseStatus? status,
-    DateTime? dateReported,
-    SubmissionStatus? submissionStatus,
-    List<CaseUpdate>? updates,
-  }) {
-    return Case(
-      id: id ?? this.id,
-      firstName: firstName ?? this.firstName,
-      lastName: lastName ?? this.lastName,
-      age: age ?? this.age,
-      gender: gender ?? this.gender,
-      photo: photo ?? this.photo,
-      description: description ?? this.description,
-      lastSeenDate: lastSeenDate ?? this.lastSeenDate,
-      lastSeenLocation: lastSeenLocation ?? this.lastSeenLocation,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      reporter: reporter ?? this.reporter,
-      status: status ?? this.status,
-      dateReported: dateReported ?? this.dateReported,
-      submissionStatus: submissionStatus ?? this.submissionStatus,
-      updates: updates ?? this.updates,
-    );
-  }
+
+  
 }

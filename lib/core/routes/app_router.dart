@@ -1,7 +1,10 @@
 import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
+import 'package:find_them/data/repositories/case_repo.dart';
 import 'package:find_them/data/services/auth_service.dart';
+import 'package:find_them/data/services/case_service.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
+import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:find_them/logic/cubit/sign_up_cubit.dart';
 import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +81,16 @@ class AppRouter {
 */
 
       case RouteConstants.home:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider<CaseCubit>(
+                create:
+                    (context) => CaseCubit(
+                      CaseRepository(CaseService(baseUrl: 'your-api-url')),
+                    ),
+                child: const HomeScreen(),
+              ),
+        );
 
       /*
       case RouteConstants.map:

@@ -4,6 +4,7 @@ import 'package:find_them/data/models/user.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/data/services/social_auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:flutter/widgets.dart';
 
 class AuthRepository {
   final AuthService _authService;
@@ -34,6 +35,10 @@ class AuthRepository {
       passwordConfirmation: passwordConfirmation,
     );
   }
+
+
+
+
 
 
 //navigating back after signup

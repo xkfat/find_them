@@ -1,169 +1,148 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:find_them/data/models/case.dart';
 import 'package:find_them/data/models/case_update.dart';
-import 'package:find_them/data/models/enum.dart';
-import 'api_service.dart';
-import 'package:find_them/core/constants/api_constants.dart';
 
 class CaseService {
-  late Dio dio;
+  final String baseUrl;
+  final http.Client _httpClient;
+  final String? authToken;
 
-  CaseService(ApiService apiService) {
-    dio = apiService.dio;
-  }
+  CaseService({required this.baseUrl, this.authToken, http.Client? httpClient})
+    : _httpClient = httpClient ?? http.Client();
 
-  Future<List<Case>> getCases({CaseFilter? filter}) async {
-    try {
-      final queryParams = filter?.toQueryParams();
-
-      Response response = await dio.get(
-        ApiConstants.cases,
-        queryParameters: queryParams,
-      );
-      return (response.data as List)
-          .map((json) => Case.fromJson(json))
-          .toList();
-    } catch (e) {
-      return [];
+  Map<String, String> get _headers {
+    final headers = {'Content-Type': 'application/json'};
+    if (authToken != null) {
+      headers['Authorization'] = 'Bearer $authToken';
     }
-  }
-  Future<Case?> getCase(int id) async {
-    try {
-      Response response = await dio.get('${ApiConstants.cases}/$id/');
-      return Case.fromJson(response.data);
-    } catch (e) {
-      return null;
-    }
+    return headers;
   }
 
-
-   Future<Case?> createCase(Case case_) async {
+  Future<List<Case>> getCases({
+    String? name,
+    int? ageMin,
+    int? ageMax,
+    String? gender,
+    String? status,
+    String? startDate,
+    String? endDate,
+  }) async {
     try {
-      var data = case_.toJson();
-      
-      if (case_.photo.startsWith('file://')) {
-        final filePath = case_.photo.replaceFirst('file://', '');
-        
-        FormData formData = FormData.fromMap(data);
-        formData.files.add(
-          MapEntry('photo', await MultipartFile.fromFile(filePath)),
-        );
-        
-        Response response = await dio.post(
-          ApiConstants.cases,
-          data: formData,
-        );
-        
-        return Case.fromJson(response.data);
+      final queryParams = <String, String>{};
+      if (name != null && name.isNotEmpty) queryParams['name'] = name;
+      if (ageMin != null) queryParams['age_min'] = ageMin.toString();
+      if (ageMax != null) queryParams['age_max'] = ageMax.toString();
+      if (gender != null && gender.isNotEmpty) queryParams['gender'] = gender;
+      if (status != null && status.isNotEmpty) queryParams['status'] = status;
+      if (startDate != null) queryParams['date_reported_start'] = startDate;
+      if (endDate != null) queryParams['date_reported_end'] = endDate;
+
+      final uri = Uri.parse(
+        'http://10.0.2.2:8000/api/cases/',
+      ).replace(queryParameters: queryParams);
+      final response = await _httpClient.get(uri, headers: _headers);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> results = responseData['results'] ?? [];
+        return results.map((json) => Case.fromJson(json)).toList();
       } else {
-        Response response = await dio.post(
-          ApiConstants.cases,
-          data: data,
-        );
-        
-        return Case.fromJson(response.data);
+        throw Exception('Failed to load cases: ${response.statusCode}');
       }
     } catch (e) {
-      return null;
+      throw Exception('Error getting cases: $e');
     }
   }
-  
-  Future<Case?> updateCase(Case case_) async {
+
+  Future<Case> getCaseById(int id) async {
     try {
-      if (case_.id == null) {
-        throw Exception('Case ID is required for updates');
-      }
-      
-      var data = case_.toJson();
-      
-      if (case_.photo.startsWith('file://')) {
-        final filePath = case_.photo.replaceFirst('file://', '');
-        
-        FormData formData = FormData.fromMap(data);
-        formData.files.add(
-          MapEntry('photo', await MultipartFile.fromFile(filePath)),
-        );
-        
-        Response response = await dio.put(
-          '${ApiConstants.cases}/${case_.id}/',
-          data: formData,
-        );
-        
-        return Case.fromJson(response.data);
+      final response = await _httpClient.get(
+        Uri.parse('http://10.0.2.2:8000/api/cases/$id/'),
+        headers: _headers,
+      );
+
+      if (response.statusCode == 200) {
+        return Case.fromJson(json.decode(response.body));
       } else {
-        Response response = await dio.put(
-          '${ApiConstants.cases}/${case_.id}/',
-          data: data,
-        );
-        
-        return Case.fromJson(response.data);
+        throw Exception('Failed to load case: ${response.statusCode}');
       }
     } catch (e) {
-      return null;
+      throw Exception('Error getting case details: $e');
     }
   }
-  
-  Future<bool> deleteCase(int id) async {
+
+  Future<Case> getCaseWithUpdates(int id) async {
     try {
-      await dio.delete('${ApiConstants.cases}/$id/');
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-  
-  Future<List<Case>> searchCases(String query) async {
-    try {
-      Response response = await dio.get(
-        ApiConstants.caseSearch,
-        queryParameters: {'q': query},
+      final response = await _httpClient.get(
+        Uri.parse('http://10.0.2.2:8000/api/cases/$id/with-updates/'),
+        headers: _headers,
       );
-      
-      return (response.data as List)
-          .map((json) => Case.fromJson(json))
-          .toList();
+
+      if (response.statusCode == 200) {
+        return Case.fromJson(json.decode(response.body));
+      } else {
+        throw Exception(
+          'Failed to load case with updates: ${response.statusCode}',
+        );
+      }
     } catch (e) {
-      return [];
+      throw Exception('Error getting case with updates: $e');
     }
   }
-  
-  Future<CaseUpdate?> addCaseUpdate(CaseUpdate update) async {
+
+  Future<Case> submitCase({
+    required String firstName,
+    required String lastName,
+    required int age,
+    required String gender,
+    required File photo,
+    required String description,
+    required DateTime lastSeenDate,
+    required String lastSeenLocation,
+    double? latitude,
+    double? longitude,
+  }) async {
     try {
-      Response response = await dio.post(
-        ApiConstants.caseUpdates,
-        data: update.toJson(),
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://10.0.2.2:8000/api/cases/'),
       );
-      
-      return CaseUpdate.fromJson(response.data);
+      if (authToken != null) {
+        request.headers['Authorization'] = 'Bearer $authToken';
+      }
+      request.fields['first_name'] = firstName;
+      request.fields['last_name'] = lastName;
+      request.fields['age'] = age.toString();
+      request.fields['gender'] = gender;
+      request.fields['description'] = description;
+      request.fields['last_seen_date'] =
+          lastSeenDate.toIso8601String().split('T').first;
+      request.fields['last_seen_location'] = lastSeenLocation;
+
+      if (latitude != null) {
+        request.fields['latitude'] = latitude.toString();
+      }
+
+      if (longitude != null) {
+        request.fields['longitude'] = longitude.toString();
+      }
+
+      var photoFile = await http.MultipartFile.fromPath('photo', photo.path);
+      request.files.add(photoFile);
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 201) {
+        return Case.fromJson(json.decode(response.body));
+      } else {
+        throw Exception(
+          'Failed to submit case: ${response.statusCode} - ${response.body}',
+        );
+      }
     } catch (e) {
-      return null;
-    }
-  }
-  
-  Future<List<CaseUpdate>> getCaseUpdates(int caseId) async {
-    try {
-      Response response = await dio.get(
-        ApiConstants.caseUpdates,
-        queryParameters: {'case': caseId.toString()},
-      );
-      
-      return (response.data as List)
-          .map((json) => CaseUpdate.fromJson(json))
-          .toList();
-    } catch (e) {
-      return [];
+      throw Exception('Error submitting case: $e');
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

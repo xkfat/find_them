@@ -1,0 +1,215 @@
+import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:flutter/material.dart';
+import 'package:find_them/data/models/case.dart';
+import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class CaseListWidget extends StatelessWidget {
+  final List<Case> cases;
+  final Function(int caseId) onCaseTap;
+  final bool isLoading;
+  final String? errorMessage;
+  final Function() onRefresh;
+
+  const CaseListWidget({
+    Key? key,
+    required this.cases,
+    required this.onCaseTap,
+    this.isLoading = false,
+    this.errorMessage,
+    required this.onRefresh,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (errorMessage != null) {
+      return Center(child: Text(errorMessage!));
+    }
+
+    if (cases.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 64,
+              color: AppColors.darkGreen.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text('No cases found matching your search'),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () {
+                onRefresh();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.darkGreen,
+              ),
+
+              child: Text(
+                'Show All Cases',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: () async {
+        onRefresh();
+      },
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        itemCount: cases.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 24),
+        itemBuilder: (context, index) {
+          return _CaseCard(caseData: cases[index], onTap: onCaseTap);
+        },
+      ),
+    );
+  }
+}
+
+class _CaseCard extends StatelessWidget {
+  final Case caseData;
+  final Function(int caseId) onTap;
+
+  const _CaseCard({Key? key, required this.caseData, required this.onTap})
+    : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (caseData.id != null) {
+          onTap(caseData.id!);
+        }
+      },
+      child: Container(
+        width: 370,
+        height: 140,
+        decoration: BoxDecoration(
+          color: AppColors.lighterMint,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF1C4D42), width: 1),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Photo
+              Container(
+                width: 82,
+                height: 82,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.darkGreen,
+                  image:
+                      caseData.photo.isNotEmpty
+                          ? DecorationImage(
+                            image: NetworkImage(caseData.photo),
+                            fit: BoxFit.cover,
+                          )
+                          : DecorationImage(
+                            image: AssetImage('assets/images/profile.png'),
+                            fit: BoxFit.cover,
+                          ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Information
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Full Name
+                    Text(
+                      caseData.fullName,
+                      style: GoogleFonts.inter(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Missing from',
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    PhosphorIcons.calendar_x,
+                                    size: 22.0,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${caseData.lastSeenDate.year}-${caseData.lastSeenDate.month}-${caseData.lastSeenDate.day}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Last seen
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Last seen',
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                caseData.lastSeenLocation,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

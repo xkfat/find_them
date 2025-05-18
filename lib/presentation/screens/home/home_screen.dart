@@ -1,8 +1,13 @@
+import 'package:find_them/presentation/widgets/case/case_card.dart';
 import 'package:find_them/presentation/widgets/home_appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/constants/themes/app_text.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
+import 'package:find_them/logic/cubit/case_list_cubit.dart';
+import 'package:find_them/data/models/case.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +19,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   int _selectedIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Load cases when screen initializes
+    context.read<CaseCubit>().getCases();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _onNavItemTapped(int index) {
     setState(() {
@@ -24,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onSearch(String query) {
     setState(() {
       _searchQuery = query;
-      //filtering queries v django
     });
+    context.read<CaseCubit>().searchByName(query);
   }
 
   @override
@@ -39,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 10),
 
+          // Search Bar
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 16),
@@ -59,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: _searchController,
                         decoration: InputDecoration(
                           hintText: 'Search',
                           contentPadding: const EdgeInsets.symmetric(
@@ -69,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             context,
                           ).copyWith(color: Colors.grey),
                         ),
+                        onSubmitted: _onSearch,
                       ),
                     ),
                     IconButton(
@@ -76,18 +98,42 @@ class _HomeScreenState extends State<HomeScreen> {
                         Icons.search,
                         color: AppColors.darkGreen,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        _onSearch(_searchController.text);
+                      },
                     ),
                     IconButton(
                       icon: const Icon(
                         Icons.filter_list,
                         color: AppColors.darkGreen,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        // Show filter options
+                      },
                     ),
                   ],
                 ),
               ),
+            ),
+          ),
+
+          // Space between search bar and case list (22 pixels)
+          const SizedBox(height: 22),
+
+          // Case List Widget
+          Expanded(
+            child: BlocBuilder<CaseCubit, CaseListState>(
+              builder: (context, state) {
+                return CaseListWidget(
+                  cases: state is CaseLoaded ? state.cases : [],
+                  isLoading: state is CaseLoading,
+                  errorMessage: state is CaseError ? state.message : null,
+                  onCaseTap: (caseId) {},
+                  onRefresh: () {
+                    context.read<CaseCubit>().getCases();
+                  },
+                );
+              },
             ),
           ),
         ],
