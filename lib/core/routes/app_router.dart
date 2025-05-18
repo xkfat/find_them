@@ -7,6 +7,7 @@ import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:find_them/logic/cubit/sign_up_cubit.dart';
 import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
+import 'package:find_them/presentation/screens/case/case_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/core/routes/route_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,15 +81,35 @@ class AppRouter {
         );
 */
 
-      case RouteConstants.home:
+        case RouteConstants.home:
         return MaterialPageRoute(
           builder:
               (_) => BlocProvider<CaseCubit>(
                 create:
                     (context) => CaseCubit(
-                      CaseRepository(CaseService(baseUrl: 'your-api-url')),
+                      CaseRepository(CaseService()),
                     ),
                 child: const HomeScreen(),
+              ),
+        );
+
+            case RouteConstants.caseDetails:
+        final int caseId = args is int ? args : (args is String ? int.tryParse(args) ?? 0 : 0);
+        if (caseId == 0) {
+          return MaterialPageRoute(
+            builder: (_) => const Scaffold(
+              body: Center(child: Text('Invalid case ID')),
+            ),
+          );
+        }
+        return MaterialPageRoute(
+          builder:
+              (context) => BlocProvider<CaseCubit>(
+                create:
+                    (context) => CaseCubit(
+                      CaseRepository(CaseService()),
+                    ),
+                child: CaseDetailScreen(caseId: caseId),
               ),
         );
 

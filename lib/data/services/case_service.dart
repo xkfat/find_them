@@ -9,8 +9,11 @@ class CaseService {
   final http.Client _httpClient;
   final String? authToken;
 
-  CaseService({required this.baseUrl, this.authToken, http.Client? httpClient})
-    : _httpClient = httpClient ?? http.Client();
+  CaseService({
+    this.baseUrl = 'http://10.0.2.2:8000/api',
+    this.authToken,
+    http.Client? httpClient,
+  }) : _httpClient = httpClient ?? http.Client();
 
   Map<String, String> get _headers {
     final headers = {'Content-Type': 'application/json'};
@@ -49,7 +52,7 @@ class CaseService {
       if (endDate != null) queryParams['date_reported_end'] = endDate;
 
       final uri = Uri.parse(
-        'http://10.0.2.2:8000/api/cases/',
+        '$baseUrl/cases/',
       ).replace(queryParameters: queryParams);
       final response = await _httpClient.get(uri, headers: _headers);
 
@@ -68,7 +71,7 @@ class CaseService {
   Future<Case> getCaseById(int id) async {
     try {
       final response = await _httpClient.get(
-        Uri.parse('http://10.0.2.2:8000/api/cases/$id/'),
+        Uri.parse('$baseUrl/cases/$id/'),
         headers: _headers,
       );
 
@@ -85,7 +88,7 @@ class CaseService {
   Future<Case> getCaseWithUpdates(int id) async {
     try {
       final response = await _httpClient.get(
-        Uri.parse('http://10.0.2.2:8000/api/cases/$id/with-updates/'),
+        Uri.parse('$baseUrl/cases/$id/with-updates/'),
         headers: _headers,
       );
 
@@ -114,10 +117,7 @@ class CaseService {
     double? longitude,
   }) async {
     try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('http://10.0.2.2:8000/api/cases/'),
-      );
+      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/cases/'));
       if (authToken != null) {
         request.headers['Authorization'] = 'Bearer $authToken';
       }
