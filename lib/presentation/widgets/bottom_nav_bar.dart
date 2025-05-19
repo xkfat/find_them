@@ -1,17 +1,14 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:find_them/core/routes/nav_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:flutter/cupertino.dart';
 
 class ButtomNavBar extends StatelessWidget {
   final int currentIndex;
-  final Function(int) onTap;
 
   const ButtomNavBar({
     super.key,
     required this.currentIndex,
-    required this.onTap,
   });
 
   @override
@@ -24,7 +21,6 @@ class ButtomNavBar extends StatelessWidget {
           BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 1),
         ],
       ),
-
       child: Material(
         color: Colors.transparent,
         child: BottomNavigationBar(
@@ -44,7 +40,7 @@ class ButtomNavBar extends StatelessWidget {
             height: 2,
           ),
           currentIndex: currentIndex,
-          onTap: onTap,
+          onTap: (index) => NavHandler.handleNavTap(context, index),
           items: [
             BottomNavigationBarItem(
               icon: Image.asset(
@@ -53,7 +49,6 @@ class ButtomNavBar extends StatelessWidget {
                 height: 35,
                 color: AppColors.teal,
               ),
-
               activeIcon: Image.asset(
                 'assets/icons/house-line-fill.png',
                 width: 35,

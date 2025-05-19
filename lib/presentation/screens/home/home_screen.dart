@@ -1,3 +1,4 @@
+import 'package:find_them/presentation/screens/report/report_screen.dart';
 import 'package:find_them/presentation/widgets/case/case_card.dart';
 import 'package:find_them/presentation/widgets/case/case_filter.dart';
 import 'package:find_them/presentation/widgets/home_appbar.dart';
@@ -35,16 +36,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onNavItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Report1Screen()),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   void _onSearch(String query) {
     setState(() {
       _searchQuery = query;
     });
-  context.read<CaseCubit>().searchByNameOrLocation(query);
+    context.read<CaseCubit>().searchByNameOrLocation(query);
   }
 
   @override
@@ -146,8 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(left: 0),
         child: ButtomNavBar(
-          currentIndex: _selectedIndex,
-          onTap: _onNavItemTapped,
+          currentIndex: 0,
         ),
       ),
     );

@@ -22,7 +22,7 @@ class AppColors {
   static const Color black = Colors.black;
   static const Color grey = Colors.grey;
     static const Color lightgrey = Color.fromARGB(255, 201, 201, 201);
-
+  Color lightestGrey = Colors.grey.shade300;
   static const Color darkGrey = Color(0xFF333333);
 
 

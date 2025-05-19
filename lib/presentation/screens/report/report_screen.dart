@@ -1,0 +1,266 @@
+import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:find_them/presentation/screens/report/report_screen2.dart';
+import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
+
+class Report1Screen extends StatefulWidget {
+  const Report1Screen({Key? key}) : super(key: key);
+
+  @override
+  State<Report1Screen> createState() => _Report1ScreenState();
+}
+
+class _Report1ScreenState extends State<Report1Screen> {
+  final _formKey = GlobalKey<FormState>();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _ageController = TextEditingController();
+  String? _selectedGender;
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _ageController.dispose();
+    super.dispose();
+  }
+
+  void _continueToNextStep() {
+    if (_formKey.currentState?.validate() ?? false) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => Report2Screen(
+                firstName: _firstNameController.text,
+                lastName: _lastNameController.text,
+                age: int.tryParse(_ageController.text) ?? 0,
+                gender: _selectedGender ?? 'Male',
+              ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          'Reporting a missing person',
+          style: TextStyle(color: Colors.black),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildStepCircle(1, true),
+                    _buildStepLine(true),
+                    _buildStepCircle(2, false),
+                    _buildStepLine(false),
+                    _buildStepCircle(3, false),
+                  ],
+                ),
+                const SizedBox(height: 32),
+
+                Center(
+                  child: Text(
+                    'Basic Information',
+                    style: GoogleFonts.inter(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                Text('First name'),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _firstNameController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter first name of missing person here',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter first name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                Text('Last name'),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _lastNameController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter last name of missing person here',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter last name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                Text('Age'),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _ageController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    hintText: '123',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter age';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                Text('Gender'),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Radio<String>(
+                      value: 'Male',
+                      groupValue: _selectedGender,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedGender = newValue;
+                        });
+                      },
+                    ),
+                    Text('Male'),
+                    const SizedBox(width: 40),
+                    Radio<String>(
+                      value: 'Female',
+                      groupValue: _selectedGender,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedGender = newValue;
+                        });
+                      },
+                    ),
+                    Text('Female'),
+                  ],
+                ),
+                const SizedBox(height: 40),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _continueToNextStep,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.teal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Continue',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(left: 0),
+        child: ButtomNavBar(currentIndex: 2),
+      ),
+    );
+  }
+
+  Widget _buildStepCircle(int step, bool isActive) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isActive ? AppColors.teal : Colors.white,
+        border: Border.all(color: AppColors.teal, width: 2),
+      ),
+      child: Center(
+        child: Text(
+          '$step',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isActive ? Colors.white : AppColors.teal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepLine(bool isActive) {
+    return Container(
+      width: 50,
+      height: 2,
+      color: isActive ? AppColors.teal : Colors.grey.shade300,
+    );
+  }
+}
