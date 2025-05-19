@@ -1,5 +1,4 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
-import 'package:find_them/core/routes/nav_handler.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -70,7 +69,11 @@ class _Report3ScreenState extends State<Report3Screen> {
       appBar: AppBar(
         title: Text(
           'Reporting a missing person',
-          style: TextStyle(color: Colors.black),
+          style: GoogleFonts.dmSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -224,9 +227,7 @@ class _Report3ScreenState extends State<Report3Screen> {
           ),
         ),
       ),
-      bottomNavigationBar: const ButtomNavBar(
-        currentIndex: 2,
-      ),
+      bottomNavigationBar: const ButtomNavBar(currentIndex: 2),
     );
   }
 

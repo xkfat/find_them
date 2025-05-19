@@ -88,8 +88,11 @@ class _Report2ScreenState extends State<Report2Screen> {
       appBar: AppBar(
         title: Text(
           'Reporting a missing person',
-          style: TextStyle(color: Colors.black),
-        ),
+ style: GoogleFonts.dmSans(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: Colors.black,
+  ),        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         leading: IconButton(

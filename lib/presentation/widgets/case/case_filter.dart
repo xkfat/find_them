@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/constants/themes/app_text.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
-import 'package:find_them/logic/cubit/case_filter_state.dart';
 
 class FilterDrawer extends StatefulWidget {
   final Function onClose;
