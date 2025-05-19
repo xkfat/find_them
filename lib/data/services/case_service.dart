@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:find_them/data/models/case.dart';
-import 'package:find_them/data/models/case_update.dart';
 
 class CaseService {
   final String baseUrl;

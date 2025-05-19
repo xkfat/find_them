@@ -5,20 +5,13 @@ import 'dart:io';
 //import 'package:dio/dio.dart';
 import 'package:find_them/data/dataprovider/exception.dart';
 import 'package:http/http.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:find_them/core/constants/api_constants.dart';
-import 'package:find_them/data/models/auth.dart';
-import 'package:find_them/data/models/user.dart';
-import 'package:find_them/data/services/api_service.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:http/http.dart' as http;
 
 class AuthService {
   // final ApiService _apiService;
-  static const String _authDataKey = 'auth_data';
+  //static const String _authDataKey = 'auth_data';
 
-  AuthService() {
-  }
+  AuthService() {}
   dynamic _response(http.Response response) {
     switch (response.statusCode) {
       case 200:
@@ -99,7 +92,6 @@ class AuthService {
     required String password,
     required String passwordConfirmation,
   }) async {
-    dynamic responseJson;
     try {
       print("signup");
 
@@ -160,27 +152,23 @@ class AuthService {
   }
 
   Future<Map<String, dynamic>> deleteAccount(String username) async {
-  try {
-    var response = await http.delete(
-      Uri.parse('http://10.0.2.2:8000/api/accounts/delete/'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        "username": username,
-      }),
-    );
-    
-    if (response.statusCode == 200) {
-      return {'success': true};
-    } else {
-      return {'success': false, 'message': 'Failed to delete account'};
+    try {
+      var response = await http.delete(
+        Uri.parse('http://10.0.2.2:8000/api/accounts/delete/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({"username": username}),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true};
+      } else {
+        return {'success': false, 'message': 'Failed to delete account'};
+      }
+    } catch (e) {
+      print("Error in delete account: $e");
+      return {'success': false, 'message': e.toString()};
     }
-  } catch (e) {
-    print("Error in delete account: $e");
-    return {'success': false, 'message': e.toString()};
   }
-}
 
   /*
   Future<AuthData?> getAuthData() async {

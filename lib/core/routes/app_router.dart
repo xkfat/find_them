@@ -1,10 +1,13 @@
 import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
 import 'package:find_them/data/repositories/case_repo.dart';
+import 'package:find_them/data/repositories/report_repo.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/data/services/case_service.dart';
+import 'package:find_them/data/services/report_service.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
+import 'package:find_them/logic/cubit/report_cubit.dart';
 import 'package:find_them/logic/cubit/sign_up_cubit.dart';
 import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
 import 'package:find_them/presentation/screens/case/case_detail_screen.dart';
@@ -13,14 +16,10 @@ import 'package:find_them/core/routes/route_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
 import '../../presentation/screens/onboarding/onboarding.dart';
-import '../../presentation/screens/onboarding/onboarding2.dart';
-import '../../presentation/screens/onboarding/onboarding3.dart';
 import '../../presentation/screens/auth/login_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
 import '../../presentation/screens/auth/signup_screen.dart';
 import '../../presentation/screens/auth/sms_verification_screen.dart.dart';
-import '../../presentation/screens/auth/reset_pass_screen.dart';
-import '../../presentation/widgets/placeholder_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -93,25 +92,32 @@ class AppRouter {
               ),
         );
 
-            case RouteConstants.caseDetails:
-        final int caseId = args is int ? args : (args is String ? int.tryParse(args) ?? 0 : 0);
-        if (caseId == 0) {
-          return MaterialPageRoute(
-            builder: (_) => const Scaffold(
-              body: Center(child: Text('Invalid case ID')),
-            ),
-          );
-        }
-        return MaterialPageRoute(
-          builder:
-              (context) => BlocProvider<CaseCubit>(
-                create:
-                    (context) => CaseCubit(
-                      CaseRepository(CaseService()),
-                    ),
-                child: CaseDetailScreen(caseId: caseId),
-              ),
-        );
+       case RouteConstants.caseDetails:
+  final int caseId = args is int ? args : (args is String ? int.tryParse(args) ?? 0 : 0);
+  if (caseId == 0) {
+    return MaterialPageRoute(
+      builder: (_) => const Scaffold(
+        body: Center(child: Text('Invalid case ID')),
+      ),
+    );
+  }
+  return MaterialPageRoute(
+    builder: (context) => MultiBlocProvider(
+      providers: [
+        BlocProvider<CaseCubit>(
+          create: (context) => CaseCubit(
+            CaseRepository(CaseService()),
+          ),
+        ),
+        BlocProvider<ReportCubit>(
+          create: (context) => ReportCubit(
+            ReportRepository(ReportService()),
+          ),
+        ),
+      ],
+      child: CaseDetailScreen(caseId: caseId),
+    ),
+  );
 
       /*
       case RouteConstants.map:

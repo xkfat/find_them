@@ -1,8 +1,12 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/constants/themes/app_text.dart';
+import 'package:find_them/core/routes/route_constants.dart';
 import 'package:find_them/data/models/case.dart';
 import 'package:find_them/data/models/enum.dart';
+import 'package:find_them/data/repositories/report_repo.dart';
+import 'package:find_them/data/services/report_service.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
+import 'package:find_them/logic/cubit/report_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
@@ -24,6 +28,344 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
   void initState() {
     super.initState();
     context.read<CaseCubit>().getCaseDetail(widget.caseId);
+  }
+
+  void _showReportDialog(BuildContext context, int caseId) {
+    // Create a TextEditingController for the note
+    final TextEditingController noteController = TextEditingController();
+    final reportCubit = context.read<ReportCubit>();
+
+    showDialog(
+      context: context,
+      builder:
+          (dialogContext) => StatefulBuilder(
+            builder: (context, setState) {
+              bool isSubmitting = false;
+
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                backgroundColor: Colors.white,
+                elevation: 8,
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Leave an information',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.darkGreen,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              color: AppColors.darkGrey,
+                              size: 24,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: BoxConstraints(),
+                            onPressed: () => Navigator.pop(dialogContext),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'Please provide any information you have about this missing person.',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: AppColors.darkGrey,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.lighterMint,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.teal, width: 1),
+                        ),
+                        child: TextField(
+                          controller: noteController,
+                          maxLines: 7,
+                          decoration: InputDecoration(
+                            hintText: 'Write your message here...',
+                            contentPadding: EdgeInsets.all(16),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed:
+                              isSubmitting
+                                  ? null
+                                  : () async {
+                                    if (noteController.text.trim().isEmpty) {
+                                      // Show validation message in a dialog
+                                      showDialog(
+                                        context: context,
+                                        builder:
+                                            (context) => AlertDialog(
+                                              title: Text(
+                                                'Missing Information',
+                                              ),
+                                              content: Text(
+                                                'Please enter some information',
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed:
+                                                      () => Navigator.pop(
+                                                        context,
+                                                      ),
+                                                  child: Text('OK'),
+                                                ),
+                                              ],
+                                            ),
+                                      );
+                                      return;
+                                    }
+
+                                    setState(() {
+                                      isSubmitting = true;
+                                    });
+
+                                    try {
+                                      await reportCubit.submitReport(
+                                        caseId: caseId,
+                                        note: noteController.text.trim(),
+                                      );
+
+                                      // Close the report dialog
+                                      Navigator.pop(dialogContext);
+
+                                      // Show success message in a dialog
+                                      showDialog(
+                                        context: context,
+                                        builder:
+                                            (context) => Dialog(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(
+                                                  20.0,
+                                                ),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.favorite,
+                                                      color:
+                                                          const Color.fromARGB(
+                                                            255,
+                                                            92,
+                                                            16,
+                                                            16,
+                                                          ),
+                                                      size: 60,
+                                                    ),
+                                                    SizedBox(height: 16),
+                                                    Text(
+                                                      'Thank You!',
+                                                      style: TextStyle(
+                                                        fontSize: 22,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            AppColors.darkGreen,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 8),
+                                                    Text(
+                                                      'for trying to help us.',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        color:
+                                                            AppColors.darkGrey,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 20),
+                                                    SizedBox(
+                                                      width: double.infinity,
+                                                      height: 45,
+                                                      child: ElevatedButton(
+                                                        onPressed:
+                                                            () => Navigator.pop(
+                                                              context,
+                                                            ),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              AppColors
+                                                                  .darkGreen,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  12,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                        child: Text(
+                                                          'OK',
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                      );
+                                    } catch (e) {
+                                      setState(() {
+                                        isSubmitting = false;
+                                      });
+
+                                      // Show error message in a dialog
+                                      showDialog(
+                                        context: context,
+                                        builder:
+                                            (context) => Dialog(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(
+                                                  20.0,
+                                                ),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.error,
+                                                      color:
+                                                          AppColors.missingRed,
+                                                      size: 60,
+                                                    ),
+                                                    SizedBox(height: 16),
+                                                    Text(
+                                                      'Submission Failed',
+                                                      style: TextStyle(
+                                                        fontSize: 22,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black87,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 8),
+                                                    Text(
+                                                      'Failed to submit information. Please try again.',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        color:
+                                                            AppColors.darkGrey,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 20),
+                                                    SizedBox(
+                                                      width: double.infinity,
+                                                      height: 45,
+                                                      child: ElevatedButton(
+                                                        onPressed:
+                                                            () => Navigator.pop(
+                                                              context,
+                                                            ),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              AppColors
+                                                                  .darkGreen,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  12,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                        child: Text(
+                                                          'OK',
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                      );
+                                    }
+                                  },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.darkGreen,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child:
+                              isSubmitting
+                                  ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(width: 12),
+                                      Text(
+                                        'Submitting...',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                  : Text(
+                                    'Submit',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+    );
   }
 
   void _makePhoneCall(String phoneNumber) {
@@ -438,7 +780,19 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                   child: SizedBox(
                     height: 48,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (caseData.id != null) {
+                          _showReportDialog(context, caseData.id!);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Cannot submit report: Invalid case ID',
+                              ),
+                            ),
+                          );
+                        }
+                      },
                       child: const Text(
                         'Leave an information',
                         style: TextStyle(

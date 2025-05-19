@@ -1,25 +1,32 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
 import 'package:find_them/data/models/report.dart';
-import 'api_service.dart';
-import 'package:find_them/core/constants/api_constants.dart';
+import 'package:http/http.dart' as http;
 
 class ReportService {
-  late Dio dio;
+  final String baseUrl;
+  final http.Client _httpClient;
 
-  ReportService(ApiService apiService) {
-    dio = apiService.dio;
-  }
+  ReportService({
+    this.baseUrl = 'http://10.0.2.2:8000/api',
+    http.Client? httpClient,
+  }) : _httpClient = httpClient ?? http.Client();
 
-  Future<Report?> submitReport(Report report) async {
+  Future<bool> submitReport(Report report) async {
     try {
-      Response response = await dio.post(
-        ApiConstants.submitReport,
-        data: report.toJson(),
+      final response = await _httpClient.post(
+        Uri.parse('$baseUrl/reports/submit/'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(report.toJson()),
       );
-
-      return Report.fromJson(response.data);
+      if (response.statusCode == 201) {
+        return true;
+      } else {
+        throw Exception(
+          'Failed to submit report: ${response.statusCode} - ${response.body}',
+        );
+      }
     } catch (e) {
-      return null;
+      throw Exception('Error submitting report: $e');
     }
   }
 }
