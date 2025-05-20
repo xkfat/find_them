@@ -19,6 +19,8 @@ class Report3Screen extends StatefulWidget {
   final DateTime lastSeenDate;
   final String lastSeenLocation;
   final String? contactPhone;
+  final double? latitude;
+  final double? longitude;
 
   const Report3Screen({
     super.key,
@@ -29,6 +31,8 @@ class Report3Screen extends StatefulWidget {
     required this.lastSeenDate,
     required this.lastSeenLocation,
     this.contactPhone,
+    this.latitude,
+    this.longitude,
   });
 
   @override
@@ -93,8 +97,8 @@ class _Report3ScreenState extends State<Report3Screen> {
         widget.lastSeenDate,
         widget.lastSeenLocation,
         _phoneController.text,
-        null, // latitude
-        null, // longitude
+        widget.longitude, // latitude
+        widget.latitude, // longitude
       );
     }
   }

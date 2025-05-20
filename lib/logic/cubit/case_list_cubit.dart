@@ -28,6 +28,7 @@ class CaseCubit extends Cubit<CaseListState> {
         startDate: _currentFilters.startDate,
         endDate: _currentFilters.endDate,
       );
+
       emit(CaseLoaded(cases));
     } catch (e) {
       emit(CaseError(e.toString()));

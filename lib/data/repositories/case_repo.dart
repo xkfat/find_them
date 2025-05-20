@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:find_them/data/models/case.dart';
+import 'package:find_them/data/models/enum.dart';
 import 'package:find_them/data/services/api_service.dart';
 import 'package:find_them/data/services/case_service.dart';
 
@@ -25,7 +26,7 @@ class CaseRepository {
     String? startDate,
     String? endDate,
   }) async {
-    return await _caseService.getCases(
+    final cases = await _caseService.getCases(
       name: name,
       lastSeenLocation: lastSeenLocation,
       nameOrLocation: nameOrLocation,
@@ -36,6 +37,9 @@ class CaseRepository {
       startDate: startDate,
       endDate: endDate,
     );
+    return cases
+        .where((c) => c.submissionStatus.value != 'in_progress')
+        .toList();
   }
 
   Future<Case> getCaseById(int id) async {

@@ -1,11 +1,12 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/logic/cubit/submit_case_cubit.dart';
+import 'package:find_them/presentation/screens/report/location_report_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen3.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-//import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart'; 
 
 class Report2Screen extends StatefulWidget {
   final String firstName;
@@ -30,12 +31,17 @@ class _Report2ScreenState extends State<Report2Screen> {
   final _lastSeenDateController = TextEditingController();
   final _lastSeenLocationController = TextEditingController();
   DateTime? _selectedDate;
-  //LatLng? _selectedLocation;
+  double? _latitude;
+  double? _longitude;
+  String? _address;
+  Set<Marker> _markers = {}; 
+  GoogleMapController? _mapController; 
 
   @override
   void dispose() {
     _lastSeenDateController.dispose();
     _lastSeenLocationController.dispose();
+    _mapController?.dispose(); 
     super.dispose();
   }
 
@@ -61,23 +67,43 @@ class _Report2ScreenState extends State<Report2Screen> {
       if (_selectedDate == null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Please select a date')));
+        ).showSnackBar(const SnackBar(content: Text('Please select a date')));
         return;
       }
-        Navigator.pushNamed(
-      context,
-      '/report3',
-      arguments: {
-        'firstName': widget.firstName,
-        'lastName': widget.lastName,
-        'age': widget.age,
-        'gender': widget.gender,
-        'lastSeenDate': _selectedDate,
-        'lastSeenLocation': _lastSeenLocationController.text,
-      },
-    );
+          String humanReadableLocation = _lastSeenLocationController.text;
+
+      Navigator.pushNamed(
+        context,
+        '/report3',
+        arguments: {
+          'firstName': widget.firstName,
+          'lastName': widget.lastName,
+          'age': widget.age,
+          'gender': widget.gender,
+          'lastSeenDate': _selectedDate,
+          'lastSeenLocation': humanReadableLocation,
+          'latitude': _latitude,
+          'longitude': _longitude,
+        },
+      );
+    }
   }
-}
+
+  void _updateMapLocation(double lat, double lng, String? addr) {
+    setState(() {
+      _latitude = lat;
+      _longitude = lng;
+      _address = addr;
+
+      _markers = {
+        Marker(
+          markerId: const MarkerId('selected_location'),
+          position: LatLng(lat, lng),
+          infoWindow: InfoWindow(title: 'Last Seen Location', snippet: addr),
+        ),
+      };
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +176,7 @@ class _Report2ScreenState extends State<Report2Screen> {
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(color: Colors.grey.shade300),
                         ),
-                        suffixIcon: Icon(Icons.calendar_today),
+                        suffixIcon: const Icon(Icons.calendar_today),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -191,15 +217,111 @@ class _Report2ScreenState extends State<Report2Screen> {
 
                 Text('Select last seen location on map (optional)'),
                 const SizedBox(height: 8),
-                Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Center(child: Text('Google map view')),
+                GestureDetector(
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LocationReportScreen(),
+                      ),
+                    );
+
+                    if (result != null) {
+                      _updateMapLocation(
+                        result['latitude'],
+                        result['longitude'],
+                        result['address'],
+                      );
+
+                      if (_lastSeenLocationController.text.isEmpty) {
+                        _lastSeenLocationController.text = _address ?? '';
+                      }
+                    }
+                  },
+                  child: Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Stack(
+                        children: [
+                          if (_latitude != null && _longitude != null)
+                            GoogleMap(
+                              initialCameraPosition: CameraPosition(
+                                target: LatLng(_latitude!, _longitude!),
+                                zoom: 15,
+                              ),
+                              markers: _markers,
+                              onMapCreated: (GoogleMapController controller) {
+                                _mapController = controller;
+                              },
+                              myLocationEnabled: false,
+                              myLocationButtonEnabled: false,
+                              zoomControlsEnabled: false,
+                              mapToolbarEnabled: false,
+                            )
+                          else
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.add_location_alt,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Tap to select location on map',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (_latitude != null &&
+                              _longitude != null &&
+                              _address != null)
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                color: Colors.black.withOpacity(0.6),
+                                child: Text(
+                                  _address!,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          Positioned(
+                            right: 8,
+                            bottom: 8,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.teal,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Icon(
+                                Icons.edit_location_alt,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 40),
