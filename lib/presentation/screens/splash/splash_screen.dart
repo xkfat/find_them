@@ -1,4 +1,6 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:find_them/data/repositories/auth_repo.dart';
+import 'package:find_them/data/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -18,14 +20,21 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthentication() async {
-    route();
+    final authRepository = AuthRepository(AuthService());
+    final isLoggedIn = await authRepository.isLoggedIn();
+
+    if (isLoggedIn) {
+      Navigator.of(context).pushReplacementNamed('/home');
+    } else {
+      route();
+    }
   }
 
   Future<void> startTimer() async {
     Timer(const Duration(milliseconds: 3600), () {
       route();
     });
-      await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
   }
 
   route() {}

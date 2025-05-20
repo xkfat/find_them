@@ -1,13 +1,20 @@
+import 'dart:developer';
+
+import 'package:find_them/data/services/api_service.dart';
 import 'package:find_them/data/services/auth_service.dart';
 
 class AuthRepository {
+    final ApiService _apiService;
+
   final AuthService _authService;
   // final FirebaseAuthService _firebaseAuthService;
 
-  AuthRepository(this._authService);
+  AuthRepository(this._authService, {
+    ApiService? apiService,
+  }) : _apiService = apiService ?? ApiService();
 
-  Future<dynamic> login(String username, String Pwd) async {
-    return await _authService.login(username, Pwd);
+  Future<dynamic> login(String username, String pwd) async {
+    return await _authService.login(username, pwd);
   }
 
   Future<dynamic> signup({
@@ -30,18 +37,33 @@ class AuthRepository {
     );
   }
 
+  Future<bool> isLoggedIn() async {
+    return await _apiService.hasToken();
+  }
 
-
-
+  Future<void> logout() async {
+  try {
+    await _apiService.clearAuthTokens();
+      //return true;
+    } catch (e) {
+      log("Error logging out: $e");
+      //return false;
+    }
+  }
 
 
   Future<bool> deleteAccount(String username) async {
-  try {
-    final response = await _authService.deleteAccount(username);
-    return response['success'] == true;
-  } catch (e) {
-    print("Error deleting account: $e");
-    return false;
+    try {
+      final response = await _authService.deleteAccount(username);
+      if (response['success'] == true) {
+      final response = await _authService.deleteAccount(username);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print("Error deleting account: $e");
+      return false;
+    }
   }
 }
 
@@ -121,4 +143,4 @@ class AuthRepository {
   }
 }
 */
-}
+

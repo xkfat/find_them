@@ -19,7 +19,7 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
       var responseDta = await _authRepository.login(username, pwd);
       if (responseDta["code"] == "200") {
         log(responseDta["access"]);
-        
+
         emit(Authentificationloaded());
       } else if (responseDta["code"] == "401") {
         emit(Authentificationerreur(responseDta["msg"]));
@@ -30,4 +30,29 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
       emit(Authentificationerreur("Connect to server first"));
     }
   }
+ Future<void> checkAuthStatus() async {
+    emit(AuthentificationLoading());
+    try {
+      final isLoggedIn = await _authRepository.isLoggedIn();
+      if (isLoggedIn) {
+        emit(Authentificationloaded());
+      } else {
+        emit(AuthentificationInitial());
+      }
+    } catch (e) {
+      emit(AuthentificationInitial());
+    }
+  }
+
+Future<void> logout() async {
+    emit(AuthentificationLoading());
+    try {
+      await _authRepository.logout();
+      emit(AuthentificationInitial());
+    } catch (e) {
+      emit(Authentificationerreur("Error logging out"));
+    }
+  }
 }
+
+
