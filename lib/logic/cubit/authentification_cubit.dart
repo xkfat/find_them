@@ -30,7 +30,8 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
       emit(Authentificationerreur("Connect to server first"));
     }
   }
- Future<void> checkAuthStatus() async {
+
+  Future<void> checkAuthStatus() async {
     emit(AuthentificationLoading());
     try {
       final isLoggedIn = await _authRepository.isLoggedIn();
@@ -44,7 +45,7 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
     }
   }
 
-Future<void> logout() async {
+  Future<void> logout() async {
     emit(AuthentificationLoading());
     try {
       await _authRepository.logout();
@@ -54,5 +55,3 @@ Future<void> logout() async {
     }
   }
 }
-
-

@@ -11,13 +11,20 @@ class ReportService {
     http.Client? httpClient,
   }) : _httpClient = httpClient ?? http.Client();
 
-  Future<bool> submitReport(Report report) async {
+  Future<bool> submitReport(Report report, {String? token}) async {
     try {
+      final headers = {'Content-Type': 'application/json'};
+
+      if (token != null) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
       final response = await _httpClient.post(
         Uri.parse('$baseUrl/reports/submit/'),
-        headers: {'Content-Type': 'application/json'},
+        headers: headers,
         body: json.encode(report.toJson()),
       );
+
       if (response.statusCode == 201) {
         return true;
       } else {

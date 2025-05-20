@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:find_them/core/constants/api_constants.dart';
+import 'package:find_them/data/dataprovider/exception.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -102,4 +103,46 @@ class ApiService {
       body: body != null ? jsonEncode(body) : null,
     );
   }
+Future<bool> refreshToken() async {
+  final refreshToken = await getRefreshToken();
+  if (refreshToken == null) return false;
+  
+  try {
+    final response = await http.post(
+      Uri.parse('${ApiConstants.baseUrl}${ApiConstants.tokenRefresh}'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'refresh': refreshToken}),
+    );
+    
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      await _secureStorage.write(key: _accessTokenKey, value: responseData['access']);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+  Future<http.Response> authenticatedRequest(
+  Future<http.Response> Function() requestFunction,
+) async {
+  try {
+    final response = await requestFunction();
+    
+    if (response.statusCode == 401) {
+      final refreshed = await refreshToken();
+      if (refreshed) {
+        return await requestFunction();
+      } else {
+        await clearAuthTokens();
+        throw UnauthorisedException('Session expired');
+      }
+    }
+    
+    return response;
+  } catch (e) {
+    rethrow;
+  }
+}
 }
