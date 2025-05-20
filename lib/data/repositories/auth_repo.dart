@@ -1,10 +1,4 @@
-import 'package:dio/dio.dart';
-import 'package:find_them/data/models/auth.dart';
-import 'package:find_them/data/models/user.dart';
 import 'package:find_them/data/services/auth_service.dart';
-import 'package:find_them/data/services/social_auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:flutter/widgets.dart';
 
 class AuthRepository {
   final AuthService _authService;

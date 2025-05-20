@@ -10,7 +10,6 @@ class CaseRepository {
   CaseRepository(this._caseService);
 
 
-
    Future<List<Case>> getCases({
     String? name,
      String? lastSeenLocation,
@@ -39,10 +38,7 @@ class CaseRepository {
     return await _caseService.getCaseById(id);
    }
 
-    Future<Case> getCaseWithUpdates(int id) async {
-    return await _caseService.getCaseWithUpdates(id);
-  }
-
+  
    Future<Case> submitCase({
     required String firstName,
     required String lastName,

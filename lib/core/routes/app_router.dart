@@ -12,7 +12,6 @@ import 'package:find_them/logic/cubit/sign_up_cubit.dart';
 import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
 import 'package:find_them/presentation/screens/case/case_detail_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:find_them/core/routes/route_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
 import '../../presentation/screens/onboarding/onboarding.dart';
@@ -26,13 +25,13 @@ class AppRouter {
     final args = settings.arguments;
 
     switch (settings.name) {
-      case RouteConstants.splash:
+      case '/':
         return MaterialPageRoute(builder: (_) => const SplashScreen());
 
-      case RouteConstants.onboarding:
+      case '/onboarding' :
         return MaterialPageRoute(builder: (_) => const OnboardingWrapper());
 
-      case RouteConstants.signup:
+      case '/auth/signup' :
         return MaterialPageRoute(
           builder:
               (_) => BlocProvider(
@@ -43,7 +42,7 @@ class AppRouter {
               ),
         );
 
-      case RouteConstants.verifyPhone:
+      case '/auth/verify-phone' :
         final Map<String, dynamic> params = args as Map<String, dynamic>;
         final String phoneNumber = params['phoneNumber'];
         final SignUpData? signUpData = params['signUpData'];
@@ -61,7 +60,7 @@ class AppRouter {
               ),
         );
 
-      case RouteConstants.login:
+      case '/auth/login' :
         return MaterialPageRoute(
           builder:
               (_) => BlocProvider(
@@ -72,7 +71,7 @@ class AppRouter {
               ),
         );
 
-      /* case RouteConstants.resetPassword:
+      /* case '/auth/reset-password' :
         return MaterialPageRoute(
           builder:
               (_) =>
@@ -80,7 +79,7 @@ class AppRouter {
         );
 */
 
-        case RouteConstants.home:
+        case '/home' :
         return MaterialPageRoute(
           builder:
               (_) => BlocProvider<CaseCubit>(
@@ -92,7 +91,7 @@ class AppRouter {
               ),
         );
 
-       case RouteConstants.caseDetails:
+       case '/case/details' :
   final int caseId = args is int ? args : (args is String ? int.tryParse(args) ?? 0 : 0);
   if (caseId == 0) {
     return MaterialPageRoute(
@@ -120,46 +119,31 @@ class AppRouter {
   );
 
       /*
-      case RouteConstants.map:
+      case '/map':
         return MaterialPageRoute(builder: (_) => const MapScreen());
 
-      case RouteConstants.report:
+      case '/report' :
         return MaterialPageRoute(builder: (_) => const ReportScreen());
 
-      case RouteConstants.reportStep2:
-        return MaterialPageRoute(builder: (_) => const ReportStep2Screen());
-
-      case RouteConstants.reportStep3:
-        return MaterialPageRoute(builder: (_) => const ReportStep3Screen());
-
-      case RouteConstants.reportSuccess:
-        return MaterialPageRoute(builder: (_) => const ReportSuccessScreen());
-
-      case RouteConstants.profile:
+    
+      case  '/profile' :
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
 
-      case RouteConstants.settings:
+      case '/settings' :
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
 
-      case RouteConstants.profile:
-        return MaterialPageRoute(builder: (_) => const EditProfileScreen());
-
-      case RouteConstants.submittedCases:
+   
+      case '/submitted-cases' :
         return MaterialPageRoute(builder: (_) => const SubmittedCasesScreen());
 
-      case RouteConstants.caseDetails:
-        final caseId = args is String ? args : '';
-        return MaterialPageRoute(
-          builder: (_) => CaseDetailsScreen(caseId: caseId),
-        );
 
-      case RouteConstants.addFriend:
+      case '/friends/add' :
         return MaterialPageRoute(builder: (_) => const AddFriendScreen());
 
-      case RouteConstants.locationSharing:
+      case'/location-sharing' :
         return MaterialPageRoute(builder: (_) => const LocationSharingScreen());
 
-      case RouteConstants.notifications:
+      case '/notifications' :
         return MaterialPageRoute(builder: (_) => const NotificationsScreen());
 */
       default:

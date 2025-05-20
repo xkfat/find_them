@@ -1,15 +1,6 @@
 import 'package:find_them/core/routes/app_router.dart';
-import 'package:find_them/logic/cubits/auth/auth_state.dart';
 import 'package:flutter/material.dart';
-import 'package:find_them/logic/cubits/theme/theme_cubit.dart';
-import 'package:find_them/logic/cubits/auth/auth_cubit.dart';
 import 'package:find_them/core/constants/themes/app_theme.dart';
-import 'package:find_them/core/routes/route_constants.dart';
-import 'package:find_them/data/services/api_service.dart';
-import 'package:find_them/data/services/auth_service.dart';
-import 'package:find_them/data/services/social_auth_service.dart';
-import 'package:find_them/data/repositories/auth_repo.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 //import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -70,7 +61,7 @@ class _MyAppState extends State<MyApp> {
       darkTheme: AppTheme.darkTheme,
       // themeMode: state,
       //  navigatorKey: NavigationHelper.navigatorKey,
-      initialRoute: RouteConstants.splash,
+      initialRoute: '/',
       onGenerateRoute: AppRouter.generateRoute,
     );
   }

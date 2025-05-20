@@ -43,15 +43,7 @@ Future<void> getCaseDetail(int id) async {
       emit(CaseError(e.toString()));
     }
   }
-  Future<void> getCaseWithUpdates(int id) async {
-    try {
-      emit(CaseLoading());
-      final caseData = await _caseRepository.getCaseWithUpdates(id);
-      emit(CaseDetailLoaded(caseData));
-    } catch (e) {
-      emit(CaseError(e.toString()));
-    }
-  }
+
 
    Future<void> setFilters(CaseFilterState filters) async {
     _currentFilters = filters;

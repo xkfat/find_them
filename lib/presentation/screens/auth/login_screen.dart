@@ -1,12 +1,10 @@
+import 'dart:developer';
+
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
-import 'package:find_them/core/routes/route_constants.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:find_them/logic/cubits/auth/auth_cubit.dart';
-import 'package:find_them/logic/cubits/auth/auth_state.dart';
-import 'package:find_them/data/models/auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
-  String? _errorMessage;
+ // String? _errorMessage;
   bool _usernameError = false;
   bool _passwordError = false;
 
@@ -372,10 +370,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         >(
                           listener: (context, state) {
                             if (state is Authentificationloaded) {
-                              Navigator.pushNamed(context, RouteConstants.home);
+                              Navigator.pushNamed(context, '/home');
                             }
                             if (state is Authentificationerreur) {
-                              print("jjhjhjhgfd");
+                              log("jjhjhjhgfd");
                               _showErrorDialog(state.msg);
                             }
                           },
@@ -429,7 +427,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               onTap: () {
                                 Navigator.pushNamed(
                                   context,
-                                  RouteConstants.signup,
+                                  '/auth/signup',
                                 );
                               },
                               child: Text(

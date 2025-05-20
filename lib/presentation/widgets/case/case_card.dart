@@ -1,5 +1,4 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
-import 'package:find_them/core/routes/route_constants.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/data/models/case.dart';
@@ -79,7 +78,7 @@ class CaseListWidget extends StatelessWidget {
             onTap: (id) {
               Navigator.pushNamed(
                 context,
-                RouteConstants.caseDetails,
+                '/case/details',
                 arguments: id,
               );
             },

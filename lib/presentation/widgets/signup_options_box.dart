@@ -1,4 +1,3 @@
-import 'package:find_them/core/routes/route_constants.dart';
 import 'package:find_them/data/repositories/social_auth_repo.dart';
 import 'package:find_them/data/services/social_auth_service.dart';
 import 'package:find_them/logic/cubit/social_auth_cubit.dart';
@@ -79,7 +78,7 @@ class _SignUpOptionsContent extends StatelessWidget {
           print("State userData: ${state.userData}");
 
           try {
-            print("Home route constant value: ${RouteConstants.home}");
+            print("Home route constant value: ${'/home'}");
             print("Attempting to navigate to home screen...");
 
             Navigator.of(context).pushAndRemoveUntil(
@@ -181,7 +180,7 @@ class _SignUpOptionsContent extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(
                             context,
-                          ).pushNamed(RouteConstants.signup);
+                          ).pushNamed('/auth/signup');
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.darkGreen,
@@ -211,7 +210,7 @@ class _SignUpOptionsContent extends StatelessWidget {
                       height: 54,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pushNamed(RouteConstants.login);
+                          Navigator.of(context).pushNamed('/auth/login');
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.teal,

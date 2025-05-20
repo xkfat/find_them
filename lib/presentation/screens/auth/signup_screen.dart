@@ -9,7 +9,6 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:find_them/data/models/auth.dart';
 
-import 'package:find_them/core/routes/route_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -465,7 +464,7 @@ class _SignupScreenState extends State<SignupScreen> {
           };
           Navigator.of(
             context,
-          ).pushNamed(RouteConstants.verifyPhone, arguments: params);
+          ).pushNamed('/auth/verify-phone', arguments: params);
         } else if (state is SignUpFieldError) {
           _handleFieldError(state.field, state.message);
         } else if (state is SignUperreur) {
@@ -531,7 +530,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     onTap:
                                         () => Navigator.of(
                                           context,
-                                        ).pushNamed(RouteConstants.login),
+                                        ).pushNamed('/auth/login'),
                                     child: const Text(
                                       'Login',
                                       style: TextStyle(

@@ -1,6 +1,5 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/constants/themes/app_text.dart';
-import 'package:find_them/core/routes/route_constants.dart';
 import 'package:find_them/data/models/case.dart';
 import 'package:find_them/data/models/enum.dart';
 import 'package:find_them/data/repositories/report_repo.dart';

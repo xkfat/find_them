@@ -16,17 +16,14 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
 
       var responseDta = await _authRepository.login(username, Pwd);
       if (responseDta["code"] == "200") {
-
-
- 
         emit(Authentificationloaded());
       } else if (responseDta["code"] == "401") {
         emit(Authentificationerreur(responseDta["msg"]));
       } else {
-        emit(Authentificationerreur("bbbvvbv"));
+        emit(Authentificationerreur("Connect to server first"));
       }
     } catch (e) {
-      emit(Authentificationerreur("bbbvvbv"));
+      emit(Authentificationerreur("Connect to server first"));
     }
   }
 }

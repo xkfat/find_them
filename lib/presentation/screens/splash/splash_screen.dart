@@ -1,8 +1,5 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
-import 'package:find_them/logic/cubits/auth/auth_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/routes/route_constants.dart';
 import 'dart:async';
 
 class SplashScreen extends StatefulWidget {
@@ -39,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: AppColors.teal,
       body: GestureDetector(
         onTap: () {
-          Navigator.of(context).pushReplacementNamed(RouteConstants.onboarding);
+          Navigator.of(context).pushReplacementNamed('/onboarding');
         },
         child: Center(
           child: Column(
