@@ -1,12 +1,9 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
-import 'package:find_them/logic/cubit/submit_case_cubit.dart';
 import 'package:find_them/presentation/screens/report/location_report_screen.dart';
-import 'package:find_them/presentation/screens/report/report_screen3.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart'; 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Report2Screen extends StatefulWidget {
   final String firstName;
@@ -34,14 +31,14 @@ class _Report2ScreenState extends State<Report2Screen> {
   double? _latitude;
   double? _longitude;
   String? _address;
-  Set<Marker> _markers = {}; 
-  GoogleMapController? _mapController; 
+  Set<Marker> _markers = {};
+  GoogleMapController? _mapController;
 
   @override
   void dispose() {
     _lastSeenDateController.dispose();
     _lastSeenLocationController.dispose();
-    _mapController?.dispose(); 
+    _mapController?.dispose();
     super.dispose();
   }
 
@@ -70,7 +67,7 @@ class _Report2ScreenState extends State<Report2Screen> {
         ).showSnackBar(const SnackBar(content: Text('Please select a date')));
         return;
       }
-          String humanReadableLocation = _lastSeenLocationController.text;
+      String humanReadableLocation = _lastSeenLocationController.text;
 
       Navigator.pushNamed(
         context,
@@ -87,6 +84,15 @@ class _Report2ScreenState extends State<Report2Screen> {
         },
       );
     }
+  }
+
+  void _handleLocationResult(Map<String, dynamic> result) {
+    setState(() {
+      _latitude = result['latitude'];
+      _longitude = result['longitude'];
+
+      _lastSeenLocationController.text = result['humanReadableLocation'];
+    });
   }
 
   void _updateMapLocation(double lat, double lng, String? addr) {
@@ -227,14 +233,17 @@ class _Report2ScreenState extends State<Report2Screen> {
                     );
 
                     if (result != null) {
+                      _handleLocationResult(result);
+
                       _updateMapLocation(
                         result['latitude'],
                         result['longitude'],
-                        result['address'],
+                        result['humanReadableLocation'],
                       );
 
                       if (_lastSeenLocationController.text.isEmpty) {
-                        _lastSeenLocationController.text = _address ?? '';
+                        _lastSeenLocationController.text =
+                            result['humanReadableLocation'];
                       }
                     }
                   },

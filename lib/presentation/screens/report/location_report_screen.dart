@@ -26,6 +26,7 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
   String _address = "Searching your location...";
   bool _isLoading = true;
   bool _initialLocationSet = false;
+  double _currentZoom = 15.0;
 
   final Set<Marker> _markers = {};
   final String _apiKey = ApiKeys.googleMaps;
@@ -145,7 +146,33 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
       final GoogleMapController controller = await _controller.future;
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(target: position, zoom: 15),
+          CameraPosition(target: position, zoom: _currentZoom),
+        ),
+      );
+    }
+  }
+
+  Future<void> _zoomIn() async {
+    if (_controller.isCompleted) {
+      final GoogleMapController controller = await _controller.future;
+      _currentZoom += 1.0;
+      if (_currentZoom > 20.0) _currentZoom = 20.0;
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: _selectedPosition, zoom: _currentZoom),
+        ),
+      );
+    }
+  }
+
+  Future<void> _zoomOut() async {
+    if (_controller.isCompleted) {
+      final GoogleMapController controller = await _controller.future;
+      _currentZoom -= 1.0;
+      if (_currentZoom < 2.0) _currentZoom = 2.0;
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: _selectedPosition, zoom: _currentZoom),
         ),
       );
     }
@@ -206,22 +233,24 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
     _getAddressFromLatLng(position);
   }
 
-void _saveLocation() {
-  String humanReadablePart = _address;
-  
-  if (_address.contains(',')) {
-    List<String> parts = _address.split(',');
-    if (parts.length > 1 && (parts[0].contains('+') || RegExp(r'\d+[A-Z]+\+').hasMatch(parts[0]))) {
-      humanReadablePart = parts.sublist(1).join(',').trim();
+  void _saveLocation() {
+    String humanReadableLocation = _address;
+
+    if (humanReadableLocation.contains('+') &&
+        humanReadableLocation.contains(',')) {
+      List<String> parts = _address.split(',');
+      String firstPart = parts[0].trim();
+      if (firstPart.contains('+') && firstPart.length < 10) {
+        humanReadableLocation = parts.sublist(1).join(',').trim();
+      }
     }
+
+    Navigator.pop(context, {
+      'latitude': _selectedPosition.latitude,
+      'longitude': _selectedPosition.longitude,
+      'humanReadableLocation': humanReadableLocation,
+    });
   }
-  
-  Navigator.pop(context, {
-    'latitude': _selectedPosition.latitude,
-    'longitude': _selectedPosition.longitude,
-    'humanReadableLocation': humanReadablePart, 
-  });
-}
 
   Future<void> _searchPlace() async {
     TextEditingController searchInputController = TextEditingController();
@@ -516,6 +545,9 @@ void _saveLocation() {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate bottom container height
+    final bottomContainerHeight = 150.0;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.teal,
@@ -587,62 +619,112 @@ void _saveLocation() {
               ),
             ),
           ),
+
+          // Repositioned zoom controls - moved higher to avoid overlap with bottom container
+          Positioned(
+            right: 16,
+            bottom: 260,
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.darkGreen,
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.add, color: AppColors.teal),
+                    onPressed: _zoomIn,
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.darkGreen,
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.remove, color: AppColors.teal),
+                    onPressed: _zoomOut,
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
+              height: 240,
               color: AppColors.teal,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Select Location',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Your Location',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 14,
-                    ),
-                  ),
-                  Text(
-                    _address,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _saveLocation,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Select Location',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: const Text(
-                        'Save Location',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 20),
+
+                    Text(
+                      _address,
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 40),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _saveLocation,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.teal,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Save Location',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    //const SizedBox(height: 0),
+                  ],
+                ),
               ),
             ),
           ),

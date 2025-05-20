@@ -1,9 +1,6 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
-import 'package:find_them/logic/cubit/submit_case_cubit.dart';
-import 'package:find_them/presentation/screens/report/report_screen2.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 

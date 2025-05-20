@@ -179,6 +179,9 @@ class AppRouter {
                     gender: args['gender'] as String,
                     lastSeenDate: args['lastSeenDate'] as DateTime,
                     lastSeenLocation: args['lastSeenLocation'] as String,
+                                        latitude: args.containsKey('latitude') ? args['latitude'] as double? : null,
+                    longitude: args.containsKey('longitude') ? args['longitude'] as double? : null,
+
           contactPhone: args.containsKey('contactPhone') ? args['contactPhone'] as String? : null,
                   ),
                 ),

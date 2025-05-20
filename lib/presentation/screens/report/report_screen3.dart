@@ -1,7 +1,4 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
-import 'package:find_them/data/repositories/case_repo.dart';
-import 'package:find_them/data/services/case_service.dart';
-import 'package:find_them/data/services/report_service.dart';
 import 'package:find_them/logic/cubit/submit_case_cubit.dart';
 import 'package:find_them/presentation/screens/report/report_success_screen.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
@@ -97,8 +94,8 @@ class _Report3ScreenState extends State<Report3Screen> {
         widget.lastSeenDate,
         widget.lastSeenLocation,
         _phoneController.text,
-        widget.longitude, // latitude
-        widget.latitude, // longitude
+        widget.latitude,
+        widget.longitude,
       );
     }
   }
@@ -272,21 +269,31 @@ class _Report3ScreenState extends State<Report3Screen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _submitReport,
+                      onPressed: _isSubmitting ? null : _submitReport,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.teal,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text(
-                        'Submit report',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child:
+                          _isSubmitting
+                              ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : Text(
+                                'Submit report',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
                     ),
                   ),
                 ],
