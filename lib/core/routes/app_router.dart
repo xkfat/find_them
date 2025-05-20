@@ -10,8 +10,13 @@ import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:find_them/logic/cubit/report_cubit.dart';
 import 'package:find_them/logic/cubit/sign_up_cubit.dart';
 import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
+import 'package:find_them/logic/cubit/submit_case_cubit.dart';
 import 'package:find_them/presentation/screens/case/case_detail_screen.dart';
 import 'package:find_them/presentation/screens/map/map_screen.dart';
+import 'package:find_them/presentation/screens/report/report_screen.dart';
+import 'package:find_them/presentation/screens/report/report_screen2.dart';
+import 'package:find_them/presentation/screens/report/report_screen3.dart';
+import 'package:find_them/presentation/screens/report/report_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
@@ -121,11 +126,76 @@ class AppRouter {
       case '/map':
         return MaterialPageRoute(builder: (_) => const MapScreen());
 
-      /*
-      case '/report' :
-        return MaterialPageRoute(builder: (_) => const ReportScreen());
+      case '/report':
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider<SubmitCaseCubit>(
+                create:
+                    (context) => SubmitCaseCubit(CaseRepository(CaseService())),
+                child: const Report1Screen(),
+              ),
+        );
 
-    
+      case '/report2':
+        final args = settings.arguments;
+        if (args is Map<String, dynamic>) {
+          return MaterialPageRoute(
+            builder:
+                (_) => BlocProvider<SubmitCaseCubit>(
+                  create:
+                      (context) =>
+                          SubmitCaseCubit(CaseRepository(CaseService())),
+                  child: Report2Screen(
+                    firstName: args['firstName'] as String,
+                    lastName: args['lastName'] as String,
+                    age: args['age'] as int,
+                    gender: args['gender'] as String,
+                  ),
+                ),
+          );
+        } else {
+          return MaterialPageRoute(
+            builder:
+                (_) => Scaffold(
+                  body: Center(child: Text('Invalid arguments provided')),
+                ),
+          );
+        }
+
+      case '/report3':
+        final args = settings.arguments;
+        if (args is Map<String, dynamic>) {
+          settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder:
+                (_) => BlocProvider<SubmitCaseCubit>(
+                  create:
+                      (context) =>
+                          SubmitCaseCubit(CaseRepository(CaseService())),
+                  child: Report3Screen(
+                    firstName: args['firstName'] as String,
+                    lastName: args['lastName'] as String,
+                    age: args['age'] as int,
+                    gender: args['gender'] as String,
+                    lastSeenDate: args['lastSeenDate'] as DateTime,
+                    lastSeenLocation: args['lastSeenLocation'] as String,
+          contactPhone: args.containsKey('contactPhone') ? args['contactPhone'] as String? : null,
+                  ),
+                ),
+          );
+        } else {
+          return MaterialPageRoute(
+            builder:
+                (_) => Scaffold(
+                  body: Center(child: Text('Invalid arguments provided')),
+                ),
+          );
+        }
+
+      case '/report_success':
+        return MaterialPageRoute(builder: (_) => const ReportSuccessScreen());
+
+      /*
       case  '/profile' :
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
 

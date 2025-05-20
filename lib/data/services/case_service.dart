@@ -19,7 +19,7 @@ class CaseService {
 
   Map<String, String> get _headers {
     final headers = {'Content-Type': 'application/json'};
-   
+
     return headers;
   }
 
@@ -84,8 +84,7 @@ class CaseService {
     }
   }
 
-
-  Future<dynamic> submitCase({
+  Future<Case> submitCase({
     required String firstName,
     required String lastName,
     required int age,
@@ -94,6 +93,7 @@ class CaseService {
     required String description,
     required DateTime lastSeenDate,
     required String lastSeenLocation,
+    required String contactPhone, 
     double? latitude,
     double? longitude,
     String? authToken,
@@ -105,7 +105,11 @@ class CaseService {
         'POST',
         Uri.parse('http://10.0.2.2:8000/api/cases/'),
       );
+          final token = authToken ?? this.authToken;
 
+      if (token != null) {
+        request.headers['Authorization'] = 'Token $token';
+      }
       request.fields['first_name'] = firstName;
       request.fields['last_name'] = lastName;
       request.fields['age'] = age.toString();
@@ -114,6 +118,7 @@ class CaseService {
       request.fields['last_seen_date'] =
           lastSeenDate.toIso8601String().split('T').first;
       request.fields['last_seen_location'] = lastSeenLocation;
+request.fields['contact_phone'] = contactPhone;
 
       if (latitude != null) {
         request.fields['latitude'] = latitude.toString();
@@ -144,9 +149,9 @@ class CaseService {
       switch (response.statusCode) {
         case 200:
         case 201:
-          return responseJson;
+          return Case.fromJson(responseJson);
         case 400:
-          return responseJson;
+          return Case.fromJson(responseJson);
         case 401:
         case 403:
           throw UnauthorisedException("Authentication failed");

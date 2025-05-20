@@ -19,6 +19,7 @@ class Case {
   final DateTime dateReported;
   final SubmissionStatus submissionStatus;
   final List<CaseUpdate>? updates;
+  final String? contactPhone; 
 
   Case({
     this.id,
@@ -37,6 +38,7 @@ class Case {
     DateTime? dateReported,
     this.submissionStatus = SubmissionStatus.inProgress,
     this.updates,
+    this.contactPhone,
   }) : dateReported = dateReported ?? DateTime.now();
 
   factory Case.fromJson(Map<String, dynamic> json) {
@@ -147,6 +149,15 @@ class Case {
         longitude = null;
       }
 
+      String? contactPhone;
+      try {
+        contactPhone = json['contact_phone'];
+        print("Parsed contactPhone: $contactPhone");
+      } catch (e) {
+        print("Error parsing contactPhone: $e");
+        contactPhone = null;
+      }
+
       CaseStatus status;
       try {
         status = CaseStatusExtension.fromValue(json['status'] ?? 'missing');
@@ -228,6 +239,8 @@ class Case {
         dateReported: dateReported,
         submissionStatus: submissionStatus,
         updates: updates,
+                contactPhone: contactPhone,
+
       );
     } catch (e) {
       print("OVERALL ERROR in Case.fromJson: $e");
@@ -247,6 +260,8 @@ class Case {
       'last_seen_location': lastSeenLocation,
       'status': status.value,
       'submission_status': submissionStatus.value,
+            'contact_phone': contactPhone,
+
     };
 
     if (id != null) {

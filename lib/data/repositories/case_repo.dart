@@ -48,9 +48,11 @@ class CaseRepository {
     required String description,
     required DateTime lastSeenDate,
     required String lastSeenLocation,
+    required String contactPhone,
     double? latitude,
     double? longitude,
   }) async {
+     final String? authToken = await getAuthToken();
     return await _caseService.submitCase(
       firstName: firstName,
       lastName: lastName,
@@ -62,6 +64,8 @@ class CaseRepository {
       lastSeenLocation: lastSeenLocation,
       latitude: latitude,
       longitude: longitude,
+       contactPhone: contactPhone,
+         authToken: authToken,
     );
   }
 }

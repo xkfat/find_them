@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:find_them/data/dataprovider/exception.dart';
+import 'package:find_them/data/models/case.dart';
 import 'package:find_them/data/repositories/case_repo.dart';
 
 part 'submit_case_state.dart';
@@ -19,13 +22,14 @@ class SubmitCaseCubit extends Cubit<SubmitCaseState> {
      String description,
      DateTime lastSeenDate,
      String lastSeenLocation,
+      String contactPhone,
     double? latitude,
     double? longitude, ) async {
     emit(SubmitCaseLoading());
     try {
       print("Checking authentication status");
 
-      dynamic responseDta = await _submitCaseRepository.submitCase(
+      final caseObject  = await _submitCaseRepository.submitCase(
         firstName: firstName,
        lastName: lastName,
          age: age,
@@ -36,17 +40,19 @@ class SubmitCaseCubit extends Cubit<SubmitCaseState> {
          lastSeenLocation: lastSeenLocation,
          latitude: latitude,
          longitude: longitude,
+          contactPhone: contactPhone,
         );
         
-      if (responseDta["code"] == "201") {
-        emit(SubmitCaseLoaded());
-      } else if (responseDta["code"] == "401") {
-        emit(SubmitCaseerreur(responseDta["msg"]));
-      } else {
-        emit(SubmitCaseerreur("Connect to server first"));
-      }
-    } catch (e) {
-      emit(SubmitCaseerreur("Connect to server first"));
-    }
+          emit(SubmitCaseLoaded(caseObject));
+  } on UnauthorisedException catch (e) {
+    emit(SubmitCaseError("Authentication error: $e"));
+
+  } on SocketException catch (e) {
+    emit(SubmitCaseError("Network error: Check your internet connection"));
+  } on TimeoutException catch (e) {
+    emit(SubmitCaseError("Connection timed out"));
+  } catch (e) {
+    emit(SubmitCaseError("An unexpected error occurred: $e"));
   }
+}
 }

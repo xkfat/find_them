@@ -1,7 +1,9 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:find_them/logic/cubit/submit_case_cubit.dart';
 import 'package:find_them/presentation/screens/report/report_screen3.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 //import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -62,24 +64,20 @@ class _Report2ScreenState extends State<Report2Screen> {
         ).showSnackBar(SnackBar(content: Text('Please select a date')));
         return;
       }
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder:
-              (context) => Report3Screen(
-                firstName: widget.firstName,
-                lastName: widget.lastName,
-                age: widget.age,
-                gender: widget.gender,
-                lastSeenDate: _selectedDate!,
-                lastSeenLocation: _lastSeenLocationController.text,
-                //locationCoordinates: _selectedLocation,
-              ),
-        ),
-      );
-    }
+        Navigator.pushNamed(
+      context,
+      '/report3',
+      arguments: {
+        'firstName': widget.firstName,
+        'lastName': widget.lastName,
+        'age': widget.age,
+        'gender': widget.gender,
+        'lastSeenDate': _selectedDate,
+        'lastSeenLocation': _lastSeenLocationController.text,
+      },
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

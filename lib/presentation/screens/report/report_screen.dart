@@ -1,7 +1,9 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:find_them/logic/cubit/submit_case_cubit.dart';
 import 'package:find_them/presentation/screens/report/report_screen2.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 
@@ -29,20 +31,19 @@ class _Report1ScreenState extends State<Report1Screen> {
 
   void _continueToNextStep() {
     if (_formKey.currentState?.validate() ?? false) {
-      Navigator.push(
+      Navigator.pushNamed(
         context,
-        MaterialPageRoute(
-          builder:
-              (context) => Report2Screen(
-                firstName: _firstNameController.text,
-                lastName: _lastNameController.text,
-                age: int.tryParse(_ageController.text) ?? 0,
-                gender: _selectedGender ?? 'Male',
-              ),
-        ),
-      );
-    }
+             '/report2',
+      arguments: {
+        'firstName': _firstNameController.text,
+        'lastName': _lastNameController.text,
+        'age': int.tryParse(_ageController.text) ?? 0,
+        'gender': _selectedGender ?? 'Male',
+      },
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
