@@ -93,7 +93,7 @@ class CaseService {
     required String description,
     required DateTime lastSeenDate,
     required String lastSeenLocation,
-    required String contactPhone, 
+    required String contactPhone,
     double? latitude,
     double? longitude,
     String? authToken,
@@ -105,10 +105,10 @@ class CaseService {
         'POST',
         Uri.parse('http://10.0.2.2:8000/api/cases/'),
       );
-          final token = authToken ?? this.authToken;
+      final token = authToken ?? this.authToken;
 
       if (token != null) {
-        request.headers['Authorization'] = 'Token $token';
+        request.headers['Authorization'] = 'Bearer $token';
       }
       request.fields['first_name'] = firstName;
       request.fields['last_name'] = lastName;
@@ -118,7 +118,7 @@ class CaseService {
       request.fields['last_seen_date'] =
           lastSeenDate.toIso8601String().split('T').first;
       request.fields['last_seen_location'] = lastSeenLocation;
-request.fields['contact_phone'] = contactPhone;
+      request.fields['contact_phone'] = contactPhone;
 
       if (latitude != null) {
         request.fields['latitude'] = latitude.toString();

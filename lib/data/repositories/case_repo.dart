@@ -1,19 +1,23 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:find_them/data/models/case.dart';
+import 'package:find_them/data/services/api_service.dart';
 import 'package:find_them/data/services/case_service.dart';
-
-
 
 class CaseRepository {
   final CaseService _caseService;
+  final ApiService _apiService;
 
-  CaseRepository(this._caseService);
+  CaseRepository(this._caseService) : _apiService = ApiService();
 
+  Future<String?> getAuthToken() async {
+    return await _apiService.getAccessToken();
+  }
 
-   Future<List<Case>> getCases({
+  Future<List<Case>> getCases({
     String? name,
-     String? lastSeenLocation,
-      String? nameOrLocation,
+    String? lastSeenLocation,
+    String? nameOrLocation,
     int? ageMin,
     int? ageMax,
     String? gender,
@@ -24,7 +28,7 @@ class CaseRepository {
     return await _caseService.getCases(
       name: name,
       lastSeenLocation: lastSeenLocation,
-      nameOrLocation: nameOrLocation, 
+      nameOrLocation: nameOrLocation,
       ageMin: ageMin,
       ageMax: ageMax,
       gender: gender,
@@ -34,12 +38,11 @@ class CaseRepository {
     );
   }
 
-   Future<Case> getCaseById(int id) async {
+  Future<Case> getCaseById(int id) async {
     return await _caseService.getCaseById(id);
-   }
+  }
 
-  
-   Future<Case> submitCase({
+  Future<Case> submitCase({
     required String firstName,
     required String lastName,
     required int age,
@@ -52,7 +55,9 @@ class CaseRepository {
     double? latitude,
     double? longitude,
   }) async {
-     final String? authToken = await getAuthToken();
+    final String? authToken = await getAuthToken();
+    log("Retrieved auth token: ${authToken ?? 'null'}");
+
     return await _caseService.submitCase(
       firstName: firstName,
       lastName: lastName,
@@ -64,8 +69,8 @@ class CaseRepository {
       lastSeenLocation: lastSeenLocation,
       latitude: latitude,
       longitude: longitude,
-       contactPhone: contactPhone,
-         authToken: authToken,
+      contactPhone: contactPhone,
+      authToken: authToken,
     );
   }
 }

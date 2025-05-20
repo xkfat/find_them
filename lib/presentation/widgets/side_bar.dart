@@ -1,9 +1,12 @@
+import 'package:find_them/data/services/auth_service.dart';
+import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/themes/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SideBar extends StatefulWidget {
-  const SideBar({Key? key}) : super(key: key);
+  const SideBar({super.key});
 
   @override
   State<SideBar> createState() => _SideBarState();
@@ -11,6 +14,74 @@ class SideBar extends StatefulWidget {
 
 class _SideBarState extends State<SideBar> {
   int _selectedIndex = -1;
+  final AuthService _authService = AuthService();
+
+  void _handleLogout() async {
+    Navigator.pop(context);
+
+    // Store dialog context for proper dismissal
+    late BuildContext dialogContext;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        dialogContext = context; // Store the dialog context
+        return const Center(
+          child: CircularProgressIndicator(color: AppColors.darkGreen),
+        );
+      },
+    );
+
+    try {
+      final authService = AuthService();
+      final success = await authService.logout();
+
+      // Close the dialog using the stored context
+      Navigator.of(dialogContext).pop();
+
+      if (success) {
+        if (context.mounted) {
+          // Add a small delay to ensure the dialog is fully dismissed
+          await Future.delayed(Duration(milliseconds: 100));
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/auth/login',
+            (route) => false,
+          );
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Logout failed. Please try again.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Close the dialog using the stored context
+      Navigator.of(dialogContext).pop();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error logging out: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        // Still try to navigate to login
+        await Future.delayed(Duration(milliseconds: 100));
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/auth/login',
+          (route) => false,
+        );
+      }
+    } // Missing closing brace was here
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,24 +95,19 @@ class _SideBarState extends State<SideBar> {
         ),
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start, 
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-              left: 34,
-              top: 90,
-            ), 
+            padding: const EdgeInsets.only(left: 34, top: 90),
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 34, 
+                  radius: 34,
                   backgroundImage: AssetImage('assets/images/profile.png'),
                 ),
-                const SizedBox(width: 16), 
+                const SizedBox(width: 16),
                 Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start, 
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Sophia Rose',
@@ -71,24 +137,32 @@ class _SideBarState extends State<SideBar> {
             'assets/icons/submit.png',
             'assets/icons/submitF.png',
             'My submitted cases',
+            () {
+              Navigator.pop(context);
+            },
           ),
           _buildMenuItemWithImageIcon(
             1,
             'assets/icons/location.png',
             'assets/icons/locationF.png',
             'Location sharing',
+            () {},
           ),
           _buildMenuItemWithImageIcon(
             2,
             'assets/icons/notification.png',
             'assets/icons/notificationF.png',
             'Notifications',
+            () {
+              Navigator.pop(context);
+            },
           ),
           _buildMenuItemWithImageIcon(
             3,
             'assets/icons/logout.png',
             'assets/icons/logoutF.png',
             'Log out',
+            _handleLogout,
           ),
           const Spacer(),
 
@@ -153,6 +227,7 @@ class _SideBarState extends State<SideBar> {
     String outlinedIconPath,
     String filledIconPath,
     String title,
+    VoidCallback onTap,
   ) {
     bool isSelected = index == _selectedIndex;
 
@@ -161,11 +236,9 @@ class _SideBarState extends State<SideBar> {
         setState(() {
           _selectedIndex = index;
         });
-
-        Future.delayed(Duration(milliseconds: 150), () {
-          Navigator.pop(context);
-        });
+        onTap();
       },
+
       onHover: (hovering) {
         if (hovering && !isSelected) {
           setState(() {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:find_them/core/constants/api_constants.dart';
 import 'package:find_them/data/dataprovider/exception.dart';
 import 'package:find_them/data/services/api_service.dart';
 import 'package:http/http.dart';
@@ -10,10 +11,8 @@ import 'package:http/http.dart' as http;
 class AuthService {
   final ApiService _apiService;
 
-  AuthService({ApiService? apiService})       : _apiService = apiService ?? ApiService();
-
-
- 
+  AuthService({ApiService? apiService})
+    : _apiService = apiService ?? ApiService();
 
   dynamic _response(http.Response response) {
     switch (response.statusCode) {
@@ -61,8 +60,8 @@ class AuthService {
 
       responseJson = _response(response);
 
-      if (response.statusCode == 200  &&
-             responseJson['access'] != null && 
+      if (response.statusCode == 200 &&
+          responseJson['access'] != null &&
           responseJson['refresh'] != null) {
         await _apiService.saveAuthTokens(
           accessToken: responseJson['access'],
@@ -70,13 +69,11 @@ class AuthService {
           userData: responseJson['user'] ?? {},
         );
       }
-         return responseJson;
-
+      return responseJson;
     } on BadRequestException {
       log("bad 400");
-      
+
       throw Failure();
-      
     } on TimeoutException {
       log("timeout");
       throw Failure();
@@ -96,7 +93,6 @@ class AuthService {
       log("FetchData");
       throw Failure(message: "Erreur fetch data:");
     }
-
   }
 
   Future<dynamic> signup({
@@ -138,8 +134,9 @@ class AuthService {
       }
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (responseJson.containsKey('access') && responseJson.containsKey('refresh')) {
-           await _apiService.saveAuthTokens(
+        if (responseJson.containsKey('access') &&
+            responseJson.containsKey('refresh')) {
+          await _apiService.saveAuthTokens(
             accessToken: responseJson['access'],
             refreshToken: responseJson['refresh'],
             userData: responseJson['user'] ?? {},
@@ -186,7 +183,8 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-    await _apiService.clearAuthTokens();        return {'success': true};
+        await _apiService.clearAuthTokens();
+        return {'success': true};
       } else {
         return {'success': false, 'message': 'Failed to delete account'};
       }
@@ -196,16 +194,78 @@ class AuthService {
     }
   }
 
-  // Add a method to log out
   Future<bool> logout() async {
     try {
-      // You might want to call a logout endpoint on your API here if needed
-      // For now, we'll just clear the tokens
-      await _apiService.clearAuthTokens();
-      return true;
+      final accessToken = await _apiService.getAccessToken();
+      final refreshToken = await _apiService.getRefreshToken();
+
+      if (refreshToken == null) {
+        log("No refresh token available, clearing local tokens only");
+        await _apiService.clearAuthTokens();
+        return true;
+      }
+
+      try {
+        final response = await http
+            .post(
+              Uri.parse('http://10.0.2.2:8000/api/accounts/logout/'),
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $accessToken',
+              },
+              body: jsonEncode({"refresh": refreshToken}),
+            )
+            .timeout(Duration(seconds: 60));
+
+        log("Logout response status: ${response.statusCode}");
+        log("Logout response body: ${response.body}");
+
+        if (response.statusCode == 200 || response.statusCode == 204) {
+          await _apiService.clearAuthTokens();
+          return true;
+        }
+
+        if (response.statusCode == 401) {
+          log("Access token expired, attempting to refresh before logout");
+          final refreshed = await _apiService.refreshToken();
+
+          if (refreshed) {
+            final newAccessToken = await _apiService.getAccessToken();
+
+            final retryResponse = await http
+                .post(
+                  Uri.parse('http://10.0.2.2:8000/api/accounts/logout/'),
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer $newAccessToken',
+                  },
+                  body: jsonEncode({"refresh": refreshToken}),
+                )
+                .timeout(Duration(seconds: 60));
+
+            log("Retry logout response status: ${retryResponse.statusCode}");
+            log("Retry logout response body: ${retryResponse.body}");
+
+            await _apiService.clearAuthTokens();
+            return true;
+          }
+        }
+
+        await _apiService.clearAuthTokens();
+        return true;
+      } catch (e) {
+        log("Error during server logout: $e");
+        await _apiService.clearAuthTokens();
+        return true;
+      }
     } catch (e) {
-      log("Error logging out: $e");
-      return false;
+      log("Unexpected error in logout: $e");
+      try {
+        await _apiService.clearAuthTokens();
+        return true;
+      } catch (_) {
+        return false;
+      }
     }
   }
 }
