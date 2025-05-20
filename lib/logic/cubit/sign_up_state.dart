@@ -23,5 +23,5 @@ class SignUpFieldError extends SignUpState {
   final String field;
   final String message;
 
-  SignUpFieldError({required this.field, required this.message});
+  const SignUpFieldError({required this.field, required this.message});
 }

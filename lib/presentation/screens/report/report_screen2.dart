@@ -88,11 +88,12 @@ class _Report2ScreenState extends State<Report2Screen> {
       appBar: AppBar(
         title: Text(
           'Reporting a missing person',
- style: GoogleFonts.dmSans(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    color: Colors.black,
-  ),        ),
+          style: GoogleFonts.dmSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         leading: IconButton(
@@ -112,11 +113,11 @@ class _Report2ScreenState extends State<Report2Screen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildCompletedStep(), 
+                    _buildCompletedStep(),
                     _buildStepLine(true),
-                    _buildActiveStep(2), 
+                    _buildActiveStep(2),
                     _buildStepLine(false),
-                    _buildInactiveStep(3), 
+                    _buildInactiveStep(3),
                   ],
                 ),
                 const SizedBox(height: 32),
@@ -237,8 +238,8 @@ class _Report2ScreenState extends State<Report2Screen> {
 
   Widget _buildCompletedStep() {
     return Container(
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white,
@@ -250,8 +251,8 @@ class _Report2ScreenState extends State<Report2Screen> {
 
   Widget _buildActiveStep(int step) {
     return Container(
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: AppColors.teal,

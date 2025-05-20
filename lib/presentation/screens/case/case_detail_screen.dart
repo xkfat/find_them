@@ -78,7 +78,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        'Please provide any information you have about this missing person.',
+                        'Please provide any information you have about this missing person, and help us find other people loved ones.',
                         style: TextStyle(
                           fontSize: 15,
                           color: AppColors.darkGrey,
@@ -111,7 +111,6 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                   ? null
                                   : () async {
                                     if (noteController.text.trim().isEmpty) {
-                                      // Show validation message in a dialog
                                       showDialog(
                                         context: context,
                                         builder:
@@ -319,7 +318,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                     }
                                   },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.darkGreen,
+                            backgroundColor: AppColors.teal,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -391,7 +390,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                   },
                   icon: const Icon(Icons.phone, color: Colors.white, size: 20),
                   label: const Text(
-                    'Call +222 31310909',
+                    'Call +222 12345678',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -462,7 +461,6 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
   }
 
   Widget _buildCaseDetail(BuildContext context, Case caseData) {
-    const String phoneNumber = '+22231310909';
 
     String formattedDate = '';
     try {
@@ -470,7 +468,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
       formattedDate = DateFormat('MMMM d, yyyy').format(date);
     } catch (e) {
       formattedDate =
-          '${caseData.lastSeenDate.day}/${caseData.lastSeenDate.month}/${caseData.lastSeenDate.year}';
+          '${caseData.lastSeenDate.year}/${caseData.lastSeenDate.month}/${caseData.lastSeenDate.day}';
     }
 
     return SafeArea(
@@ -580,9 +578,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                         borderRadius: BorderRadius.circular(8),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                              0.05,
-                                            ),
+                                            color: AppColors.black,
                                             blurRadius: 2,
                                             offset: const Offset(0, 1),
                                           ),
@@ -816,7 +812,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                   height: 48,
                   width: 48,
                   child: ElevatedButton(
-                    onPressed: () => _makePhoneCall('+22231310909'),
+                    onPressed: () => _makePhoneCall('+22212345678'),
                     child: const Icon(Icons.phone, color: Colors.white),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero,

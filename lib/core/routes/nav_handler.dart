@@ -1,4 +1,5 @@
 import 'package:find_them/presentation/screens/home/home_screen.dart';
+import 'package:find_them/presentation/screens/map/map_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen2.dart';
 import 'package:find_them/presentation/screens/report/report_screen3.dart';
@@ -24,9 +25,9 @@ class NavHandler {
         }
         break;
 
-      // case 1:
+       case 1:
 
-      /*
+      
         if (!isMapScreen) {
           Navigator.of(context).popUntil((route) => route.isFirst);
           Navigator.of(
@@ -34,7 +35,7 @@ class NavHandler {
           ).push(MaterialPageRoute(builder: (context) => MapScreen()));
         }
         break;
-*/
+
       case 2:
         if (!isReportScreen) {
           Navigator.of(

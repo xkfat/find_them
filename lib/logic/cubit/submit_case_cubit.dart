@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:find_them/data/repositories/case_repo.dart';
 
 part 'submit_case_state.dart';
-/*
+
 class SubmitCaseCubit extends Cubit<SubmitCaseState> {
   CaseRepository _submitCaseRepository;
   SubmitCaseCubit(this._submitCaseRepository) : super(SubmitCaseInitial()); 
@@ -25,7 +25,7 @@ class SubmitCaseCubit extends Cubit<SubmitCaseState> {
     try {
       print("Checking authentication status");
 
-      var responseDta = await _submitCaseRepository.submitCase(
+      dynamic responseDta = await _submitCaseRepository.submitCase(
         firstName: firstName,
        lastName: lastName,
          age: age,
@@ -50,4 +50,3 @@ class SubmitCaseCubit extends Cubit<SubmitCaseState> {
     }
   }
 }
-*/

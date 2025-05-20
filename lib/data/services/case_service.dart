@@ -99,7 +99,7 @@ class CaseService {
     String? authToken,
   }) async {
     try {
-      print("submitCase");
+      log("submitCase");
 
       var request = http.MultipartRequest(
         'POST',

@@ -11,7 +11,7 @@ class AuthService {
   // final ApiService _apiService;
   //static const String _authDataKey = 'auth_data';
 
-  AuthService() {}
+  AuthService();
   dynamic _response(http.Response response) {
     switch (response.statusCode) {
       case 200:
@@ -53,30 +53,31 @@ class AuthService {
             body: jsonEncode({"username": username, "password": Pwd}),
           )
           .timeout(Duration(seconds: 60));
-      print(response.statusCode.toString());
-      print(response.body);
+      log(response.statusCode.toString());
+      log(response.body);
 
       responseJson = _response(response);
     } on BadRequestException {
-      print("bad 400");
+      log("bad 400");
       throw Failure();
     } on TimeoutException {
-      print("timeout");
+      log("timeout");
       throw Failure();
-    } on SocketException catch (e) {
-      print("Socket");
+    } on SocketException {
+      log("Socket");
       throw Failure();
-    } on ClientException catch (e) {
-      print("ClientException ");
+    } on ClientException {
+      log("ClientException ");
       throw Failure();
     } on UnauthorisedException {
-      print("401-3");
+      log("401-3");
       throw Failure(code: 1);
     } on NotFoundException {
-      print("404");
+      log("404");
       throw Failure();
     } on FetchDataException {
-      print("FetchData");
+      
+      log("FetchData");
       throw Failure(message: "Erreur fetch data:");
     }
 
@@ -93,7 +94,7 @@ class AuthService {
     required String passwordConfirmation,
   }) async {
     try {
-      print("signup");
+      log("signup");
 
       var response = await http
           .post(
@@ -165,7 +166,7 @@ class AuthService {
         return {'success': false, 'message': 'Failed to delete account'};
       }
     } catch (e) {
-      print("Error in delete account: $e");
+      log("Error in delete account: $e");
       return {'success': false, 'message': e.toString()};
     }
   }

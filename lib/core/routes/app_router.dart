@@ -11,6 +11,7 @@ import 'package:find_them/logic/cubit/report_cubit.dart';
 import 'package:find_them/logic/cubit/sign_up_cubit.dart';
 import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
 import 'package:find_them/presentation/screens/case/case_detail_screen.dart';
+import 'package:find_them/presentation/screens/map/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
@@ -28,10 +29,10 @@ class AppRouter {
       case '/':
         return MaterialPageRoute(builder: (_) => const SplashScreen());
 
-      case '/onboarding' :
+      case '/onboarding':
         return MaterialPageRoute(builder: (_) => const OnboardingWrapper());
 
-      case '/auth/signup' :
+      case '/auth/signup':
         return MaterialPageRoute(
           builder:
               (_) => BlocProvider(
@@ -42,7 +43,7 @@ class AppRouter {
               ),
         );
 
-      case '/auth/verify-phone' :
+      case '/auth/verify-phone':
         final Map<String, dynamic> params = args as Map<String, dynamic>;
         final String phoneNumber = params['phoneNumber'];
         final SignUpData? signUpData = params['signUpData'];
@@ -60,7 +61,7 @@ class AppRouter {
               ),
         );
 
-      case '/auth/login' :
+      case '/auth/login':
         return MaterialPageRoute(
           builder:
               (_) => BlocProvider(
@@ -79,49 +80,48 @@ class AppRouter {
         );
 */
 
-        case '/home' :
+      case '/home':
         return MaterialPageRoute(
           builder:
               (_) => BlocProvider<CaseCubit>(
-                create:
-                    (context) => CaseCubit(
-                      CaseRepository(CaseService()),
-                    ),
+                create: (context) => CaseCubit(CaseRepository(CaseService())),
                 child: const HomeScreen(),
               ),
         );
 
-       case '/case/details' :
-  final int caseId = args is int ? args : (args is String ? int.tryParse(args) ?? 0 : 0);
-  if (caseId == 0) {
-    return MaterialPageRoute(
-      builder: (_) => const Scaffold(
-        body: Center(child: Text('Invalid case ID')),
-      ),
-    );
-  }
-  return MaterialPageRoute(
-    builder: (context) => MultiBlocProvider(
-      providers: [
-        BlocProvider<CaseCubit>(
-          create: (context) => CaseCubit(
-            CaseRepository(CaseService()),
-          ),
-        ),
-        BlocProvider<ReportCubit>(
-          create: (context) => ReportCubit(
-            ReportRepository(ReportService()),
-          ),
-        ),
-      ],
-      child: CaseDetailScreen(caseId: caseId),
-    ),
-  );
+      case '/case/details':
+        final int caseId =
+            args is int ? args : (args is String ? int.tryParse(args) ?? 0 : 0);
+        if (caseId == 0) {
+          return MaterialPageRoute(
+            builder:
+                (_) => const Scaffold(
+                  body: Center(child: Text('Invalid case ID')),
+                ),
+          );
+        }
+        return MaterialPageRoute(
+          builder:
+              (context) => MultiBlocProvider(
+                providers: [
+                  BlocProvider<CaseCubit>(
+                    create:
+                        (context) => CaseCubit(CaseRepository(CaseService())),
+                  ),
+                  BlocProvider<ReportCubit>(
+                    create:
+                        (context) =>
+                            ReportCubit(ReportRepository(ReportService())),
+                  ),
+                ],
+                child: CaseDetailScreen(caseId: caseId),
+              ),
+        );
 
-      /*
       case '/map':
         return MaterialPageRoute(builder: (_) => const MapScreen());
 
+      /*
       case '/report' :
         return MaterialPageRoute(builder: (_) => const ReportScreen());
 

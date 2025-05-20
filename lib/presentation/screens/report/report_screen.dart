@@ -205,23 +205,25 @@ class _Report1ScreenState extends State<Report1Screen> {
                 ),
                 const SizedBox(height: 40),
 
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _continueToNextStep,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.teal,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                Center(
+                  child: SizedBox(
+                    width: 248,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _continueToNextStep,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.teal,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Continue',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                      child: Text(
+                        'Continue',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -240,8 +242,8 @@ class _Report1ScreenState extends State<Report1Screen> {
 
   Widget _buildStepCircle(int step, bool isActive) {
     return Container(
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: isActive ? AppColors.teal : Colors.white,

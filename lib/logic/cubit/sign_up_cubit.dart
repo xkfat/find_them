@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
@@ -5,7 +7,7 @@ import 'package:find_them/data/repositories/auth_repo.dart';
 part 'sign_up_state.dart';
 
 class SignUpCubit extends Cubit<SignUpState> {
-  AuthRepository _authRepository;
+  final AuthRepository _authRepository;
 
   SignUpCubit(this._authRepository) : super(SignUpInitial());
 
@@ -20,7 +22,7 @@ class SignUpCubit extends Cubit<SignUpState> {
   }) async {
     emit(SignUpLoading());
     try {
-      print("Processing signup request");
+      log("Processing signup request");
 
       var responseData = await _authRepository.signup(
         firstName: firstName,
@@ -32,18 +34,18 @@ class SignUpCubit extends Cubit<SignUpState> {
         passwordConfirmation: passwordConfirmation,
       );
 
-      print("Signup response data: $responseData");
+      log("Signup response data: $responseData");
 
       if (responseData is Map) {
         if (responseData.containsKey("refresh") &&
             responseData.containsKey("access")) {
-          print("Success detected - emitting SignUploaded state");
+          log("Success detected - emitting SignUploaded state");
           emit(SignUploaded());
           return;
         }
 
         if (responseData.containsKey("user")) {
-          print("User object found - emitting SignUploaded state");
+          log("User object found - emitting SignUploaded state");
           emit(SignUploaded());
           return;
         }
@@ -52,7 +54,7 @@ class SignUpCubit extends Cubit<SignUpState> {
             responseData.containsKey("message")) {
           String field = responseData["field"];
           String message = responseData["message"];
-          print("Field error detected: $field - $message");
+          log("Field error detected: $field - $message");
 
           emit(SignUpFieldError(field: field, message: message));
           return;
@@ -69,7 +71,7 @@ class SignUpCubit extends Cubit<SignUpState> {
           } else {
             errorMessage = "Unknown error format: $messageValue";
           }
-          print("Error message: $errorMessage");
+          log("Error message: $errorMessage");
 
           if (errorMessage.toLowerCase().contains("username") &&
               (errorMessage.toLowerCase().contains("already") ||
@@ -101,7 +103,7 @@ class SignUpCubit extends Cubit<SignUpState> {
       }
       emit(SignUperreur("An unexpected error occurred. Please try again."));
     } catch (e) {
-      print("Exception during signup: ${e.toString()}");
+      log("Exception during signup: ${e.toString()}");
     }
   }
 }

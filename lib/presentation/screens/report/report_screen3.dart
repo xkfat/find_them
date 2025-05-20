@@ -233,8 +233,8 @@ class _Report3ScreenState extends State<Report3Screen> {
 
   Widget _buildStepCircle(int step, bool isCompleted, bool isActive) {
     return Container(
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: isActive ? AppColors.teal : Colors.white,

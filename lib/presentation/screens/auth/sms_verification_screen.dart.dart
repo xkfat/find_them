@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:find_them/data/models/auth.dart';
+import 'package:find_them/data/repositories/case_repo.dart';
+import 'package:find_them/data/services/case_service.dart';
+import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
 import 'package:find_them/presentation/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -449,8 +452,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
             ),
           ),
 
-          if (isLoading &&
-              false) 
+          if (isLoading && false)
             Positioned.fill(
               child: Container(
                 color: Colors.black,
@@ -506,7 +508,15 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    MaterialPageRoute(
+                      builder:
+                          (context) => BlocProvider<CaseCubit>(
+                            create:
+                                (context) =>
+                                    CaseCubit(CaseRepository(CaseService())),
+                            child: const HomeScreen(),
+                          ),
+                    ),
                     (route) => false,
                   );
                 },

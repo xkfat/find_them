@@ -76,11 +76,7 @@ class CaseListWidget extends StatelessWidget {
           return _CaseCard(
             caseData: cases[index],
             onTap: (id) {
-              Navigator.pushNamed(
-                context,
-                '/case/details',
-                arguments: id,
-              );
+              Navigator.pushNamed(context, '/case/details', arguments: id);
             },
           );
         },
@@ -177,9 +173,9 @@ class _CaseCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    '${caseData.lastSeenDate.year}/${caseData.lastSeenDate.month}/${caseData.lastSeenDate.day}',
+                                    '${caseData.lastSeenDate.day}/${caseData.lastSeenDate.month}/${caseData.lastSeenDate.year}',
                                     style: GoogleFonts.inter(
-                                      fontSize: 13,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
