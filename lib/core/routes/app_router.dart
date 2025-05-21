@@ -92,12 +92,19 @@ class AppRouter {
       case '/home':
         return MaterialPageRoute(
           builder:
-              (_) => BlocProvider<CaseCubit>(
-                create: (context) => CaseCubit(CaseRepository(CaseService())),
+              (_) => MultiBlocProvider(
+                providers: [
+                  BlocProvider<CaseCubit>(
+                    create:
+                        (context) => CaseCubit(CaseRepository(CaseService())),
+                  ),
+                  BlocProvider<ProfileCubit>(
+                    create: (context) => ProfileCubit(ProfileRepository()),
+                  ),
+                ],
                 child: const HomeScreen(),
               ),
         );
-
       case '/case/details':
         final int caseId =
             args is int ? args : (args is String ? int.tryParse(args) ?? 0 : 0);
@@ -211,13 +218,33 @@ class AppRouter {
       case '/report_success':
         return MaterialPageRoute(builder: (_) => const ReportSuccessScreen());
 
-     case '/profile':
+      case '/profile':
         return MaterialPageRoute(
           builder:
               (_) => BlocProvider<ProfileCubit>(
                 create:
-                    (context) => ProfileCubit(ProfileRepository(profileService: ProfileService())),
-                child: const ProfileScreen(),
+                    (context) =>
+                        ProfileCubit(ProfileRepository())..loadProfile(),
+                child: BlocListener<ProfileCubit, ProfileState>(
+                  listener: (context, state) {
+                    if (state is ProfileUpdateSuccess) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Profile updated successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else if (state is ProfileUpdateError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.message),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  child: const ProfileScreen(),
+                ),
               ),
         );
       /*

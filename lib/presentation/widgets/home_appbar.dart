@@ -1,6 +1,9 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:find_them/data/repositories/profile_repo.dart';
+import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:find_them/presentation/widgets/side_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
@@ -51,22 +54,23 @@ class HomeAppBar extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        return SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Row(
-            children: [
-              const SideBar(),
-              
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Container(
-                    color: Colors.black54,
+      builder: (modalContext) {
+        return BlocProvider(
+          create: (_) => ProfileCubit(ProfileRepository())..loadProfile(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Row(
+              children: [
+                const SideBar(),
+
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(color: Colors.black54),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

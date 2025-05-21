@@ -8,7 +8,6 @@ class ProfileRepository {
   ProfileRepository({ProfileService? profileService}) 
       : _profileService = profileService ?? ProfileService();
   
-  // Get current user profile
   Future<User> getUserProfile() async {
     try {
       return await _profileService.getUserProfile();
@@ -17,37 +16,24 @@ class ProfileRepository {
     }
   }
   
-  // Update user profile info
-  Future<User> updateProfile({
-    required String firstName,
-    required String lastName,
-    required String username,
-    required String email,
-    required String phoneNumber,
-  }) async {
-    try {
-      return await _profileService.updateProfile(
-        firstName: firstName,
-        lastName: lastName,
-        username: username,
-        email: email,
-        phoneNumber: phoneNumber,
-      );
-    } catch (e) {
-      throw Exception('Failed to update profile: $e');
-    }
-  }
+ 
   
-  // Update profile photo
   Future<User> updateProfilePhoto(File photo) async {
     try {
       return await _profileService.updateProfilePhoto(photo);
     } catch (e) {
-      throw Exception('Failed to update profile photo: $e');
+      throw e;
+    }
+  }
+
+    Future<User> updateProfilePartial(Map<String, dynamic> fields) async {
+    try {
+      return await _profileService.updateProfilePartial(fields);
+    } catch (e) {
+      throw e;
     }
   }
   
-  // Change password
   Future<bool> changePassword({
     required String currentPassword,
     required String newPassword,

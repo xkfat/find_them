@@ -94,6 +94,15 @@ class ApiService {
       body: body != null ? jsonEncode(body) : null,
     );
   }
+
+   Future<http.Response> patch(String endpoint, {Map<String, dynamic>? body}) async {
+    final headers = await _getAuthHeaders();
+    return _client.patch(
+      Uri.parse('${ApiConstants.baseUrl}$endpoint'),
+      headers: headers,
+      body: body != null ? jsonEncode(body) : null,
+    );
+  }
   
   Future<http.Response> delete(String endpoint, {Map<String, dynamic>? body}) async {
     final headers = await _getAuthHeaders();

@@ -10,13 +10,15 @@ class NavHandler {
   static void handleNavTap(BuildContext context, int index) {
     bool isHomeScreen = context.widget is HomeScreen;
     bool isReportScreen =
-        context.widget is Report1Screen || context.widget is Report2Screen
-    ||
-     context.widget is Report3Screen;
+        context.widget is Report1Screen ||
+        context.widget is Report2Screen ||
+        context.widget is Report3Screen;
 
     bool isMapScreen = false;
     bool isSettingsScreen = false;
     bool isProfileScreen = false;
+
+    String? currentRoute = ModalRoute.of(context)?.settings.name;
 
     switch (index) {
       case 0:
@@ -25,9 +27,7 @@ class NavHandler {
         }
         break;
 
-       case 1:
-
-      
+      case 1:
         if (!isMapScreen) {
           Navigator.of(context).popUntil((route) => route.isFirst);
           Navigator.of(
@@ -44,15 +44,14 @@ class NavHandler {
         }
         break;
 
-      case 3:
-      if (!isProfileScreen) {
+      case 3: // Profile
+        if (currentRoute != '/profile') {
           Navigator.of(context).popUntil((route) => route.isFirst);
           Navigator.of(
             context,
-          ).push(MaterialPageRoute(builder: (context) => ProfileScreen()));
+          ).pushReplacementNamed('/profile'); // <--- CORRECTED LINE
         }
         break;
-
 
       //case 4:
     }

@@ -1,5 +1,7 @@
+import 'package:find_them/data/models/user.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
+import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/themes/app_colors.dart';
@@ -16,17 +18,22 @@ class _SideBarState extends State<SideBar> {
   int _selectedIndex = -1;
   final AuthService _authService = AuthService();
 
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProfileCubit>().loadProfile();
+  }
+
   void _handleLogout() async {
     Navigator.pop(context);
 
-    // Store dialog context for proper dismissal
     late BuildContext dialogContext;
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        dialogContext = context; // Store the dialog context
+        dialogContext = context;
         return const Center(
           child: CircularProgressIndicator(color: AppColors.darkGreen),
         );
@@ -37,12 +44,10 @@ class _SideBarState extends State<SideBar> {
       final authService = AuthService();
       final success = await authService.logout();
 
-      // Close the dialog using the stored context
       Navigator.of(dialogContext).pop();
 
       if (success) {
         if (context.mounted) {
-          // Add a small delay to ensure the dialog is fully dismissed
           await Future.delayed(Duration(milliseconds: 100));
           Navigator.pushNamedAndRemoveUntil(
             context,
@@ -61,7 +66,6 @@ class _SideBarState extends State<SideBar> {
         }
       }
     } catch (e) {
-      // Close the dialog using the stored context
       Navigator.of(dialogContext).pop();
 
       if (context.mounted) {
@@ -72,7 +76,6 @@ class _SideBarState extends State<SideBar> {
           ),
         );
 
-        // Still try to navigate to login
         await Future.delayed(Duration(milliseconds: 100));
         Navigator.pushNamedAndRemoveUntil(
           context,
@@ -80,7 +83,7 @@ class _SideBarState extends State<SideBar> {
           (route) => false,
         );
       }
-    } // Missing closing brace was here
+    }
   }
 
   @override
@@ -99,35 +102,55 @@ class _SideBarState extends State<SideBar> {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 34, top: 90),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 34,
-                  backgroundImage: AssetImage('assets/images/profile.png'),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: BlocBuilder<ProfileCubit, ProfileState>(
+              builder: (context, state) {
+                User? user;
+                if (state is ProfileLoaded) {
+                  user = state.user;
+                } else if (state is ProfileUpdateSuccess) {
+                  user = state.user;
+                } else if (state is ProfilePhotoUploadSuccess) {
+                  user = state.user;
+                }
+                ImageProvider<Object> profileImage;
+                if (user != null &&
+                    user.profilePhoto != null &&
+                    user.profilePhoto!.isNotEmpty) {
+                  profileImage = NetworkImage(user.profilePhoto!);
+                } else {
+                  profileImage = const AssetImage('assets/images/profile.png');
+                }
+
+                return Row(
                   children: [
-                    Text(
-                      'Sophia Rose',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      '@username',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey,
-                      ),
+                    CircleAvatar(radius: 34, backgroundImage: profileImage),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user != null
+                              ? '${user.firstName ?? ''} ${user.lastName ?? ''}'
+                              : 'Loading...',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          user != null ? '@${user.username ?? 'username'}' : '',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ],
+                );
+              },
             ),
           ),
           const SizedBox(height: 48),

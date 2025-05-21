@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
 import 'package:permission_handler/permission_handler.dart';
@@ -545,16 +546,21 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate bottom container height
-    final bottomContainerHeight = 150.0;
+    // final bottomContainerHeight = 150.0;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.teal,
-        title: const Text(
+        title: Text(
           'Set Location',
-          style: TextStyle(color: Colors.white),
+          style: GoogleFonts.dmSans(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
+        centerTitle: true,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -620,7 +626,6 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
             ),
           ),
 
-          // Repositioned zoom controls - moved higher to avoid overlap with bottom container
           Positioned(
             right: 16,
             bottom: 260,

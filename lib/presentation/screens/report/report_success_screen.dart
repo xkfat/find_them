@@ -9,20 +9,16 @@ class ReportSuccessScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // AppBar removed completely
       body: SafeArea(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               children: [
-                // Add more space at the top without the AppBar
                 const SizedBox(height: 40),
 
-                // Flexible space to push content to the center
                 const Spacer(flex: 2),
 
-                // Success icon
                 Container(
                   width: 80,
                   height: 80,
@@ -34,7 +30,6 @@ class ReportSuccessScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Success text
                 Text(
                   'Success!',
                   style: GoogleFonts.inter(
@@ -44,7 +39,6 @@ class ReportSuccessScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Message
                 Text(
                   'We will treat your information as soon as possible.',
                   textAlign: TextAlign.center,
@@ -54,17 +48,14 @@ class ReportSuccessScreen extends StatelessWidget {
                   ),
                 ),
 
-                // Add flexible space to push button to bottom
                 const Spacer(flex: 3),
 
-                // Button at bottom
                 Center(
                   child: SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Navigate to home screen
                         Navigator.pushNamedAndRemoveUntil(
                           context,
                           '/home',
@@ -88,7 +79,7 @@ class ReportSuccessScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24), // Bottom padding
+                const SizedBox(height: 24), 
               ],
             ),
           ),

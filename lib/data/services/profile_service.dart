@@ -7,14 +7,14 @@ import 'package:http/http.dart' as http;
 
 class ProfileService {
   final ApiService _apiService;
-  
-  ProfileService({ApiService? apiService}) 
-      : _apiService = apiService ?? ApiService();
-  
+
+  ProfileService({ApiService? apiService})
+    : _apiService = apiService ?? ApiService();
+
   Future<User> getUserProfile() async {
     try {
       final response = await _apiService.get(ApiConstants.profile);
-      
+
       if (response.statusCode == 200) {
         final userData = json.decode(response.body);
         return User.fromJson(userData);
@@ -26,72 +26,72 @@ class ProfileService {
       throw Exception('Error fetching user profile: $e');
     }
   }
-  
-  Future<User> updateProfile({
-    required String firstName,
-    required String lastName,
-    required String username,
-    required String email,
-    required String phoneNumber,
-  }) async {
+
+ 
+
+  Future<User> updateProfilePartial(Map<String, dynamic> fields) async {
     try {
-      final body = {
-        'first_name': firstName,
-        'last_name': lastName,
-        'username': username,
-        'email': email,
-        'phone_number': phoneNumber,
-      };
-      
-      final response = await _apiService.put(
+      final response = await _apiService.patch(
         ApiConstants.profile,
-        body: body,
+        body: fields,
       );
-      
+
       if (response.statusCode == 200) {
         final updatedData = json.decode(response.body);
         return User.fromJson(updatedData);
       } else {
         final errorData = json.decode(response.body);
-        throw Exception(errorData);
+        throw Exception(errorData['detail'] ?? 'Partial update failed');
       }
     } catch (e) {
-      throw Exception('Error updating profile: $e');
+      throw Exception('Error in partial profile update: $e');
     }
   }
-  
+
   Future<User> updateProfilePhoto(File photo) async {
     try {
       final token = await _apiService.getAccessToken();
-      
+
       var request = http.MultipartRequest(
         'PATCH',
         Uri.parse('${ApiConstants.baseUrl}${ApiConstants.profile}'),
       );
-      
+
       if (token != null) {
         request.headers['Authorization'] = 'Bearer $token';
       }
-      
+
       request.files.add(
         await http.MultipartFile.fromPath('profile_photo', photo.path),
       );
-      
+
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
-      
+
       if (response.statusCode == 200) {
         final updatedData = json.decode(response.body);
         return User.fromJson(updatedData);
       } else {
-        final errorData = json.decode(response.body);
-        throw Exception(errorData);
+        if (response.body.isNotEmpty) {
+          try {
+            final errorData = json.decode(response.body);
+            throw Exception(errorData);
+          } catch (e) {
+            throw Exception(
+              'Error updating profile photo: ${response.statusCode}',
+            );
+          }
+        } else {
+          throw Exception(
+            'Error updating profile photo: ${response.statusCode}',
+          );
+        }
       }
     } catch (e) {
       throw Exception('Error updating profile photo: $e');
     }
   }
-  
+
   Future<bool> changePassword({
     required String currentPassword,
     required String newPassword,
@@ -101,12 +101,12 @@ class ProfileService {
         'current_password': currentPassword,
         'new_password': newPassword,
       };
-      
+
       final response = await _apiService.post(
         ApiConstants.changePassword,
         body: body,
       );
-      
+
       return response.statusCode == 200;
     } catch (e) {
       throw Exception('Error changing password: $e');
