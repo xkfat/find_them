@@ -29,7 +29,7 @@ class DarkTheme {
       unselectedItemColor: AppColors.darkTextSecondary,
     ),
 
-    cardTheme: CardTheme(
+     cardTheme: CardThemeData(
       color: AppColors.darkCardBackground,
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

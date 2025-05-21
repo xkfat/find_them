@@ -32,7 +32,7 @@ class LightTheme {
       unselectedItemColor: AppColors.teal,
     ),
 
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: AppColors.lightMint,
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

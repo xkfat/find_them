@@ -1,18 +1,22 @@
 import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
 import 'package:find_them/data/repositories/case_repo.dart';
+import 'package:find_them/data/repositories/profile_repo.dart';
 import 'package:find_them/data/repositories/report_repo.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/data/services/case_service.dart';
+import 'package:find_them/data/services/profile_service.dart';
 import 'package:find_them/data/services/report_service.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
+import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:find_them/logic/cubit/report_cubit.dart';
 import 'package:find_them/logic/cubit/sign_up_cubit.dart';
 import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
 import 'package:find_them/logic/cubit/submit_case_cubit.dart';
 import 'package:find_them/presentation/screens/case/case_detail_screen.dart';
 import 'package:find_them/presentation/screens/map/map_screen.dart';
+import 'package:find_them/presentation/screens/profile/profile_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen2.dart';
 import 'package:find_them/presentation/screens/report/report_screen3.dart';
@@ -179,10 +183,19 @@ class AppRouter {
                     gender: args['gender'] as String,
                     lastSeenDate: args['lastSeenDate'] as DateTime,
                     lastSeenLocation: args['lastSeenLocation'] as String,
-                                        latitude: args.containsKey('latitude') ? args['latitude'] as double? : null,
-                    longitude: args.containsKey('longitude') ? args['longitude'] as double? : null,
+                    latitude:
+                        args.containsKey('latitude')
+                            ? args['latitude'] as double?
+                            : null,
+                    longitude:
+                        args.containsKey('longitude')
+                            ? args['longitude'] as double?
+                            : null,
 
-          contactPhone: args.containsKey('contactPhone') ? args['contactPhone'] as String? : null,
+                    contactPhone:
+                        args.containsKey('contactPhone')
+                            ? args['contactPhone'] as String?
+                            : null,
                   ),
                 ),
           );
@@ -198,10 +211,16 @@ class AppRouter {
       case '/report_success':
         return MaterialPageRoute(builder: (_) => const ReportSuccessScreen());
 
+     case '/profile':
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider<ProfileCubit>(
+                create:
+                    (context) => ProfileCubit(ProfileRepository(profileService: ProfileService())),
+                child: const ProfileScreen(),
+              ),
+        );
       /*
-      case  '/profile' :
-        return MaterialPageRoute(builder: (_) => const ProfileScreen());
-
       case '/settings' :
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
 
