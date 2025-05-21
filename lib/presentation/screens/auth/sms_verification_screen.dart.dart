@@ -17,10 +17,10 @@ class SmsVerificationScreen extends StatefulWidget {
   final SignUpData? signUpData;
 
   const SmsVerificationScreen({
-    Key? key,
+    super.key,
     required this.phoneNumber,
     this.signUpData,
-  }) : super(key: key);
+  });
 
   @override
   State<SmsVerificationScreen> createState() => _SmsVerificationScreenState();
@@ -137,23 +137,22 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
     if (widget.signUpData != null) {
       bool? shouldDelete = await showDialog<bool>(
         context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text('Go back to signup?'),
-              content: const Text(
-                'Your account was created but not verified. Going back will delete this account and you\'ll need to sign up again.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Stay here'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Go back'),
-                ),
-              ],
+        builder: (context) => AlertDialog(
+          title: const Text('Go back to signup?'),
+          content: const Text(
+            'Your account was created but not verified. Going back will delete this account and you\'ll need to sign up again.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Stay here'),
             ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Go back'),
+            ),
+          ],
+        ),
       );
 
       if (shouldDelete == true) {
@@ -204,264 +203,243 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
   }
 
   Widget _buildVerificationScreen(SmsVerificationState state) {
-    bool isLoading =
-        state is SmsVerificationLoading ||
-        state is SmsVerificationAccountDeletionLoading;
+    bool isLoading = state is SmsVerificationLoading || 
+                     state is SmsVerificationAccountDeletionLoading;
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: null,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, top: 16.0),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: AppColors.black,
-                      size: 28,
-                    ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: _goBack,
-                  ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 16.0),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.black,
+                  size: 28,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 16),
-                      Text(
-                        'Enter code',
-                        style: GoogleFonts.inter(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        'Please enter the 4 digit code sent to ${widget.phoneNumber}',
-                        style: GoogleFonts.roboto(
-                          fontSize: 18,
-                          color: AppColors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          4,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: SizedBox(
-                              width: 71,
-                              height: 71,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color:
-                                        _showError
-                                            ? Colors.red
-                                            : (_focusNodes[index].hasFocus
-                                                ? AppColors.teal
-                                                : AppColors.grey),
-                                    width: 1.7,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Center(
-                                  child: TextFormField(
-                                    controller: _controllers[index],
-                                    focusNode: _focusNodes[index],
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color:
-                                          _showError
-                                              ? AppColors.missingRed
-                                              : AppColors.darkGrey,
-                                    ),
-                                    maxLength: 1,
-                                    decoration: const InputDecoration(
-                                      counterText: '',
-                                      border: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      errorBorder: InputBorder.none,
-                                      disabledBorder: InputBorder.none,
-                                      focusedErrorBorder: InputBorder.none,
-                                      contentPadding: EdgeInsets.zero,
-                                      isDense: true,
-                                    ),
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                    ],
-                                    enabled: !isLoading,
-                                    onChanged: (value) {
-                                      if (value.isNotEmpty && index < 3) {
-                                        FocusScope.of(
-                                          context,
-                                        ).requestFocus(_focusNodes[index + 1]);
-                                      }
-
-                                      if (_showError) {
-                                        setState(() {
-                                          _showError = false;
-                                        });
-                                      }
-
-                                      if (index == 3 && value.isNotEmpty) {
-                                        if (_controllers.every(
-                                          (c) => c.text.isNotEmpty,
-                                        )) {
-                                          Future.delayed(
-                                            const Duration(milliseconds: 100),
-                                            () {
-                                              _verifyCode();
-                                            },
-                                          );
-                                        }
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 26),
-
-                      Center(
-                        child:
-                            _showError
-                                ? Text(
-                                  _errorMessage,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    color: Colors.red,
-                                  ),
-                                )
-                                : const SizedBox.shrink(),
-                      ),
-
-                      const SizedBox(height: 50),
-
-                      Center(
-                        child: SizedBox(
-                          width: 362,
-                          height: 72,
-                          child: ElevatedButton(
-                            onPressed: isLoading ? null : _verifyCode,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.teal,
-                              disabledBackgroundColor: AppColors.teal,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                            ),
-                            child:
-                                isLoading
-                                    ? const SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 3,
-                                      ),
-                                    )
-                                    : Text(
-                                      'Verify Code',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      Center(
-                        child: Text(
-                          'Code expires in $_formattedTime',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            color: AppColors.grey,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "I didn't receive a code",
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                color: AppColors.black,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            TextButton(
-                              onPressed:
-                                  (_canResend && !isLoading)
-                                      ? _resendCode
-                                      : null,
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              child: Text(
-                                "Resend",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      (_canResend && !isLoading)
-                                          ? AppColors.teal
-                                          : AppColors.grey,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          if (isLoading && false)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black,
-                child: Center(
-                  child: CircularProgressIndicator(color: AppColors.teal),
-                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: _goBack,
               ),
             ),
-        ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  Text(
+                    'Enter code',
+                    style: GoogleFonts.inter(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Please enter the 4 digit code sent to ${widget.phoneNumber}',
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      4,
+                      (index) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                        ),
+                        child: SizedBox(
+                          width: 71,
+                          height: 71,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: _showError
+                                    ? Colors.red
+                                    : (_focusNodes[index].hasFocus
+                                        ? AppColors.teal
+                                        : AppColors.grey),
+                                width: 1.7,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Center(
+                              child: TextFormField(
+                                controller: _controllers[index],
+                                focusNode: _focusNodes[index],
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: _showError
+                                      ? AppColors.missingRed
+                                      : AppColors.darkGrey,
+                                ),
+                                maxLength: 1,
+                                decoration: const InputDecoration(
+                                  counterText: '',
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  focusedErrorBorder: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                  isDense: true,
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                enabled: !isLoading,
+                                onChanged: (value) {
+                                  if (value.isNotEmpty && index < 3) {
+                                    FocusScope.of(
+                                      context,
+                                    ).requestFocus(_focusNodes[index + 1]);
+                                  }
+
+                                  if (_showError) {
+                                    setState(() {
+                                      _showError = false;
+                                    });
+                                  }
+
+                                  if (index == 3 && value.isNotEmpty) {
+                                    if (_controllers.every(
+                                      (c) => c.text.isNotEmpty,
+                                    )) {
+                                      Future.delayed(
+                                        const Duration(milliseconds: 100),
+                                        () {
+                                          _verifyCode();
+                                        },
+                                      );
+                                    }
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 26),
+
+                  Center(
+                    child: _showError
+                        ? Text(
+                            _errorMessage,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.red,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+
+                  const SizedBox(height: 50),
+
+                  Center(
+                    child: SizedBox(
+                      width: 362,
+                      height: 72,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : _verifyCode,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.teal,
+                          disabledBackgroundColor: AppColors.teal,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                              )
+                            : Text(
+                                'Verify Code',
+                                style: GoogleFonts.inter(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Center(
+                    child: Text(
+                      'Code expires in $_formattedTime',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "I didn't receive a code",
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            color: AppColors.black,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        TextButton(
+                          onPressed: (_canResend && !isLoading)
+                              ? _resendCode
+                              : null,
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            "Resend",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: (_canResend && !isLoading)
+                                  ? AppColors.teal
+                                  : AppColors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -509,13 +487,11 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                 onPressed: () {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
-                      builder:
-                          (context) => BlocProvider<CaseCubit>(
-                            create:
-                                (context) =>
-                                    CaseCubit(CaseRepository(CaseService())),
-                            child: const HomeScreen(),
-                          ),
+                      builder: (context) => BlocProvider<CaseCubit>(
+                        create: (context) =>
+                            CaseCubit(CaseRepository(CaseService())),
+                        child: const HomeScreen(),
+                      ),
                     ),
                     (route) => false,
                   );

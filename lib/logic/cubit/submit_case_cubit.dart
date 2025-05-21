@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
@@ -27,7 +28,7 @@ class SubmitCaseCubit extends Cubit<SubmitCaseState> {
     double? longitude, ) async {
     emit(SubmitCaseLoading());
     try {
-      print("Checking authentication status");
+      log("Checking authentication status");
 
       final caseObject  = await _submitCaseRepository.submitCase(
         firstName: firstName,
@@ -47,9 +48,9 @@ class SubmitCaseCubit extends Cubit<SubmitCaseState> {
   } on UnauthorisedException catch (e) {
     emit(SubmitCaseError("Authentication error: $e"));
 
-  } on SocketException catch (e) {
+  } on SocketException  {
     emit(SubmitCaseError("Network error: Check your internet connection"));
-  } on TimeoutException catch (e) {
+  } on TimeoutException {
     emit(SubmitCaseError("Connection timed out"));
   } catch (e) {
     emit(SubmitCaseError("An unexpected error occurred: $e"));

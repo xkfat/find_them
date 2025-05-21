@@ -1,6 +1,11 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart' as geo;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -12,6 +17,158 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   String _selectedFilter = 'All';
   final TextEditingController _searchController = TextEditingController();
+
+  GoogleMapController? _mapController;
+
+  CameraPosition _initialCameraPosition = const CameraPosition(
+    target: LatLng(18.7357, -15.9570),
+    zoom: 10,
+  );
+
+  final Set<Marker> _markers = {};
+
+  bool _isMapLoading = true;
+  bool _locationPermissionGranted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLocationPermission();
+  }
+
+  Future<void> _checkLocationPermission() async {
+    final status = await Permission.location.status;
+
+    setState(() {
+      _locationPermissionGranted = status.isGranted;
+    });
+
+    if (!status.isGranted) {
+      final result = await Permission.location.request();
+      setState(() {
+        _locationPermissionGranted = result.isGranted;
+      });
+    }
+
+    if (_locationPermissionGranted) {
+      _getCurrentLocation();
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: geo.LocationAccuracy.high,
+      );
+
+      setState(() {
+        _initialCameraPosition = CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 15,
+        );
+        _markers.add(
+          Marker(
+            markerId: const MarkerId('currentLocation'),
+            position: LatLng(position.latitude, position.longitude),
+            infoWindow: const InfoWindow(title: 'Your Location'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueBlue,
+            ),
+          ),
+        );
+
+        _isMapLoading = false;
+      });
+      if (_mapController != null) {
+        _mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(_initialCameraPosition),
+        );
+      }
+    } catch (e) {
+      print('Error getting location: $e');
+      setState(() {
+        _isMapLoading = false;
+      });
+    }
+  }
+
+  void _addMissingPersonMarkers() {
+    final currentPosition = _initialCameraPosition.target;
+    _markers.addAll([
+      Marker(
+        markerId: const MarkerId('missing1'),
+        position: LatLng(
+          currentPosition.latitude + 0.01,
+          currentPosition.longitude + 0.01,
+        ),
+        infoWindow: const InfoWindow(
+          title: 'John Doe',
+          snippet: 'Missing since: June 15, 2023',
+        ),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        visible:
+            _selectedFilter == 'All' || _selectedFilter == 'Missing persons',
+      ),
+      Marker(
+        markerId: const MarkerId('missing2'),
+        position: LatLng(
+          currentPosition.latitude - 0.015,
+          currentPosition.longitude + 0.005,
+        ),
+        infoWindow: const InfoWindow(
+          title: 'Jane Smith',
+          snippet: 'Missing since: July 22, 2023',
+        ),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        visible:
+            _selectedFilter == 'All' || _selectedFilter == 'Missing persons',
+      ),
+    ]);
+    _markers.add(
+      Marker(
+        markerId: const MarkerId('sharing1'),
+        position: LatLng(
+          currentPosition.latitude - 0.008,
+          currentPosition.longitude - 0.012,
+        ),
+        infoWindow: const InfoWindow(
+          title: 'Alex Johnson',
+          snippet: 'Sharing location',
+        ),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        visible:
+            _selectedFilter == 'All' || _selectedFilter == 'Location sharing',
+      ),
+    );
+
+    setState(() {});
+  }
+
+  void _filterMarkers(String filter) {
+    setState(() {
+      _selectedFilter = filter;
+      _markers.forEach((marker) {
+        final markerId = marker.markerId.value;
+
+        if (markerId == 'currentLocation') {
+          return;
+        }
+        if (markerId.startsWith('missing')) {
+          final newMarker = marker.copyWith(
+            visibleParam: filter == 'All' || filter == 'Missing persons',
+          );
+          _markers.remove(marker);
+          _markers.add(newMarker);
+        } else if (markerId.startsWith('sharing')) {
+          final newMarker = marker.copyWith(
+            visibleParam: filter == 'All' || filter == 'Location sharing',
+          );
+          _markers.remove(marker);
+          _markers.add(newMarker);
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +257,48 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Widget _buildMapContainer() {
-    return Container(color: AppColors.white);
+    if (_isMapLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.teal),
+      );
+    }
+
+    if (!_locationPermissionGranted) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Location permission is required to use the map.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _checkLocationPermission,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.teal,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Grant Permission'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GoogleMap(
+      initialCameraPosition: _initialCameraPosition,
+      markers: _markers,
+      myLocationEnabled: true,
+      myLocationButtonEnabled: true,
+      zoomControlsEnabled: true,
+      compassEnabled: true,
+      mapType: MapType.normal,
+      onMapCreated: (GoogleMapController controller) {
+        _mapController = controller;
+        _addMissingPersonMarkers();
+      },
+    );
   }
 }

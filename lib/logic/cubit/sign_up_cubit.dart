@@ -64,12 +64,10 @@ class SignUpCubit extends Cubit<SignUpState> {
           String messageValue = responseData["message"];
 
           String errorMessage;
-          if (messageValue is String) {
-            errorMessage = messageValue;
-          } else if (messageValue is Map) {
+          if (messageValue is Map) {
             errorMessage = messageValue.toString();
-          } else {
-            errorMessage = "Unknown error format: $messageValue";
+               }  else {
+    errorMessage = messageValue.toString();
           }
           log("Error message: $errorMessage");
 

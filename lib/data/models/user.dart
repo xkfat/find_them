@@ -30,7 +30,7 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
-      username: json['username'],
+      username: json['username'] ?? '',
       firstName: json['first_name'] ?? '',
       lastName: json['last_name'] ?? '',
       email: json['email'] ?? '',
@@ -39,6 +39,34 @@ class User {
       language: LanguageExtension.fromValue(json['language'] ?? 'english'),
       theme: ThemeExtension.fromValue(json['theme'] ?? 'light'),
       locationPermission: json['location_permission'] ?? false,
+    );
+  }
+
+  User copyWith({
+    int? id,
+    String? username,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? password,
+    String? phoneNumber,
+    String? profilePhoto,
+    Language? language,
+    Theme? theme,
+    bool? locationPermission,
+  }) {
+    return User(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      profilePhoto: profilePhoto ?? this.profilePhoto,
+      language: language ?? this.language,
+      theme: theme ?? this.theme,
+      locationPermission: locationPermission ?? this.locationPermission,
     );
   }
 
@@ -72,5 +100,4 @@ class User {
   String get fullName => '$firstName $lastName';
   
   String get profilePhotoUrl => profilePhoto ?? 'assets/images/default_profile.png';
-
 }

@@ -1,5 +1,3 @@
-// lib/logic/cubit/profile_cubit.dart
-import 'dart:convert'; // Keep for error parsing
 import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -31,7 +29,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     String? phoneNumber,
   }) async {
     emit(ProfileUpdating()); 
-     try {
+    try {
       User? currentUser;
       if (state is ProfileLoaded) {
         currentUser = (state as ProfileLoaded).user;
@@ -43,14 +41,15 @@ class ProfileCubit extends Cubit<ProfileState> {
       }
 
       if (currentUser == null) {
-        _handleUpdateError(
-          Exception('Cannot update profile: user data not loaded.'),
-        );
+        emit(ProfileUpdateError(
+          'Cannot update profile: user data not loaded.', 
+          {}, 
+          null
+        ));
         return;
       }
 
       Map<String, dynamic> changedFields = {};
-
       if (firstName != null && firstName != currentUser.firstName) {
         changedFields['first_name'] = firstName;
       }
@@ -72,32 +71,68 @@ class ProfileCubit extends Cubit<ProfileState> {
         return;
       }
 
-      final updatedUser = await _profileRepository.updateProfilePartial(
-        changedFields,
-      );
-      emit(ProfileUpdateSuccess(updatedUser));
-      emit(
-        ProfileLoaded(updatedUser),
-      ); 
+      final response = await _profileRepository.updateProfilePartial(changedFields);
+      
+      if (response.success && response.user != null) {
+        emit(ProfileUpdateSuccess(response.user!));
+        emit(ProfileLoaded(response.user!));
+      } else {
+        Map<String, String> fieldErrors = {};
+        if (response.errors != null) {
+          response.errors!.forEach((key, value) {
+            fieldErrors[key] = value.toString();
+          });
+        }
+        
+        emit(ProfileUpdateError(
+          response.message, 
+          fieldErrors, 
+          response.user ?? currentUser
+        ));
+      }
     } catch (e) {
-      _handleUpdateError(e); 
+      User? currentUser;
+      if (state is ProfileLoaded) {
+        currentUser = (state as ProfileLoaded).user;
+      }
+      
+      emit(ProfileUpdateError(
+        'An unexpected error occurred: ${e.toString()}', 
+        {}, 
+        currentUser
+      ));
     }
   }
 
   Future<void> uploadProfilePhoto(File photo) async {
     emit(ProfilePhotoUploading()); 
     try {
-      final updatedUser = await _profileRepository.updateProfilePhoto(photo);
-      emit(ProfilePhotoUploadSuccess(updatedUser));
-      emit(
-        ProfileLoaded(updatedUser),
-      ); 
+      User? currentUser;
+      if (state is ProfileLoaded) {
+        currentUser = (state as ProfileLoaded).user;
+      }
+      
+      final response = await _profileRepository.updateProfilePhoto(photo);
+      
+      if (response.success && response.user != null) {
+        emit(ProfilePhotoUploadSuccess(response.user!));
+        emit(ProfileLoaded(response.user!));
+      } else {
+        emit(ProfilePhotoUploadError(
+          response.message,
+          response.user ?? currentUser
+        ));
+      }
     } catch (e) {
-      emit(
-        ProfilePhotoUploadError(
-          'Failed to upload profile photo: ${e.toString()}',
-        ),
-      );
+      User? currentUser;
+      if (state is ProfileLoaded) {
+        currentUser = (state as ProfileLoaded).user;
+      }
+      
+      emit(ProfilePhotoUploadError(
+        'Failed to upload profile photo: ${e.toString()}',
+        currentUser
+      ));
     }
   }
 
@@ -105,9 +140,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String currentPassword,
     required String newPassword,
   }) async {
-    emit(
-      ProfileUpdating(),
-    ); 
+    emit(ProfileUpdating()); 
     try {
       final success = await _profileRepository.changePassword(
         currentPassword: currentPassword,
@@ -116,70 +149,16 @@ class ProfileCubit extends Cubit<ProfileState> {
 
       if (success) {
         emit(const ProfilePasswordChangeSuccess());
-        // loadProfile();
+        loadProfile();
       } else {
-        // If API returns 200 but indicates failure, or specific error code
-        emit(
-          const ProfilePasswordChangeError(
-            'Failed to change password. Please check your current password.',
-          ),
-        );
+        emit(const ProfilePasswordChangeError(
+          'Failed to change password. Please check your current password.'
+        ));
       }
     } catch (e) {
-      emit(
-        ProfilePasswordChangeError('Error changing password: ${e.toString()}'),
-      );
+      emit(ProfilePasswordChangeError(
+        'Error changing password: ${e.toString()}'
+      ));
     }
-  }
-
-  void _handleUpdateError(dynamic e) {
-    Map<String, String> fieldErrors = {};
-    String errorMessage = 'Failed to update profile';
-
-    try {
-      if (e.toString().contains('{') && e.toString().contains('}')) {
-        final start = e.toString().indexOf('{');
-        final end = e.toString().lastIndexOf('}') + 1;
-        final jsonStr = e.toString().substring(start, end);
-
-        final Map<String, dynamic> errorData = json.decode(jsonStr);
-
-        errorData.forEach((key, value) {
-          if (value is List && value.isNotEmpty) {
-            if (value.first.toString().toLowerCase().contains(
-              'already exists',
-            )) {
-              fieldErrors[key] = '${key.replaceAll('_', ' ')} already exists!';
-            } else {
-              fieldErrors[key] = value.first.toString();
-            }
-          } else if (value is String) {
-            if (value.toLowerCase().contains('already exists')) {
-              fieldErrors[key] = '${key.replaceAll('_', ' ')} already exists!';
-            } else {
-              fieldErrors[key] = value;
-            }
-          }
-        });
-
-        if (errorData.containsKey('detail')) {
-          errorMessage = errorData['detail'];
-        }
-      }
-    } catch (_) {
-      if (e.toString().toLowerCase().contains('username') &&
-          e.toString().toLowerCase().contains('already exists')) {
-        fieldErrors['username'] = 'Username already exists!';
-      } else if (e.toString().toLowerCase().contains('email') &&
-          e.toString().toLowerCase().contains('already exists')) {
-        fieldErrors['email'] = 'Email already exists!';
-      } else if (e.toString().toLowerCase().contains('phone_number') &&
-          e.toString().toLowerCase().contains('already exists')) {
-        fieldErrors['phone_number'] = 'Phone number already exists!';
-      } else {
-        errorMessage = e.toString();
-      }
-    }
-    emit(ProfileUpdateError(errorMessage, fieldErrors));
   }
 }

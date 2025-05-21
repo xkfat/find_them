@@ -55,7 +55,7 @@ class AuthRepository {
     try {
       final response = await _authService.deleteAccount(username);
       if (response['success'] == true) {
-        final response = await _authService.deleteAccount(username);
+       // final response = await _authService.deleteAccount(username);
         return true;
       }
       return false;

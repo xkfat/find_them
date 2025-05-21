@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
@@ -22,15 +24,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _lastNameController = TextEditingController();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController =
-      TextEditingController();
+  final _phoneController = TextEditingController();
 
   String _completePhoneNumber = '';
   File? _profileImage;
   final _imagePicker = ImagePicker();
 
   bool _isUserDataLoaded = false;
-  User? _currentUser; 
+  User? _currentUser;
+
   @override
   void initState() {
     super.initState();
@@ -66,70 +68,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: BlocConsumer<ProfileCubit, ProfileState>(
         listener: (context, state) {
           if (state is ProfileUpdateSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Profile updated successfully!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            _loadUserData(state.user); 
-             setState(() {
-              _isUserDataLoaded = true; 
-                _currentUser = state.user; 
-                 });
-          } else if (state is ProfileUpdateError) {
-            String errorMessage = state.message;
-            state.fieldErrors.forEach((field, error) {
-              errorMessage += '\n${field.replaceAll('_', ' ')}: $error';
+            _loadUserData(state.user);
+            setState(() {
+              _isUserDataLoaded = true;
+              _currentUser = state.user;
             });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Failed to update profile: $errorMessage'),
-                backgroundColor: Colors.red,
-              ),
-            );
+          } else if (state is ProfileUpdateError) {
+            if (state.user != null) {
+              _loadUserData(state.user!);
+              setState(() {
+                _currentUser = state.user;
+              });
+            }
           } else if (state is ProfilePhotoUploadSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Profile photo uploaded successfully!'),
-                backgroundColor: Colors.green,
-              ),
-            );
             setState(() {
               _profileImage = null;
-               _currentUser = state.user;
-                });
+              _currentUser = state.user;
+            });
             _loadUserData(state.user);
           } else if (state is ProfilePhotoUploadError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Failed to upload profile photo: ${state.message}',
-                ),
-                backgroundColor: Colors.red,
-              ),
-            );
-          } else if (state is ProfileLoadError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error loading profile: ${state.message}'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          } else if (state is ProfilePasswordChangeSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Password changed successfully!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          } else if (state is ProfilePasswordChangeError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Password change failed: ${state.message}'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            if (state.user != null) {
+              setState(() {
+                _currentUser = state.user;
+              });
+            }
           }
         },
         builder: (context, state) {
@@ -144,6 +106,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             user = state.user;
           } else if (state is ProfilePhotoUploadSuccess) {
             user = state.user;
+          } else if (state is ProfileUpdateError && state.user != null) {
+            user = state.user;
+          } else if (state is ProfilePhotoUploadError && state.user != null) {
+            user = state.user;
           }
 
           if (state is ProfileLoading) {
@@ -157,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
 
           if (user != null) {
-            _currentUser = user; 
+            _currentUser = user;
             if (!_isUserDataLoaded) {
               _loadUserData(user);
               _isUserDataLoaded = true;
@@ -169,14 +135,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
 
           if (user == null) {
-            return Center(
-              child: Text(
-                state is ProfileLoadError
-                    ? 'Error: ${state.message}'
-                    : 'No profile data to display. Please try again.',
-                textAlign: TextAlign.center,
-              ),
-            );
+            if (_currentUser != null) {
+              user = _currentUser;
+            } else {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      state is ProfileLoadError
+                          ? 'Error: ${state.message}'
+                          : 'No profile data to display. Please try again.',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<ProfileCubit>().loadProfile();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.teal,
+                      ),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
           }
 
           return SingleChildScrollView(
@@ -186,7 +171,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _buildUserInfoContainer(user, isUploadingPhoto),
+                  user != null
+                      ? _buildUserInfoContainer(user, isUploadingPhoto)
+                      : const Center(child: CircularProgressIndicator()),
                   const SizedBox(height: 30),
                   _buildFormFields(),
                   const SizedBox(height: 40),
@@ -197,13 +184,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(left: 0),
-        child: ButtomNavBar(currentIndex: 3),
+      bottomNavigationBar: const Padding(
+        padding: EdgeInsets.only(left: 0),
+        child: ButtomNavBar(currentIndex: 4),
       ),
     );
   }
-
 
   Widget _buildUserInfoContainer(User user, bool isUploadingPhoto) {
     return Center(
@@ -411,7 +397,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-
   ImageProvider? _getProfileImage(User? user) {
     if (_profileImage != null) {
       return FileImage(_profileImage!);
@@ -437,15 +422,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _emailController.text = user.email;
     }
 
-    // --- CRITICAL FIX FOR PHONE NUMBER LOADING ---
-    // Let IntlPhoneField handle parsing the full E.164 number.
-    // We only set _completePhoneNumber for the PATCH request.
-    // The `_phoneController` will be automatically updated by IntlPhoneField
-    // to display only the national number when `initialValue` is used.
     _completePhoneNumber = user.phoneNumber;
 
-    // Reset the controller's text if the phone number is empty.
-    // This handles cases where a number might be removed.
     if (user.phoneNumber.isEmpty) {
       _phoneController.text = '';
     }
@@ -464,12 +442,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await context.read<ProfileCubit>().uploadProfilePhoto(selectedImage);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to pick image: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      log('Error picking image: ${e.toString()}');
     }
   }
 
@@ -534,9 +507,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildPhoneField() {
     return IntlPhoneField(
       initialValue: _currentUser?.phoneNumber,
-      controller:
-          _phoneController, 
-             decoration: InputDecoration(
+      controller: _phoneController,
+      decoration: InputDecoration(
         hintText: 'Phone Number',
         hintStyle: TextStyle(color: Colors.grey[600]),
         filled: true,
@@ -576,7 +548,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return 'Phone number must contain only digits';
           }
         }
-        return null; 
+        return null;
       },
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:find_them/data/services/social_auth_service.dart';
 
 class SocialAuthRepository {
@@ -10,7 +12,7 @@ class SocialAuthRepository {
       final result = await _socialAuthService.signInWithGoogle();
       return result;
     } catch (e) {
-      print('Repository Google Sign In Error: $e');
+      log('Repository Google Sign In Error: $e');
       return {'success': false, 'message': e.toString()};
     }
   }

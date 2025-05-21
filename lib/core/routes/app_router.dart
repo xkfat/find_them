@@ -5,7 +5,6 @@ import 'package:find_them/data/repositories/profile_repo.dart';
 import 'package:find_them/data/repositories/report_repo.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/data/services/case_service.dart';
-import 'package:find_them/data/services/profile_service.dart';
 import 'package:find_them/data/services/report_service.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
@@ -21,6 +20,8 @@ import 'package:find_them/presentation/screens/report/report_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen2.dart';
 import 'package:find_them/presentation/screens/report/report_screen3.dart';
 import 'package:find_them/presentation/screens/report/report_success_screen.dart';
+import 'package:find_them/presentation/screens/settings/settings_screen.dart';
+import 'package:find_them/presentation/widgets/profileDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
@@ -227,19 +228,43 @@ class AppRouter {
                         ProfileCubit(ProfileRepository())..loadProfile(),
                 child: BlocListener<ProfileCubit, ProfileState>(
                   listener: (context, state) {
+                    // Use ProfileDialog instead of SnackBar for notifications
                     if (state is ProfileUpdateSuccess) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Profile updated successfully'),
-                          backgroundColor: Colors.green,
-                        ),
+                      showProfileDialog(
+                        context: context,
+                        message: 'Profile updated successfully',
+                        isSuccess: true,
                       );
                     } else if (state is ProfileUpdateError) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(state.message),
-                          backgroundColor: Colors.red,
-                        ),
+                      showProfileDialog(
+                        context: context,
+                        message: state.message,
+                        isSuccess: false,
+                      );
+                    } else if (state is ProfilePhotoUploadSuccess) {
+                      showProfileDialog(
+                        context: context,
+                        message: 'Profile photo uploaded successfully',
+                        isSuccess: true,
+                      );
+                    } else if (state is ProfilePhotoUploadError) {
+                      showProfileDialog(
+                        context: context,
+                        message:
+                            'Failed to upload profile photo: ${state.message}',
+                        isSuccess: false,
+                      );
+                    } else if (state is ProfilePasswordChangeSuccess) {
+                      showProfileDialog(
+                        context: context,
+                        message: 'Password changed successfully',
+                        isSuccess: true,
+                      );
+                    } else if (state is ProfilePasswordChangeError) {
+                      showProfileDialog(
+                        context: context,
+                        message: 'Password change failed: ${state.message}',
+                        isSuccess: false,
                       );
                     }
                   },
@@ -247,11 +272,19 @@ class AppRouter {
                 ),
               ),
         );
+      case '/settings':
+        return MaterialPageRoute(
+          builder:
+              (_) => MultiBlocProvider(
+                providers: [
+                  BlocProvider<ProfileCubit>(
+                    create: (context) => ProfileCubit(ProfileRepository()),
+                  ),
+                ],
+                child: const SettingsScreen(),
+              ),
+        );
       /*
-      case '/settings' :
-        return MaterialPageRoute(builder: (_) => const SettingsScreen());
-
-   
       case '/submitted-cases' :
         return MaterialPageRoute(builder: (_) => const SubmittedCasesScreen());
 

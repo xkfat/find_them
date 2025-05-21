@@ -1,7 +1,9 @@
 import 'package:find_them/data/models/user.dart';
+import 'package:find_them/data/repositories/auth_repo.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/profile_cubit.dart';
+import 'package:find_them/presentation/screens/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/themes/app_colors.dart';
@@ -16,7 +18,7 @@ class SideBar extends StatefulWidget {
 
 class _SideBarState extends State<SideBar> {
   int _selectedIndex = -1;
-  final AuthService _authService = AuthService();
+  //final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -25,15 +27,17 @@ class _SideBarState extends State<SideBar> {
   }
 
   void _handleLogout() async {
-    Navigator.pop(context);
+    // Store a reference to the navigator before dismissing the current dialog
+    final navigator = Navigator.of(context);
 
-    late BuildContext dialogContext;
+    // Pop the menu dialog
+    navigator.pop();
 
+    // Show loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        dialogContext = context;
+      builder: (BuildContext dialogContext) {
         return const Center(
           child: CircularProgressIndicator(color: AppColors.darkGreen),
         );
@@ -44,14 +48,25 @@ class _SideBarState extends State<SideBar> {
       final authService = AuthService();
       final success = await authService.logout();
 
-      Navigator.of(dialogContext).pop();
+      // Dismiss the loading dialog
+      if (context.mounted) {
+        navigator.pop(); // Pop the loading dialog
+      }
 
       if (success) {
         if (context.mounted) {
-          await Future.delayed(Duration(milliseconds: 100));
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/auth/login',
+          // Navigate to login screen using a direct MaterialPageRoute approach
+          navigator.pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder:
+                  (context) => BlocProvider(
+                    create:
+                        (context) => AuthentificationCubit(
+                          AuthRepository(AuthService()),
+                        ),
+                    child: const LoginScreen(),
+                  ),
+            ),
             (route) => false,
           );
         }
@@ -66,9 +81,10 @@ class _SideBarState extends State<SideBar> {
         }
       }
     } catch (e) {
-      Navigator.of(dialogContext).pop();
-
+      // Dismiss the loading dialog
       if (context.mounted) {
+        navigator.pop(); // Pop the loading dialog
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error logging out: ${e.toString()}'),
@@ -76,10 +92,16 @@ class _SideBarState extends State<SideBar> {
           ),
         );
 
-        await Future.delayed(Duration(milliseconds: 100));
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/auth/login',
+        navigator.pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder:
+                (context) => BlocProvider(
+                  create:
+                      (context) =>
+                          AuthentificationCubit(AuthRepository(AuthService())),
+                  child: const LoginScreen(),
+                ),
+          ),
           (route) => false,
         );
       }

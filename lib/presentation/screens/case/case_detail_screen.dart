@@ -16,7 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 class CaseDetailScreen extends StatefulWidget {
   final int caseId;
 
-  const CaseDetailScreen({Key? key, required this.caseId}) : super(key: key);
+  const CaseDetailScreen({super.key, required this.caseId});
 
   @override
   State<CaseDetailScreen> createState() => _CaseDetailScreenState();
@@ -30,7 +30,6 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
   }
 
   void _showReportDialog(BuildContext context, int caseId) {
-    // Create a TextEditingController for the note
     final TextEditingController noteController = TextEditingController();
     final reportCubit = context.read<ReportCubit>();
 
@@ -145,10 +144,8 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                         note: noteController.text.trim(),
                                       );
 
-                                      // Close the report dialog
                                       Navigator.pop(dialogContext);
 
-                                      // Show success message in a dialog
                                       showDialog(
                                         context: context,
                                         builder:
@@ -237,7 +234,6 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                         isSubmitting = false;
                                       });
 
-                                      // Show error message in a dialog
                                       showDialog(
                                         context: context,
                                         builder:

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -39,7 +40,7 @@ class SocialAuthService {
       bool serverAuth = await _authenticateWithServer(userData);
       return {'success': serverAuth, 'user': userData};
     } catch (e) {
-      print("Google Sign In Error: $e");
+      log("Google Sign In Error: $e");
       return {'success': false, 'message': e.toString()};
     }
   }

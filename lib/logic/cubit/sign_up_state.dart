@@ -14,8 +14,8 @@ class SignUpLoading extends SignUpState {}
 class SignUploaded extends SignUpState {}
 
 class SignUperreur extends SignUpState {
-   String msg;
-   SignUperreur(this.msg);
+   final String msg;
+   const SignUperreur(this.msg);
    
 }
 

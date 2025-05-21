@@ -1,5 +1,6 @@
 part of 'profile_cubit.dart'; 
-sealed class ProfileState extends Equatable {
+
+abstract class ProfileState extends Equatable {
   const ProfileState();
 
   @override
@@ -41,12 +42,13 @@ class ProfileUpdateSuccess extends ProfileState {
 
 class ProfileUpdateError extends ProfileState {
   final String message;
-  final Map<String, String> fieldErrors; 
+  final Map<String, String> fieldErrors;
+  final User? user; 
 
-  const ProfileUpdateError(this.message, this.fieldErrors);
+  const ProfileUpdateError(this.message, this.fieldErrors, this.user);
 
   @override
-  List<Object?> get props => [message, fieldErrors];
+  List<Object?> get props => [message, fieldErrors, user];
 }
 
 class ProfilePhotoUploading extends ProfileState {}
@@ -62,11 +64,12 @@ class ProfilePhotoUploadSuccess extends ProfileState {
 
 class ProfilePhotoUploadError extends ProfileState {
   final String message;
+  final User? user; 
 
-  const ProfilePhotoUploadError(this.message);
+  const ProfilePhotoUploadError(this.message, this.user);
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, user];
 }
 
 class ProfilePasswordChangeSuccess extends ProfileState {

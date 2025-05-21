@@ -12,25 +12,36 @@ class ProfileRepository {
     try {
       return await _profileService.getUserProfile();
     } catch (e) {
+      if (e is ProfileException) {
+        if (e.user != null) {
+          return e.user!;
+        }
+      }
       throw Exception('Failed to get user profile: $e');
     }
   }
   
- 
-  
-  Future<User> updateProfilePhoto(File photo) async {
+  Future<ProfileResponse> updateProfilePhoto(File photo) async {
     try {
       return await _profileService.updateProfilePhoto(photo);
     } catch (e) {
-      throw e;
+      return ProfileResponse(
+        success: false,
+        message: e.toString(),
+        errors: {'general': 'Failed to update profile photo: $e'},
+      );
     }
   }
 
-    Future<User> updateProfilePartial(Map<String, dynamic> fields) async {
+  Future<ProfileResponse> updateProfilePartial(Map<String, dynamic> fields) async {
     try {
       return await _profileService.updateProfilePartial(fields);
     } catch (e) {
-      throw e;
+      return ProfileResponse(
+        success: false,
+        message: e.toString(),
+        errors: {'general': 'Failed to update profile: $e'},
+      );
     }
   }
   
@@ -46,5 +57,12 @@ class ProfileRepository {
     } catch (e) {
       throw Exception('Failed to change password: $e');
     }
+  }
+  
+  User? getUserFromException(dynamic e) {
+    if (e is ProfileException && e.user != null) {
+      return e.user;
+    }
+    return null;
   }
 }

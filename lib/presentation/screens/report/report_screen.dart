@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 
 class Report1Screen extends StatefulWidget {
-  const Report1Screen({Key? key}) : super(key: key);
+  const Report1Screen({super.key});
 
   @override
   State<Report1Screen> createState() => _Report1ScreenState();
@@ -30,17 +30,16 @@ class _Report1ScreenState extends State<Report1Screen> {
     if (_formKey.currentState?.validate() ?? false) {
       Navigator.pushNamed(
         context,
-             '/report2',
-      arguments: {
-        'firstName': _firstNameController.text,
-        'lastName': _lastNameController.text,
-        'age': int.tryParse(_ageController.text) ?? 0,
-        'gender': _selectedGender ?? 'Male',
-      },
-    );
+        '/report2',
+        arguments: {
+          'firstName': _firstNameController.text,
+          'lastName': _lastNameController.text,
+          'age': int.tryParse(_ageController.text) ?? 0,
+          'gender': _selectedGender ?? 'Male',
+        },
+      );
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {

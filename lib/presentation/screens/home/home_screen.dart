@@ -8,7 +8,7 @@ import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/constants/themes/app_text.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
-import 'package:google_fonts/google_fonts.dart';
+//import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:find_them/core/constants/api_constants.dart';
 import 'package:find_them/data/dataprovider/exception.dart';
 import 'package:find_them/data/services/api_service.dart';
 import 'package:http/http.dart';
@@ -43,7 +42,7 @@ class AuthService {
     }
   }
 
-  Future<dynamic> login(String username, String Pwd) async {
+  Future<dynamic> login(String username, String pwd) async {
     dynamic responseJson;
     try {
       log("attewmpting login for : $username");
@@ -52,7 +51,7 @@ class AuthService {
           .post(
             Uri.parse('http://10.0.2.2:8000/api/accounts/login/'),
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({"username": username, "password": Pwd}),
+            body: jsonEncode({"username": username, "password": pwd}),
           )
           .timeout(Duration(seconds: 60));
       log(response.statusCode.toString());

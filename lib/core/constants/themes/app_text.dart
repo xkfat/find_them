@@ -1,4 +1,3 @@
-// app_text_styles.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
@@ -30,7 +29,6 @@ class AppTextStyles {
     color: AppColors.darkGrey,
   );
   
-  // Titles - DM Sans
   static TextStyle get titleLargeLight => GoogleFonts.inter(
     fontSize: 18,
     fontWeight: semiBold,
@@ -49,7 +47,6 @@ class AppTextStyles {
     color: AppColors.darkGrey,
   );
   
-  // Body text - Roboto
   static TextStyle get bodyLargeLight => GoogleFonts.roboto(
     fontSize: 16,
     fontWeight: regular,
