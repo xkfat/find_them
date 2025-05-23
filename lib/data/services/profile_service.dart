@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:find_them/core/constants/api_constants.dart';
 import 'package:find_them/data/models/user.dart';
@@ -23,7 +24,7 @@ class ProfileService {
   final ApiService _apiService;
 
   ProfileService({ApiService? apiService})
-      : _apiService = apiService ?? ApiService();
+    : _apiService = apiService ?? ApiService();
 
   Future<User> getUserProfile() async {
     try {
@@ -48,23 +49,25 @@ class ProfileService {
     }
   }
 
-  Future<ProfileResponse> updateProfilePartial(Map<String, dynamic> fields) async {
+  Future<ProfileResponse> updateProfilePartial(
+    Map<String, dynamic> fields,
+  ) async {
     try {
       print("Updating profile with fields: $fields");
       final response = await _apiService.patch(
         ApiConstants.profile,
         body: fields,
       );
-      
+
       print("Profile PATCH response: ${response.statusCode}");
       print("Profile PATCH body: ${response.body}");
 
       final responseData = json.decode(response.body);
-      
+
       bool success = responseData['success'] ?? (response.statusCode == 200);
       String message = responseData['message'] ?? 'Profile update processed';
       User? user;
-      
+
       if (responseData.containsKey('user')) {
         try {
           user = User.fromJson(responseData['user']);
@@ -72,23 +75,20 @@ class ProfileService {
           print("Error parsing user: $e");
         }
       }
-      
+
       if (!success || response.statusCode != 200) {
         return ProfileResponse(
           success: false,
           message: message,
           user: user,
-          errors: responseData['errors'] != null 
-              ? Map<String, dynamic>.from(responseData['errors'])
-              : {'general': 'Failed to update profile'},
+          errors:
+              responseData['errors'] != null
+                  ? Map<String, dynamic>.from(responseData['errors'])
+                  : {'general': 'Failed to update profile'},
         );
       }
-      
-      return ProfileResponse(
-        success: true,
-        message: message,
-        user: user,
-      );
+
+      return ProfileResponse(success: true, message: message, user: user);
     } catch (e) {
       print("Exception in updateProfilePartial: $e");
       return ProfileResponse(
@@ -102,7 +102,9 @@ class ProfileService {
   Future<ProfileResponse> updateProfilePhoto(File photo) async {
     try {
       final token = await _apiService.getAccessToken();
-      print("Updating profile photo with token: ${token != null ? 'Valid token' : 'No token'}");
+      print(
+        "Updating profile photo with token: ${token != null ? 'Valid token' : 'No token'}",
+      );
 
       var request = http.MultipartRequest(
         'PATCH',
@@ -124,11 +126,12 @@ class ProfileService {
       print("Profile photo update body: ${response.body}");
 
       final responseData = json.decode(response.body);
-      
+
       bool success = responseData['success'] ?? (response.statusCode == 200);
-      String message = responseData['message'] ?? 'Profile photo update processed';
+      String message =
+          responseData['message'] ?? 'Profile photo update processed';
       User? user;
-      
+
       if (responseData.containsKey('user')) {
         try {
           user = User.fromJson(responseData['user']);
@@ -136,23 +139,20 @@ class ProfileService {
           print("Error parsing user: $e");
         }
       }
-      
+
       if (!success || response.statusCode != 200) {
         return ProfileResponse(
           success: false,
           message: message,
           user: user,
-          errors: responseData['errors'] != null 
-              ? Map<String, dynamic>.from(responseData['errors'])
-              : {'profile_photo': 'Failed to update profile photo'},
+          errors:
+              responseData['errors'] != null
+                  ? Map<String, dynamic>.from(responseData['errors'])
+                  : {'profile_photo': 'Failed to update profile photo'},
         );
       }
-      
-      return ProfileResponse(
-        success: true,
-        message: message,
-        user: user,
-      );
+
+      return ProfileResponse(success: true, message: message, user: user);
     } catch (e) {
       print("Exception in updateProfilePhoto: $e");
       return ProfileResponse(
@@ -163,30 +163,53 @@ class ProfileService {
     }
   }
 
-  Future<bool> changePassword({
-    required String currentPassword,
-    required String newPassword,
-  }) async {
-    try {
-      final body = {
-        'current_password': currentPassword,
-        'new_password': newPassword,
-      };
 
-      final response = await _apiService.post(
-        ApiConstants.changePassword,
-        body: body,
-      );
+Future<bool> changePassword({
+  required String currentPassword,
+  required String newPassword,
+}) async {
+  try {
+    final body = {
+      'old_password': currentPassword,
+      'new_password': newPassword,
+      'new_password2': newPassword,
+    };
 
-      print("Change password response: ${response.statusCode}");
-      print("Change password body: ${response.body}");
+    final response = await _apiService.post(
+      ApiConstants.changePassword,
+      body: body,
+    );
 
-      return response.statusCode == 200;
-    } catch (e) {
-      print("Exception in changePassword: $e");
-      throw Exception('Error changing password: $e');
+    log("Change password response: ${response.statusCode}");
+    log("Change password body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      try {
+        final errorData = json.decode(response.body);
+        
+        if (errorData['old_password'] != null) {
+          throw Exception('Old password is not correct');
+        } else if (errorData['new_password'] != null) {
+          throw Exception('Invalid new password: ${errorData['new_password'][0]}');
+        } else if (errorData['new_password2'] != null) {
+          throw Exception('Password confirmation error: ${errorData['new_password2'][0]}');
+        } else {
+          throw Exception('Failed to change password');
+        }
+      } catch (e) {
+        if (e.toString().contains('Exception:')) {
+          rethrow; 
+        }
+        throw Exception('Failed to change password');
+      }
     }
+  } catch (e) {
+    log("Exception in changePassword: $e");
+    rethrow; 
   }
+}
 }
 
 class ProfileException implements Exception {

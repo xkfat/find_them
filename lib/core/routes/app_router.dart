@@ -20,6 +20,7 @@ import 'package:find_them/presentation/screens/report/report_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen2.dart';
 import 'package:find_them/presentation/screens/report/report_screen3.dart';
 import 'package:find_them/presentation/screens/report/report_success_screen.dart';
+import 'package:find_them/presentation/screens/settings/change_pass_screen.dart';
 import 'package:find_them/presentation/screens/settings/settings_screen.dart';
 import 'package:find_them/presentation/widgets/profileDialog.dart';
 import 'package:flutter/material.dart';
@@ -81,14 +82,6 @@ class AppRouter {
                 child: const LoginScreen(),
               ),
         );
-
-      /* case '/auth/reset-password' :
-        return MaterialPageRoute(
-          builder:
-              (_) =>
-                  const ResetPasswordScreen()
-        );
-*/
 
       case '/home':
         return MaterialPageRoute(
@@ -191,14 +184,8 @@ class AppRouter {
                     gender: args['gender'] as String,
                     lastSeenDate: args['lastSeenDate'] as DateTime,
                     lastSeenLocation: args['lastSeenLocation'] as String,
-                    latitude:
-                        args.containsKey('latitude')
-                            ? args['latitude'] as double?
-                            : null,
-                    longitude:
-                        args.containsKey('longitude')
-                            ? args['longitude'] as double?
-                            : null,
+                    latitude: args['latitude'],
+                    longitude: args['longitude'],
 
                     contactPhone:
                         args.containsKey('contactPhone')
@@ -282,6 +269,14 @@ class AppRouter {
                   ),
                 ],
                 child: const SettingsScreen(),
+              ),
+        );
+      case '/settings/change-password':
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider<ProfileCubit>(
+                create: (context) => ProfileCubit(ProfileRepository()),
+                child: const ChangePasswordScreen(),
               ),
         );
       /*

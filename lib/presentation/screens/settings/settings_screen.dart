@@ -1,3 +1,4 @@
+import 'package:find_them/presentation/screens/settings/change_pass_screen.dart';
 import 'package:find_them/presentation/widgets/LanguageDrop.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
@@ -82,7 +83,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, 
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
@@ -96,9 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 38,
-                    ), 
+                    const SizedBox(height: 38),
                     _buildNavigationOption(
                       'Edit profile',
                       onTap: () => Navigator.pushNamed(context, '/profile'),
@@ -108,9 +107,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     _buildNavigationOption(
                       'Change password',
-                      onTap: () {
-                        // TODO
-                      },
+                      onTap:
+                          () => Navigator.pushNamed(
+                            context,
+                            '/settings/change-password',
+                          ),
                     ),
 
                     const SizedBox(height: 22),
@@ -135,7 +136,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 selectedLanguage = newValue;
                               });
-                        // TODO
+                              // TODO
                             },
                           ),
                         ],
@@ -152,8 +153,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           pushNotificationsEnabled = value;
                         });
                       },
-                                              // TODO
 
+                      // TODO
                     ),
 
                     const SizedBox(height: 22),
@@ -205,7 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       bottomNavigationBar: const Padding(
         padding: EdgeInsets.only(left: 0),
-        child: ButtomNavBar(currentIndex: 3),  
+        child: ButtomNavBar(currentIndex: 3),
       ),
     );
   }

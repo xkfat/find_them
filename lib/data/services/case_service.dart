@@ -121,10 +121,19 @@ class CaseService {
       request.fields['contact_phone'] = contactPhone;
 
       if (latitude != null) {
-        request.fields['latitude'] = latitude.toString();
+        final roundedLatitude = double.parse(latitude.toStringAsFixed(6));
+        request.fields['latitude'] = roundedLatitude.toString();
+        log(
+          "DEBUG: Added rounded latitude to request: $roundedLatitude (original: $latitude)",
+        );
       }
+
       if (longitude != null) {
-        request.fields['longitude'] = longitude.toString();
+        final roundedLongitude = double.parse(longitude.toStringAsFixed(6));
+        request.fields['longitude'] = roundedLongitude.toString();
+        log(
+          "DEBUG: Added rounded longitude to request: $roundedLongitude (original: $longitude)",
+        );
       }
 
       var photoFile = await http.MultipartFile.fromPath('photo', photo.path);

@@ -1,9 +1,11 @@
+import 'dart:developer';
+
 import 'package:find_them/data/models/case.dart';
 
 class CaseUpdate {
   final int? id;
   final int caseId;
-  final Case? case_; 
+  final Case? case_;
   final String message;
   final DateTime timestamp;
 
@@ -16,20 +18,31 @@ class CaseUpdate {
   }) : timestamp = timestamp ?? DateTime.now();
 
   factory CaseUpdate.fromJson(Map<String, dynamic> json) {
-    return CaseUpdate(
-      id: json['id'],
-      caseId: json['case'],
-      case_: null, 
-      message: json['message'],
-      timestamp: DateTime.parse(json['timestamp']),
-    );
+    try {
+      return CaseUpdate(
+        id: json['id'] as int?,
+        caseId: json['case'] as int? ?? 0,
+        case_: null,
+        message: json['message'] as String? ?? '',
+        timestamp:
+            json['timestamp'] != null
+                ? DateTime.parse(json['timestamp'] as String)
+                : DateTime.now(),
+      );
+    } catch (e) {
+      log("Error parsing CaseUpdate: $e");
+      log("Problematic JSON: $json");
+      return CaseUpdate(
+        id: json['id'] as int?,
+        caseId: 0,
+        message: json['message'] as String? ?? 'Update message unavailable',
+        timestamp: DateTime.now(),
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {
-    final map = <String, dynamic> {
-      'case': caseId,
-      'message': message,
-    };
+    final map = <String, dynamic>{'case': caseId, 'message': message};
 
     if (id != null) {
       map['id'] = id;
@@ -40,7 +53,7 @@ class CaseUpdate {
 
   String get formattedDate =>
       '${timestamp.day.toString().padLeft(2, '0')}/${timestamp.month.toString().padLeft(2, '0')}/${timestamp.year}';
-      
+
   CaseUpdate copyWith({
     int? id,
     int? caseId,
