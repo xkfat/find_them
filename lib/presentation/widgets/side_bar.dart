@@ -27,13 +27,9 @@ class _SideBarState extends State<SideBar> {
   }
 
   void _handleLogout() async {
-    // Store a reference to the navigator before dismissing the current dialog
     final navigator = Navigator.of(context);
 
-    // Pop the menu dialog
     navigator.pop();
-
-    // Show loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -48,14 +44,12 @@ class _SideBarState extends State<SideBar> {
       final authService = AuthService();
       final success = await authService.logout();
 
-      // Dismiss the loading dialog
       if (context.mounted) {
-        navigator.pop(); // Pop the loading dialog
+        navigator.pop(); 
       }
 
       if (success) {
         if (context.mounted) {
-          // Navigate to login screen using a direct MaterialPageRoute approach
           navigator.pushAndRemoveUntil(
             MaterialPageRoute(
               builder:
@@ -81,9 +75,8 @@ class _SideBarState extends State<SideBar> {
         }
       }
     } catch (e) {
-      // Dismiss the loading dialog
       if (context.mounted) {
-        navigator.pop(); // Pop the loading dialog
+        navigator.pop(); 
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -184,6 +177,7 @@ class _SideBarState extends State<SideBar> {
             'My submitted cases',
             () {
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/submitted-cases');
             },
           ),
           _buildMenuItemWithImageIcon(

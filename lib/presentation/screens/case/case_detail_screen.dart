@@ -1,9 +1,6 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
-import 'package:find_them/core/constants/themes/app_text.dart';
 import 'package:find_them/data/models/case.dart';
 import 'package:find_them/data/models/enum.dart';
-import 'package:find_them/data/repositories/report_repo.dart';
-import 'package:find_them/data/services/report_service.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:find_them/logic/cubit/report_cubit.dart';
 import 'package:flutter/material.dart';

@@ -1,3 +1,5 @@
+/*
+
 import 'package:find_them/data/models/user.dart';
 import 'package:find_them/data/models/user_location.dart';
 
@@ -41,3 +43,5 @@ class SelectedFriend {
     return map;
   }
 }
+
+*/

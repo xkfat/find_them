@@ -1,3 +1,4 @@
+/*
 import 'package:find_them/data/models/selected_friend.dart';
 import 'package:find_them/data/models/user.dart';
 
@@ -66,3 +67,4 @@ class UserLocation {
   
   bool get hasLocation => latitude != null && longitude != null;
 }
+*/

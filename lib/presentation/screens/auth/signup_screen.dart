@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:find_them/logic/cubit/sign_up_cubit.dart';
-import 'package:find_them/presentation/screens/auth/sms_verification_screen.dart.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';

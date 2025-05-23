@@ -3,17 +3,22 @@ import 'package:find_them/data/repositories/auth_repo.dart';
 import 'package:find_them/data/repositories/case_repo.dart';
 import 'package:find_them/data/repositories/profile_repo.dart';
 import 'package:find_them/data/repositories/report_repo.dart';
+import 'package:find_them/data/repositories/submitted_cases_repo.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/data/services/case_service.dart';
 import 'package:find_them/data/services/report_service.dart';
+import 'package:find_them/data/services/submitted_cases_service.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
+import 'package:find_them/logic/cubit/case_updates_cubit.dart';
+import 'package:find_them/logic/cubit/user_submitted_cases_cubit.dart';
 import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:find_them/logic/cubit/report_cubit.dart';
 import 'package:find_them/logic/cubit/sign_up_cubit.dart';
 import 'package:find_them/logic/cubit/sms_verification_cubit.dart';
 import 'package:find_them/logic/cubit/submit_case_cubit.dart';
 import 'package:find_them/presentation/screens/case/case_detail_screen.dart';
+import 'package:find_them/presentation/screens/case/my_submitted_cases_screen.dart';
 import 'package:find_them/presentation/screens/map/map_screen.dart';
 import 'package:find_them/presentation/screens/profile/profile_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen.dart';
@@ -279,11 +284,26 @@ class AppRouter {
                 child: const ChangePasswordScreen(),
               ),
         );
+case '/submitted-cases':
+  return MaterialPageRoute(
+    builder: (_) => MultiBlocProvider(
+      providers: [
+        BlocProvider<UserSubmittedCasesCubit>(
+          create: (context) => UserSubmittedCasesCubit(
+            SubmittedCaseRepository(SubmittedCaseService()),
+          ),
+        ),
+        BlocProvider<CaseUpdatesCubit>(
+          create: (context) => CaseUpdatesCubit(
+            SubmittedCaseRepository(SubmittedCaseService()),
+          ),
+        ),
+      ],
+      child: const SubmittedCasesScreen(),
+    ),
+  );
+
       /*
-      case '/submitted-cases' :
-        return MaterialPageRoute(builder: (_) => const SubmittedCasesScreen());
-
-
       case '/friends/add' :
         return MaterialPageRoute(builder: (_) => const AddFriendScreen());
 

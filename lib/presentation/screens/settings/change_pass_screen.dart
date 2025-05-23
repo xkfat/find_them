@@ -1,6 +1,4 @@
-// lib/presentation/screens/settings/change_password_screen.dart
 import 'package:find_them/core/constants/themes/app_colors.dart';
-import 'package:find_them/data/repositories/profile_repo.dart';
 import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +21,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
 
-  // Add error state variables
   String? _oldPasswordError;
   String? _newPasswordError;
   String? _confirmPasswordError;
@@ -38,7 +35,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   void _changePassword() {
     if (_formKey.currentState?.validate() ?? false) {
-      // Call your existing cubit method!
       context.read<ProfileCubit>().changePassword(
         currentPassword: _currentPasswordController.text,
         newPassword: _newPasswordController.text,
@@ -93,8 +89,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop(); // Close dialog
-                      Navigator.of(context).pop(); // Close screen
+                      Navigator.of(context).pop(); 
+                      Navigator.of(context).pop(); 
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.teal,
@@ -209,7 +205,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       body: BlocListener<ProfileCubit, ProfileState>(
         listener: (context, state) {
           if (state is ProfilePasswordChangeSuccess) {
-            // Clear any errors and show success dialog
             setState(() {
               _oldPasswordError = null;
               _newPasswordError = null;
@@ -218,7 +213,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
             _showSuccessDialog();
           } else if (state is ProfilePasswordChangeError) {
-            // Parse the error message for field-specific errors
             String errorMessage = state.message;
 
             setState(() {
@@ -234,7 +228,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               } else if (errorMessage.toLowerCase().contains('new_password')) {
                 _newPasswordError = 'Invalid new password';
               } else {
-                // General error - show as dialog
                 _showErrorDialog(errorMessage);
               }
             });
@@ -249,7 +242,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               children: [
                 const SizedBox(height: 32),
 
-                // Title
                 Text(
                   'Set a new password',
                   style: GoogleFonts.inter(
@@ -271,7 +263,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                 const SizedBox(height: 40),
 
-                // Old Password
                 Text(
                   'Old Password',
                   style: GoogleFonts.inter(
@@ -343,7 +334,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                   ),
                   onChanged: (value) {
-                    // Clear error when user starts typing
                     if (_oldPasswordError != null) {
                       setState(() {
                         _oldPasswordError = null;
@@ -360,7 +350,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                 const SizedBox(height: 24),
 
-                // Password
                 Text(
                   'Password',
                   style: GoogleFonts.inter(
@@ -432,7 +421,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                   ),
                   onChanged: (value) {
-                    // Clear error when user starts typing
                     if (_newPasswordError != null) {
                       setState(() {
                         _newPasswordError = null;
@@ -452,7 +440,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                 const SizedBox(height: 24),
 
-                // Confirm Password
                 Text(
                   'Confirm Password',
                   style: GoogleFonts.inter(
@@ -512,7 +499,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                 const SizedBox(height: 50),
 
-                // Update Password Button
                 BlocBuilder<ProfileCubit, ProfileState>(
                   builder: (context, state) {
                     final isLoading = state is ProfileUpdating;

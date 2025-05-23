@@ -45,4 +45,77 @@ static const Color foundGreenDark = Color(0xFF00E676);
   static const Color foundGreenBackgroundDark = Color(0xFF0E3B29);
 
 
+static Color getBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? darkBackground 
+        : backgroundGrey;
+  }
+
+
+ static Color getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? darkCardBackground 
+        : lighterMint;
+  }
+
+  static Color getTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? darkTextPrimary 
+        : black;
+  }
+
+  static Color getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? darkTextSecondary 
+        : darkGreen;
+  }
+
+  static Color getMissingRedColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? missingRedDark 
+        : missingRed;
+  }
+
+  static Color getMissingRedBackground(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? missingRedBackgroundDark 
+        : missingRedBackground;
+  }
+
+  static Color getInvestigatingYellowColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? investigatingYellowDark 
+        : investigatingYellow;
+  }
+
+  static Color getInvestigatingYellowBackground(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? investigatingYellowBackgroundDark 
+        : investigatingYellowBackground;
+  }
+
+  static Color getFoundGreenColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? foundGreenDark 
+        : foundGreen;
+  }
+
+  static Color getFoundGreenBackground(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? foundGreenBackgroundDark 
+        : foundGreenBackground;
+  }
+
+  static Color getSurfaceColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? darkSurface 
+        : white;
+  }
+
+  static Color getDividerColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? darkDivider 
+        : lightgrey;
+  }
+
 }

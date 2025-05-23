@@ -1,4 +1,3 @@
-import 'package:find_them/presentation/screens/settings/change_pass_screen.dart';
 import 'package:find_them/presentation/widgets/LanguageDrop.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
