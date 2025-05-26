@@ -159,65 +159,179 @@ class LocationSharingService {
       throw Exception('Error sending request: $e');
     }
   }
+
   Future<List<UserSearchModel>> searchUsers(String query, {String? token}) async {
-  try {
-    log('Searching users with query: $query');
-    
-    final response = await http.get(
-      Uri.parse('$baseUrl/api/location-sharing/search-users/?q=$query'),
-      headers: {
-        'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      },
-    );
-
-    log('Search users response status: ${response.statusCode}');
-    log('Search users response body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => UserSearchModel.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to search users: ${response.statusCode}');
-    }
-  } catch (e) {
-    log('Error searching users: $e');
-    throw Exception('Error searching users: $e');
-  }
-}
-
- Future<void> toggleLocationSharing({
-    required int friendId,
-    required bool shouldShare,
-    required String? token,
-  }) async {
     try {
-      log('Toggling location sharing for friend $friendId to $shouldShare');
+      log('Searching users with query: $query');
       
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/location-sharing/friends/$friendId/toggle-sharing/'),
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/location-sharing/search-users/?q=$query'),
         headers: {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
         },
-        body: json.encode({
-          'should_share': shouldShare,
-        }),
       );
 
-      log('Toggle sharing status: ${response.statusCode}');
-      log('Toggle sharing body: ${response.body}');
+      log('Search users response status: ${response.statusCode}');
+      log('Search users response body: ${response.body}');
 
-      if (response.statusCode != 200) {
-        final errorBody = json.decode(response.body);
-        throw Exception(errorBody['detail'] ?? 'Failed to toggle location sharing');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((json) => UserSearchModel.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to search users: ${response.statusCode}');
       }
     } catch (e) {
-      log('Error toggling location sharing: $e');
-      throw Exception('Error toggling location sharing: $e');
+      log('Error searching users: $e');
+      throw Exception('Error searching users: $e');
     }
   }
 
+  // NEW: Update sharing settings
+  Future<Map<String, dynamic>> updateSharingSettings({
+    bool? isSharing,
+    String? sharingMode, // 'all_friends' or 'selected_friends'
+    List<int>? selectedFriends,
+    String? token,
+  }) async {
+    try {
+      log('Updating sharing settings');
+      
+      final body = <String, dynamic>{};
+      if (isSharing != null) body['is_sharing'] = isSharing;
+      if (sharingMode != null) body['sharing_mode'] = sharingMode;
+      if (selectedFriends != null) body['selected_friends'] = selectedFriends;
+      
+      final response = await http.put(
+        Uri.parse('$baseUrl/api/location-sharing/settings/'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: json.encode(body),
+      );
 
+      log('Update sharing settings status: ${response.statusCode}');
+      log('Update sharing settings body: ${response.body}');
 
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to update sharing settings: ${response.statusCode}');
+      }
+    } catch (e) {
+      log('Error updating sharing settings: $e');
+      throw Exception('Error updating sharing settings: $e');
+    }
+  }
+
+  // NEW: Get current sharing settings
+  Future<Map<String, dynamic>> getSharingSettings({String? token}) async {
+    try {
+      log('Getting sharing settings');
+      
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/location-sharing/settings/current/'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
+
+      log('Get sharing settings status: ${response.statusCode}');
+      log('Get sharing settings body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to get sharing settings: ${response.statusCode}');
+      }
+    } catch (e) {
+      log('Error getting sharing settings: $e');
+      throw Exception('Error getting sharing settings: $e');
+    }
+  }
+
+  // NEW: Get selected friends for sharing
+  Future<List<dynamic>> getSelectedFriends({String? token}) async {
+    try {
+      log('Getting selected friends');
+      
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/location-sharing/settings/selected-friends/'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
+
+      log('Get selected friends status: ${response.statusCode}');
+      log('Get selected friends body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to get selected friends: ${response.statusCode}');
+      }
+    } catch (e) {
+      log('Error getting selected friends: $e');
+      throw Exception('Error getting selected friends: $e');
+    }
+  }
+
+  // NEW: Share/unshare location with specific friend
+  Future<void> toggleFriendLocationSharing(int friendId, bool shouldShare, {String? token}) async {
+    try {
+      log('Toggling location sharing for friend $friendId to $shouldShare');
+      
+      // Get current settings
+      final currentSettings = await getSharingSettings(token: token);
+      final bool isSharing = currentSettings['is_sharing'] ?? false;
+      final String sharingMode = currentSettings['sharing_mode'] ?? 'all_friends';
+      
+      if (!isSharing) {
+        // If not sharing at all, enable sharing first
+        await updateSharingSettings(
+          isSharing: true,
+          sharingMode: 'selected_friends',
+          selectedFriends: shouldShare ? [friendId] : [],
+          token: token,
+        );
+      } else if (sharingMode == 'all_friends') {
+        if (!shouldShare) {
+          // Switch from all_friends to selected_friends, excluding this friend
+          final friends = await getFriends(token: token);
+          final selectedFriends = friends
+              .where((f) => f.friendId != friendId)
+              .map((f) => f.friendId)
+              .toList();
+          
+          await updateSharingSettings(
+            sharingMode: 'selected_friends',
+            selectedFriends: selectedFriends,
+            token: token,
+          );
+        }
+        // If shouldShare is true and already sharing with all, no action needed
+      } else {
+        // Currently in selected_friends mode
+        final selectedFriends = await getSelectedFriends(token: token);
+        final currentIds = selectedFriends.map((f) => f['friend'] as int).toList();
+        
+        if (shouldShare && !currentIds.contains(friendId)) {
+          currentIds.add(friendId);
+        } else if (!shouldShare && currentIds.contains(friendId)) {
+          currentIds.remove(friendId);
+        }
+        
+        await updateSharingSettings(
+          selectedFriends: currentIds,
+          token: token,
+        );
+      }
+    } catch (e) {
+      log('Error toggling friend location sharing: $e');
+      throw Exception('Error toggling friend location sharing: $e');
+    }
+  }
 }

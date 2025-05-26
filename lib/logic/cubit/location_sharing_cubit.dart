@@ -73,15 +73,51 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
     }
   }
 
-  Future<void> toggleLocationSharing(int friendId, bool shouldShare) async {
+  // NEW: Toggle location sharing for specific friend
+  Future<void> toggleFriendLocationSharing(int friendId, bool shouldShare) async {
     try {
       emit(LocationSharingLoading());
-
-      await _repository.toggleLocationSharing(friendId, shouldShare);
-
+      await _repository.toggleFriendLocationSharing(friendId, shouldShare);
+      
+      final message = shouldShare 
+          ? 'Now sharing location with friend' 
+          : 'Stopped sharing location with friend';
+      emit(LocationSharingActionSuccess(message));
+      
       await loadLocationData();
     } catch (e) {
       emit(LocationSharingError(e.toString()));
+    }
+  }
+
+  // NEW: Update general sharing settings (for settings screen)
+  Future<void> updateGeneralSharingSettings(bool isSharing) async {
+    try {
+      emit(LocationSharingLoading());
+      
+      await _repository.updateSharingSettings(
+        isSharing: isSharing,
+        sharingMode: isSharing ? 'all_friends' : null,
+      );
+      
+      final message = isSharing 
+          ? 'Location sharing enabled' 
+          : 'Location sharing disabled';
+      emit(LocationSharingActionSuccess(message));
+      
+      // Don't reload location data here as this is for settings screen
+    } catch (e) {
+      emit(LocationSharingError(e.toString()));
+    }
+  }
+
+  // NEW: Get current sharing settings
+  Future<Map<String, dynamic>?> getSharingSettings() async {
+    try {
+      return await _repository.getSharingSettings();
+    } catch (e) {
+      emit(LocationSharingError(e.toString()));
+      return null;
     }
   }
 }

@@ -91,16 +91,56 @@ class LocationSharingRepository {
     }
   }
 
-    Future<void> toggleLocationSharing(int friendId, bool shouldShare) async {
+  // NEW: Toggle location sharing for specific friend
+  Future<void> toggleFriendLocationSharing(int friendId, bool shouldShare) async {
     try {
       final token = await getAuthToken();
-      return await _service.toggleLocationSharing(
-        friendId: friendId,
-        shouldShare: shouldShare,
+      return await _service.toggleFriendLocationSharing(
+        friendId,
+        shouldShare,
         token: token,
       );
     } catch (e) {
-      throw Exception('Failed to toggle location sharing: $e');
+      throw Exception('Failed to toggle friend location sharing: $e');
+    }
+  }
+
+  // NEW: Update general sharing settings
+  Future<Map<String, dynamic>> updateSharingSettings({
+    bool? isSharing,
+    String? sharingMode,
+    List<int>? selectedFriends,
+  }) async {
+    try {
+      final token = await getAuthToken();
+      return await _service.updateSharingSettings(
+        isSharing: isSharing,
+        sharingMode: sharingMode,
+        selectedFriends: selectedFriends,
+        token: token,
+      );
+    } catch (e) {
+      throw Exception('Failed to update sharing settings: $e');
+    }
+  }
+
+  // NEW: Get current sharing settings
+  Future<Map<String, dynamic>> getSharingSettings() async {
+    try {
+      final token = await getAuthToken();
+      return await _service.getSharingSettings(token: token);
+    } catch (e) {
+      throw Exception('Failed to get sharing settings: $e');
+    }
+  }
+
+  // NEW: Get selected friends
+  Future<List<dynamic>> getSelectedFriends() async {
+    try {
+      final token = await getAuthToken();
+      return await _service.getSelectedFriends(token: token);
+    } catch (e) {
+      throw Exception('Failed to get selected friends: $e');
     }
   }
 }
