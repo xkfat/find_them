@@ -46,7 +46,7 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
   Future<void> removeFriend(int friendId) async {
     try {
       await _repository.removeFriend(friendId);
-       emit(LocationSharingActionSuccess('Friend removed'));
+      emit(LocationSharingActionSuccess('Friend removed'));
       await loadLocationData();
     } catch (e) {
       emit(LocationSharingError(e.toString()));
@@ -73,32 +73,13 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
     }
   }
 
-  // NEW: Toggle location sharing for specific friend
-  Future<void> toggleFriendLocationSharing(int friendId, bool shouldShare) async {
-    try {
-      emit(LocationSharingLoading());
-      await _repository.toggleFriendLocationSharing(friendId, shouldShare);
-      
-      final message = shouldShare 
-          ? 'Now sharing location with friend' 
-          : 'Stopped sharing location with friend';
-      emit(LocationSharingActionSuccess(message));
-      
-      await loadLocationData();
-    } catch (e) {
-      emit(LocationSharingError(e.toString()));
-    }
-  }
+  // NEW SIMPLIFIED METHODS
 
-  // NEW: Update general sharing settings (for settings screen)
-  Future<void> updateGeneralSharingSettings(bool isSharing) async {
+  /// Toggle global location sharing (for settings screen)
+  Future<void> toggleGlobalSharing(bool isSharing) async {
     try {
       emit(LocationSharingLoading());
-      
-      await _repository.updateSharingSettings(
-        isSharing: isSharing,
-        sharingMode: isSharing ? 'all_friends' : null,
-      );
+      await _repository.toggleGlobalSharing(isSharing);
       
       final message = isSharing 
           ? 'Location sharing enabled' 
@@ -111,7 +92,53 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
     }
   }
 
-  // NEW: Get current sharing settings
+  /// Toggle sharing with a specific friend (can_see_me)
+  Future<void> toggleFriendSharing(int friendId, bool canSeeMe) async {
+    try {
+      // Optimistic update
+      final currentState = state;
+      if (currentState is LocationSharingLoaded) {
+        final updatedFriends = currentState.friends.map((friend) {
+          if (friend.friendId == friendId) {
+            // Create updated friend with new canSeeYou status
+            return LocationSharingModel(
+              id: friend.id,
+              userId: friend.userId,
+              friendId: friend.friendId,
+              createdAt: friend.createdAt,
+              friendDetails: friend.friendDetails,
+              isSharing: friend.isSharing,
+              canSeeYou: canSeeMe,
+            );
+          }
+          return friend;
+        }).toList();
+        
+        // Emit optimistic update
+        emit(LocationSharingLoaded(
+          requests: currentState.requests,
+          friends: updatedFriends,
+        ));
+      }
+
+      // Make API call
+      await _repository.toggleFriendSharing(friendId, canSeeMe);
+      
+      final message = canSeeMe 
+          ? 'Now sharing location with friend' 
+          : 'Stopped sharing location with friend';
+      emit(LocationSharingActionSuccess(message));
+      
+      // Reload to get actual server state
+      await loadLocationData();
+    } catch (e) {
+      emit(LocationSharingError(e.toString()));
+      // Reload on error to revert optimistic update
+      await loadLocationData();
+    }
+  }
+
+  /// Get current sharing settings (for settings screen)
   Future<Map<String, dynamic>?> getSharingSettings() async {
     try {
       return await _repository.getSharingSettings();

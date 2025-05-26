@@ -66,6 +66,68 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
     );
   }
 
+  void _showRemoveDialog(int friendId, String friendName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.getCardColor(context),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Text(
+            'Remove Friend',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.getTextColor(context),
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to remove $friendName from your friends list?',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: AppColors.getTextColor(context),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.getSecondaryTextColor(context),
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                try {
+                  await context.read<LocationSharingCubit>().removeFriend(
+                    friendId,
+                  );
+                } catch (e) {
+                  // Error handled by BlocConsumer listener
+                }
+              },
+              child: Text(
+                'Remove',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +137,7 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
         title: Text(
           'Location sharing',
           style: GoogleFonts.dmSans(
-            fontSize: 14,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             color: AppColors.getTextColor(context),
           ),
@@ -143,10 +205,12 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
   Widget _buildLocationList(LocationSharingLoaded state) {
     final allItems = <Widget>[];
 
+    // Add pending requests first
     for (final request in state.requests) {
       allItems.add(_buildRequestCard(request));
     }
 
+    // Add friends
     for (final friend in state.friends) {
       allItems.add(_buildFriendCard(friend));
     }
@@ -196,6 +260,7 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
       decoration: BoxDecoration(
         color: AppColors.getCardColor(context),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.investigatingYellow, width: 2),
       ),
       child: Column(
         children: [
@@ -241,144 +306,98 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                     Text(
                       request.senderDetails.displayName,
                       style: GoogleFonts.dmSans(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.getTextColor(context),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.investigatingYellowBackground,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Location Request',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.investigatingYellow,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'block') {
-                    //TODO
-                  } else if (value == 'report') {}
-                },
-                itemBuilder:
-                    (context) => [
-                      PopupMenuItem(value: 'report', child: Text('Report')),
-                    ],
-                child: Icon(
-                  Icons.more_horiz,
-                  color: AppColors.getSecondaryTextColor(context),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      await context.read<LocationSharingCubit>().acceptRequest(
+                        request.id,
+                      );
+                    } catch (e) {
+                      // Error handled by BlocConsumer listener
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.teal,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    'Accept',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () async {
+                    try {
+                      await context.read<LocationSharingCubit>().declineRequest(
+                        request.id,
+                      );
+                    } catch (e) {
+                      // Error handled by BlocConsumer listener
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: AppColors.getSecondaryTextColor(context),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    'Decline',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.getSecondaryTextColor(context),
+                    ),
+                  ),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 11),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Not sharing',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              color: AppColors.getSecondaryTextColor(context),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            await context
-                                .read<LocationSharingCubit>()
-                                .acceptRequest(request.id);
-                          } catch (e) {}
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.teal,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          minimumSize: const Size(double.infinity, 0),
-                        ),
-                        child: Text(
-                          'Accept',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.visibility_off,
-                            size: 16,
-                            color: AppColors.getSecondaryTextColor(context),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Can not see you',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              color: AppColors.getSecondaryTextColor(context),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      OutlinedButton(
-                        onPressed: () async {
-                          try {
-                            await context
-                                .read<LocationSharingCubit>()
-                                .declineRequest(request.id);
-                          } catch (e) {}
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: AppColors.getSecondaryTextColor(context),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          minimumSize: const Size(double.infinity, 0),
-                        ),
-                        child: Text(
-                          'Decline',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.getSecondaryTextColor(context),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
@@ -439,10 +458,46 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                     Text(
                       friend.friendDetails.displayName,
                       style: GoogleFonts.dmSans(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.getTextColor(context),
                       ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color:
+                                isSharing ? AppColors.foundGreen : Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          isSharing ? 'Sharing with you' : 'Not sharing',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            color: AppColors.getSecondaryTextColor(context),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Icon(
+                          canSeeYou ? Icons.visibility : Icons.visibility_off,
+                          size: 14,
+                          color: AppColors.getSecondaryTextColor(context),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          canSeeYou ? 'Can see you' : 'Cannot see you',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            color: AppColors.getSecondaryTextColor(context),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -450,10 +505,23 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
               PopupMenuButton<String>(
                 onSelected: (value) async {
                   if (value == 'remove') {
+                    _showRemoveDialog(
+                      friend.friendId,
+                      friend.friendDetails.displayName,
+                    );
+                  } else if (value == 'share_location') {
                     try {
-                      await context.read<LocationSharingCubit>().removeFriend(
-                        friend.friendId,
-                      );
+                      await context
+                          .read<LocationSharingCubit>()
+                          .toggleFriendSharing(friend.friendId, true);
+                    } catch (e) {
+                      // Error handled by BlocConsumer listener
+                    }
+                  } else if (value == 'stop_sharing') {
+                    try {
+                      await context
+                          .read<LocationSharingCubit>()
+                          .toggleFriendSharing(friend.friendId, false);
                     } catch (e) {
                       // Error handled by BlocConsumer listener
                     }
@@ -461,9 +529,49 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                 },
                 itemBuilder:
                     (context) => [
+                      if (!canSeeYou)
+                        PopupMenuItem(
+                          value: 'share_location',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: AppColors.foundGreen,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text('Share location'),
+                            ],
+                          ),
+                        ),
+                      if (canSeeYou)
+                        PopupMenuItem(
+                          value: 'stop_sharing',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_off,
+                                color: Colors.orange,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text('Stop sharing'),
+                            ],
+                          ),
+                        ),
                       PopupMenuItem(
                         value: 'remove',
-                        child: Text('Remove Friend'),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.person_remove,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text('Remove friend'),
+                          ],
+                        ),
                       ),
                     ],
                 child: Icon(
@@ -473,123 +581,84 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 11),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      await context.read<LocationSharingCubit>().sendAlert(
+                        friend.friendId,
+                      );
+                      _showDialog('Alert sent successfully!', true);
+                    } catch (e) {
+                      // Error handled by BlocConsumer listener
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.teal,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color:
-                                  isSharing ? AppColors.foundGreen : Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            isSharing ? 'Sharing' : 'Not sharing',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              color: AppColors.getSecondaryTextColor(context),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            await context
-                                .read<LocationSharingCubit>()
-                                .sendAlert(friend.friendId);
-                            _showDialog('Alert sent successfully!', true);
-                          } catch (e) {
-                            // Error handled by BlocConsumer listener
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.teal,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          minimumSize: const Size(double.infinity, 0),
-                        ),
-                        child: Text(
-                          'Alert',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
+                      Icon(Icons.notifications, color: Colors.white, size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Send Alert',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            canSeeYou ? Icons.visibility : Icons.visibility_off,
-                            size: 16,
-                            color: AppColors.getSecondaryTextColor(context),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            canSeeYou ? 'Can see you' : 'Can not see you',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              color: AppColors.getSecondaryTextColor(context),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: AppColors.getSecondaryTextColor(context),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          minimumSize: const Size(double.infinity, 0),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    // TODO: Navigate to map view showing friend's location
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'View ${friend.friendDetails.displayName}\'s location',
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const SizedBox(width: 4),
-                            Text(
-                              'View',
-                              style: GoogleFonts.dmSans(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.getSecondaryTextColor(context),
-                              ),
-                            ),
-                          ],
+                        backgroundColor: AppColors.teal,
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: AppColors.teal),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.map, color: AppColors.teal, size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        'View',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.teal,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
