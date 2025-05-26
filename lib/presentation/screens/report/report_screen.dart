@@ -44,20 +44,20 @@ class _Report1ScreenState extends State<Report1Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getSurfaceColor(context),
       appBar: AppBar(
         title: Text(
           'Reporting a missing person',
           style: GoogleFonts.dmSans(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.black,
+            color: AppColors.getTextColor(context),
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.getSurfaceColor(context),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: AppColors.getTextColor(context)),
           onPressed: () => Navigator.pop(context),
         ),
         elevation: 0,
@@ -88,28 +88,40 @@ class _Report1ScreenState extends State<Report1Screen> {
                     style: GoogleFonts.inter(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.getTextColor(context),
                     ),
                   ),
                 ),
                 const SizedBox(height: 32),
 
-                Text('First name'),
+                Text(
+                  'First name',
+                  style: TextStyle(color: AppColors.getTextColor(context)),
+                ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _firstNameController,
                   decoration: InputDecoration(
                     hintText: 'Enter first name of missing person here',
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.getSurfaceColor(context),
+                    hintStyle: TextStyle(
+                      color: AppColors.getSecondaryTextColor(context),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: AppColors.getDividerColor(context),
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: AppColors.getDividerColor(context),
+                      ),
                     ),
                   ),
+                  style: TextStyle(color: AppColors.getTextColor(context)),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter first name';
@@ -119,23 +131,34 @@ class _Report1ScreenState extends State<Report1Screen> {
                 ),
                 const SizedBox(height: 24),
 
-                Text('Last name'),
+                Text(
+                  'Last name',
+                  style: TextStyle(color: AppColors.getTextColor(context)),
+                ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _lastNameController,
                   decoration: InputDecoration(
                     hintText: 'Enter last name of missing person here',
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.getSurfaceColor(context),
+                    hintStyle: TextStyle(
+                      color: AppColors.getSecondaryTextColor(context),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: AppColors.getDividerColor(context),
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: AppColors.getDividerColor(context),
+                      ),
                     ),
                   ),
+                  style: TextStyle(color: AppColors.getTextColor(context)),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter last name';
@@ -145,7 +168,10 @@ class _Report1ScreenState extends State<Report1Screen> {
                 ),
                 const SizedBox(height: 24),
 
-                Text('Age'),
+                Text(
+                  'Age',
+                  style: TextStyle(color: AppColors.getTextColor(context)),
+                ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _ageController,
@@ -154,16 +180,24 @@ class _Report1ScreenState extends State<Report1Screen> {
                   decoration: InputDecoration(
                     hintText: '123',
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.getSurfaceColor(context),
+                    hintStyle: TextStyle(
+                      color: AppColors.getSecondaryTextColor(context),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: AppColors.getDividerColor(context),
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: AppColors.getDividerColor(context),
+                      ),
                     ),
                   ),
+                  style: TextStyle(color: AppColors.getTextColor(context)),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter age';
@@ -173,7 +207,10 @@ class _Report1ScreenState extends State<Report1Screen> {
                 ),
                 const SizedBox(height: 24),
 
-                Text('Gender'),
+                Text(
+                  'Gender',
+                  style: TextStyle(color: AppColors.getTextColor(context)),
+                ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -185,8 +222,16 @@ class _Report1ScreenState extends State<Report1Screen> {
                           _selectedGender = newValue;
                         });
                       },
+                      fillColor: MaterialStateProperty.resolveWith<Color>((
+                        Set<MaterialState> states,
+                      ) {
+                        return AppColors.teal;
+                      }),
                     ),
-                    Text('Male'),
+                    Text(
+                      'Male',
+                      style: TextStyle(color: AppColors.getTextColor(context)),
+                    ),
                     const SizedBox(width: 40),
                     Radio<String>(
                       value: 'Female',
@@ -196,8 +241,16 @@ class _Report1ScreenState extends State<Report1Screen> {
                           _selectedGender = newValue;
                         });
                       },
+                      fillColor: MaterialStateProperty.resolveWith<Color>((
+                        Set<MaterialState> states,
+                      ) {
+                        return AppColors.teal;
+                      }),
                     ),
-                    Text('Female'),
+                    Text(
+                      'Female',
+                      style: TextStyle(color: AppColors.getTextColor(context)),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 40),
@@ -243,7 +296,7 @@ class _Report1ScreenState extends State<Report1Screen> {
       height: 50,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isActive ? AppColors.teal : Colors.white,
+        color: isActive ? AppColors.teal : AppColors.getSurfaceColor(context),
         border: Border.all(color: AppColors.teal, width: 2),
       ),
       child: Center(
@@ -263,7 +316,7 @@ class _Report1ScreenState extends State<Report1Screen> {
     return Container(
       width: 50,
       height: 2,
-      color: isActive ? AppColors.teal : Colors.grey.shade300,
+      color: isActive ? AppColors.teal : AppColors.getDividerColor(context),
     );
   }
 }

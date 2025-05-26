@@ -7,15 +7,16 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:find_them/presentation/widgets/toggle.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  final VoidCallback toggleTheme;
+
+  const SettingsScreen({Key? key, required this.toggleTheme}) : super(key: key);
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool pushNotificationsEnabled = true;
-  bool darkModeEnabled = false;
+  bool notificationsEnabled = false;
   bool locationPermissionEnabled = false;
   bool locationSharingEnabled = false;
   String selectedLanguage = 'English';
@@ -25,6 +26,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _checkLocationPermission();
+    _checkNotificationPermission();
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    final status = await Permission.notification.status;
+    setState(() {
+      notificationsEnabled = status.isGranted;
+    });
   }
 
   Future<void> _checkLocationPermission() async {
@@ -41,9 +50,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
+  Future<void> _openNotificationSettings() async {
+    await openAppSettings();
+    await Future.delayed(const Duration(seconds: 1));
+    _checkNotificationPermission();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.getBackgroundColor(context),
       body: Stack(
         children: [
           Column(
@@ -60,7 +76,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
-              Expanded(flex: 1, child: Container(color: Colors.white)),
+              Expanded(
+                flex: 1,
+                child: Container(color: AppColors.getBackgroundColor(context)),
+              ),
             ],
           ),
 
@@ -69,11 +88,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 411,
               height: 500,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.getSurfaceColor(context),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black54
+                            : Colors.black26,
                     blurRadius: 10,
                     offset: const Offset(0, 5),
                   ),
@@ -92,7 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         style: GoogleFonts.rubik(
                           fontSize: 18,
                           fontWeight: FontWeight.normal,
-                          color: Colors.black87,
+                          color: AppColors.getTextColor(context),
                         ),
                       ),
                     ),
@@ -125,7 +147,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: GoogleFonts.rubik(
                               fontSize: 18,
                               fontWeight: FontWeight.normal,
-                              color: Colors.black87,
+                              color: AppColors.getTextColor(context),
                             ),
                           ),
                           LanguageDropdown(
@@ -135,7 +157,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 selectedLanguage = newValue;
                               });
-                              // TODO
                             },
                           ),
                         ],
@@ -145,27 +166,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 22),
 
                     _buildToggleOption(
-                      'Push notifications',
-                      pushNotificationsEnabled,
-                      onChanged: (value) {
-                        setState(() {
-                          pushNotificationsEnabled = value;
-                        });
+                      'Notifications',
+                      notificationsEnabled,
+                      onChanged: (value) async {
+                        await _openNotificationSettings();
                       },
-
-                      // TODO
                     ),
 
                     const SizedBox(height: 22),
 
                     _buildToggleOption(
                       'Dark mode',
-                      darkModeEnabled,
+                      Theme.of(context).brightness == Brightness.dark,
                       onChanged: (value) {
-                        setState(() {
-                          darkModeEnabled = value;
-                        });
-                        // TODO
+                        widget.toggleTheme();
                       },
                     ),
 
@@ -192,7 +206,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         setState(() {
                           locationSharingEnabled = value;
                         });
-                        // TODO
                       },
                     ),
                     const SizedBox(height: 10),
@@ -223,10 +236,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: GoogleFonts.rubik(
                 fontSize: 18,
                 fontWeight: FontWeight.normal,
-                color: Colors.black87,
+                color: AppColors.getTextColor(context),
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
+            Icon(
+              Icons.chevron_right,
+              color: AppColors.getSecondaryTextColor(context),
+            ),
           ],
         ),
       ),
@@ -248,7 +264,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             style: GoogleFonts.rubik(
               fontSize: 18,
               fontWeight: FontWeight.normal,
-              color: Colors.black87,
+              color: AppColors.getTextColor(context),
             ),
           ),
           Toggle(value: value, onChanged: onChanged),

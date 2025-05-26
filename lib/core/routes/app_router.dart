@@ -1,16 +1,20 @@
 import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
 import 'package:find_them/data/repositories/case_repo.dart';
+import 'package:find_them/data/repositories/location_sharing_repo.dart';
 import 'package:find_them/data/repositories/profile_repo.dart';
 import 'package:find_them/data/repositories/report_repo.dart';
 import 'package:find_them/data/repositories/submitted_cases_repo.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/data/services/case_service.dart';
+import 'package:find_them/data/services/location_sharing_service.dart';
 import 'package:find_them/data/services/report_service.dart';
 import 'package:find_them/data/services/submitted_cases_service.dart';
+import 'package:find_them/logic/cubit/add_friend_cubit.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:find_them/logic/cubit/case_updates_cubit.dart';
+import 'package:find_them/logic/cubit/location_sharing_cubit.dart';
 import 'package:find_them/logic/cubit/user_submitted_cases_cubit.dart';
 import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:find_them/logic/cubit/report_cubit.dart';
@@ -27,6 +31,8 @@ import 'package:find_them/presentation/screens/report/report_screen3.dart';
 import 'package:find_them/presentation/screens/report/report_success_screen.dart';
 import 'package:find_them/presentation/screens/settings/change_pass_screen.dart';
 import 'package:find_them/presentation/screens/settings/settings_screen.dart';
+import 'package:find_them/presentation/screens/location/add_friend_screen.dart.dart';
+import 'package:find_them/presentation/screens/location/location_sharing_screen.dart';
 import 'package:find_them/presentation/widgets/profileDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,7 +44,7 @@ import '../../presentation/screens/auth/signup_screen.dart';
 import '../../presentation/screens/auth/sms_verification_screen.dart.dart';
 
 class AppRouter {
-  static Route<dynamic> generateRoute(RouteSettings settings) {
+  static Route<dynamic> generateRoute(RouteSettings settings ,VoidCallback toggleTheme) {
     final args = settings.arguments;
 
     switch (settings.name) {
@@ -273,7 +279,7 @@ class AppRouter {
                     create: (context) => ProfileCubit(ProfileRepository()),
                   ),
                 ],
-                child: const SettingsScreen(),
+                child:  SettingsScreen(toggleTheme: toggleTheme),
               ),
         );
       case '/settings/change-password':
@@ -303,12 +309,27 @@ case '/submitted-cases':
     ),
   );
 
-      /*
-      case '/friends/add' :
-        return MaterialPageRoute(builder: (_) => const AddFriendScreen());
 
-      case'/location-sharing' :
-        return MaterialPageRoute(builder: (_) => const LocationSharingScreen());
+case '/location-sharing':
+  return MaterialPageRoute(
+    builder: (_) => BlocProvider(
+      create: (context) => LocationSharingCubit(
+        LocationSharingRepository(LocationSharingService()),
+      ),
+      child: const LocationSharingScreen(),
+    ),
+  );
+     
+     case '/add-friend':
+  return MaterialPageRoute(
+    builder: (_) => BlocProvider(
+      create: (context) => AddFriendCubit(
+        LocationSharingRepository(LocationSharingService()),
+      ),
+      child: const AddFriendScreen(),
+    ),
+  );
+/*
 
       case '/notifications' :
         return MaterialPageRoute(builder: (_) => const NotificationsScreen());

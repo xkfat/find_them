@@ -5,10 +5,10 @@ class PlaceholderScreen extends StatelessWidget {
   final Color? backgroundColor;
 
   const PlaceholderScreen({
-    Key? key,
+    super.key,
     required this.screenName,
     this.backgroundColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

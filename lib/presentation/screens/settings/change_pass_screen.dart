@@ -23,7 +23,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   String? _oldPasswordError;
   String? _newPasswordError;
-  String? _confirmPasswordError;
+  String? confirmPasswordError;
 
   @override
   void dispose() {
@@ -208,7 +208,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             setState(() {
               _oldPasswordError = null;
               _newPasswordError = null;
-              _confirmPasswordError = null;
+              confirmPasswordError = null;
             });
 
             _showSuccessDialog();
@@ -218,7 +218,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             setState(() {
               _oldPasswordError = null;
               _newPasswordError = null;
-              _confirmPasswordError = null;
+              confirmPasswordError = null;
 
               if (errorMessage.toLowerCase().contains(
                     'old password is not correct',

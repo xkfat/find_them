@@ -1,6 +1,5 @@
 part of 'theme_cubit.dart';
 
-
 sealed class ThemeState extends Equatable {
   const ThemeState();
 
@@ -11,7 +10,7 @@ sealed class ThemeState extends Equatable {
 final class ThemeInitial extends ThemeState {}
 
 final class ThemeChanged extends ThemeState {
-  final Theme currentTheme;
+  final AppEnum.Theme currentTheme;
 
   const ThemeChanged(this.currentTheme);
 

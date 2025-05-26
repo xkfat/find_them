@@ -45,7 +45,7 @@ class _SideBarState extends State<SideBar> {
       final success = await authService.logout();
 
       if (context.mounted) {
-        navigator.pop(); 
+        navigator.pop();
       }
 
       if (success) {
@@ -76,7 +76,7 @@ class _SideBarState extends State<SideBar> {
       }
     } catch (e) {
       if (context.mounted) {
-        navigator.pop(); 
+        navigator.pop();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -185,7 +185,10 @@ class _SideBarState extends State<SideBar> {
             'assets/icons/location.png',
             'assets/icons/locationF.png',
             'Location sharing',
-            () {},
+            () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/location-sharing');
+            },
           ),
           _buildMenuItemWithImageIcon(
             2,

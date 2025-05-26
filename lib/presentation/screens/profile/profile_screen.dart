@@ -52,18 +52,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getBackgroundColor(context),
       appBar: AppBar(
         title: Text(
           'Profile',
           style: GoogleFonts.dmSans(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppColors.getTextColor(context),
           ),
         ),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: AppColors.getBackgroundColor(context),
+        iconTheme: IconThemeData(color: AppColors.getTextColor(context)),
       ),
       body: BlocConsumer<ProfileCubit, ProfileState>(
         listener: (context, state) {
@@ -131,7 +133,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
 
           if (user == null && isLoadingProfileData) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(color: AppColors.teal),
+            );
           }
 
           if (user == null) {
@@ -147,6 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ? 'Error: ${state.message}'
                           : 'No profile data to display. Please try again.',
                       textAlign: TextAlign.center,
+                      style: TextStyle(color: AppColors.getTextColor(context)),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
@@ -156,7 +161,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.teal,
                       ),
-                      child: const Text('Retry'),
+                      child: const Text(
+                        'Retry',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ],
                 ),
@@ -173,7 +181,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   user != null
                       ? _buildUserInfoContainer(user, isUploadingPhoto)
-                      : const Center(child: CircularProgressIndicator()),
+                      : Center(
+                        child: CircularProgressIndicator(color: AppColors.teal),
+                      ),
                   const SizedBox(height: 30),
                   _buildFormFields(),
                   const SizedBox(height: 40),
@@ -206,7 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: GoogleFonts.dmSans(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: AppColors.getTextColor(context),
               ),
               textAlign: TextAlign.center,
             ),
@@ -215,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               user.email,
               style: GoogleFonts.dmSans(
                 fontSize: 14,
-                color: const Color.fromARGB(255, 0, 0, 0),
+                color: AppColors.getTextColor(context),
               ),
               textAlign: TextAlign.center,
             ),
@@ -225,7 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 user.phoneNumber,
                 style: GoogleFonts.dmSans(
                   fontSize: 14,
-                  color: Colors.grey[700],
+                  color: AppColors.getSecondaryTextColor(context),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -242,7 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         CircleAvatar(
           radius: 60,
-          backgroundColor: Colors.grey[300],
+          backgroundColor: AppColors.getDividerColor(context),
           backgroundImage:
               _getProfileImage(user) ??
               const AssetImage('assets/images/profile.png'),
@@ -250,7 +260,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _getProfileImage(user) == null && !isUploadingPhoto
                   ? (user?.profilePhoto == null || user!.profilePhoto!.isEmpty
                       ? null
-                      : const Icon(Icons.person, size: 50, color: Colors.white))
+                      : Icon(
+                        Icons.person,
+                        size: 50,
+                        color: AppColors.getTextColor(context),
+                      ))
                   : null,
         ),
         if (isUploadingPhoto)
@@ -273,7 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.getBackgroundColor(context),
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.teal, width: 2),
               ),
@@ -465,6 +479,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isReadOnly = false,
     String? Function(String?)? validator,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
@@ -472,9 +488,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[600]),
+        hintStyle: TextStyle(color: AppColors.getSecondaryTextColor(context)),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: isDark ? AppColors.darkSurface : Colors.grey[100],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
@@ -489,30 +505,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.missingRedDark : Colors.red,
+            width: 2,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.missingRedDark : Colors.red,
+            width: 2,
+          ),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 16,
         ),
       ),
-      style: const TextStyle(color: Colors.black),
+      style: TextStyle(color: AppColors.getTextColor(context)),
     );
   }
 
   Widget _buildPhoneField() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return IntlPhoneField(
       initialValue: _currentUser?.phoneNumber,
       controller: _phoneController,
       decoration: InputDecoration(
         hintText: 'Phone Number',
-        hintStyle: TextStyle(color: Colors.grey[600]),
+        hintStyle: TextStyle(color: AppColors.getSecondaryTextColor(context)),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: isDark ? AppColors.darkSurface : Colors.grey[100],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
@@ -527,17 +551,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.missingRedDark : Colors.red,
+            width: 2,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.missingRedDark : Colors.red,
+            width: 2,
+          ),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 16,
         ),
       ),
+      style: TextStyle(color: AppColors.getTextColor(context)),
+      dropdownTextStyle: TextStyle(color: AppColors.getTextColor(context)),
       initialCountryCode: 'MR',
       onChanged: (phone) {
         _completePhoneNumber = phone.completeNumber;
