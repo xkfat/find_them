@@ -2,12 +2,14 @@ import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
 import 'package:find_them/data/repositories/case_repo.dart';
 import 'package:find_them/data/repositories/location_sharing_repo.dart';
+import 'package:find_them/data/repositories/notification_repo.dart';
 import 'package:find_them/data/repositories/profile_repo.dart';
 import 'package:find_them/data/repositories/report_repo.dart';
 import 'package:find_them/data/repositories/submitted_cases_repo.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/data/services/case_service.dart';
 import 'package:find_them/data/services/location_sharing_service.dart';
+import 'package:find_them/data/services/notification_service.dart';
 import 'package:find_them/data/services/report_service.dart';
 import 'package:find_them/data/services/submitted_cases_service.dart';
 import 'package:find_them/logic/cubit/add_friend_cubit.dart';
@@ -15,6 +17,7 @@ import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:find_them/logic/cubit/case_updates_cubit.dart';
 import 'package:find_them/logic/cubit/location_sharing_cubit.dart';
+import 'package:find_them/logic/cubit/notification_cubit.dart';
 import 'package:find_them/logic/cubit/user_submitted_cases_cubit.dart';
 import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:find_them/logic/cubit/report_cubit.dart';
@@ -24,6 +27,7 @@ import 'package:find_them/logic/cubit/submit_case_cubit.dart';
 import 'package:find_them/presentation/screens/case/case_detail_screen.dart';
 import 'package:find_them/presentation/screens/case/my_submitted_cases_screen.dart';
 import 'package:find_them/presentation/screens/map/map_screen.dart';
+import 'package:find_them/presentation/screens/notifications/notification_screen.dart';
 import 'package:find_them/presentation/screens/profile/profile_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen.dart';
 import 'package:find_them/presentation/screens/report/report_screen2.dart';
@@ -329,11 +333,17 @@ case '/location-sharing':
       child: const AddFriendScreen(),
     ),
   );
-/*
+case '/notifications':
+  return MaterialPageRoute(
+    builder: (_) => BlocProvider(
+      create: (context) => NotificationCubit(
+        NotificationRepository(NotificationService()),
+      ),
+      child: const NotificationsScreen(),
+    ),
+  );
 
-      case '/notifications' :
-        return MaterialPageRoute(builder: (_) => const NotificationsScreen());
-*/
+
       default:
         return MaterialPageRoute(
           builder:

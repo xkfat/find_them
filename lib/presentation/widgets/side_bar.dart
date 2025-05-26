@@ -197,6 +197,7 @@ class _SideBarState extends State<SideBar> {
             'Notifications',
             () {
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/notifications');
             },
           ),
           _buildMenuItemWithImageIcon(
