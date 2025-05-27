@@ -128,11 +128,14 @@ class _FilterDrawerState extends State<FilterDrawer> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.darkGreen,
+            colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: Colors.teal,
+              brightness: Theme.of(context).brightness,
+            ).copyWith(
               onPrimary: Colors.white,
-              onSurface: Colors.black,
+              onSurface: AppColors.getTextColor(context),
             ),
+            dialogBackgroundColor: AppColors.getCardColor(context),
           ),
           child: child!,
         );
@@ -197,7 +200,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.85,
-      color: const Color(0xFFD8F3D6),
+      color: AppColors.getCardColor(context),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -208,16 +211,20 @@ class _FilterDrawerState extends State<FilterDrawer> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: Icon(
+                      Icons.close,
+                      color: AppColors.getTextColor(context),
+                    ),
                     onPressed: () => widget.onClose(),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
                   Text(
                     'Filter searching',
-                    style: AppTextStyles.bodyLarge(
-                      context,
-                    ).copyWith(fontWeight: FontWeight.w500),
+                    style: AppTextStyles.bodyLarge(context).copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.getTextColor(context),
+                    ),
                   ),
                   TextButton(
                     onPressed: _resetFilters,
@@ -225,7 +232,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                       'Reset',
                       style: AppTextStyles.bodyMedium(
                         context,
-                      ).copyWith(color: AppColors.darkGreen),
+                      ).copyWith(color: AppColors.teal),
                     ),
                   ),
                 ],
@@ -266,15 +273,23 @@ class _FilterDrawerState extends State<FilterDrawer> {
                     const SizedBox(height: 12),
                     Column(
                       children: [
-                        _buildStatusChip('missing', 'Missing', Colors.red),
+                        _buildStatusChip(
+                          'missing',
+                          'Missing',
+                          AppColors.getMissingRedColor(context),
+                        ),
                         const SizedBox(height: 8),
                         _buildStatusChip(
                           'under_investigation',
                           'Investigating',
-                          Colors.amber,
+                          AppColors.getInvestigatingYellowColor(context),
                         ),
                         const SizedBox(height: 8),
-                        _buildStatusChip('found', 'Found', Colors.green),
+                        _buildStatusChip(
+                          'found',
+                          'Found',
+                          AppColors.getFoundGreenColor(context),
+                        ),
                       ],
                     ),
 
@@ -285,17 +300,19 @@ class _FilterDrawerState extends State<FilterDrawer> {
 
                     Text(
                       'Start Date',
-                      style: AppTextStyles.bodyMedium(context),
+                      style: AppTextStyles.bodyMedium(
+                        context,
+                      ).copyWith(color: AppColors.getTextColor(context)),
                     ),
                     const SizedBox(height: 8),
                     InkWell(
                       onTap: () => _selectDate(context, true),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.getSurfaceColor(context),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColors.darkGreen.withOpacity(0.5),
+                            color: AppColors.teal.withOpacity(0.5),
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(
@@ -307,19 +324,18 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           children: [
                             Text(
                               _startDate != null
-                                  ? "${_startDate!.day}/${_startDate!.month}/${_startDate!.year}"
+                                  ? _formatDateDisplay(_startDate!)
                                   : "Select start date",
                               style: AppTextStyles.bodyMedium(context).copyWith(
                                 color:
                                     _startDate != null
-                                        ? Colors.black
-                                        : Colors.grey,
+                                        ? AppColors.getTextColor(context)
+                                        : AppColors.getSecondaryTextColor(
+                                          context,
+                                        ),
                               ),
                             ),
-                            const Icon(
-                              Icons.calendar_today,
-                              color: AppColors.darkGreen,
-                            ),
+                            Icon(Icons.calendar_today, color: AppColors.teal),
                           ],
                         ),
                       ),
@@ -327,16 +343,21 @@ class _FilterDrawerState extends State<FilterDrawer> {
 
                     const SizedBox(height: 16),
 
-                    Text('End Date', style: AppTextStyles.bodyMedium(context)),
+                    Text(
+                      'End Date',
+                      style: AppTextStyles.bodyMedium(
+                        context,
+                      ).copyWith(color: AppColors.getTextColor(context)),
+                    ),
                     const SizedBox(height: 8),
                     InkWell(
                       onTap: () => _selectDate(context, false),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.getSurfaceColor(context),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColors.darkGreen.withOpacity(0.5),
+                            color: AppColors.teal.withOpacity(0.5),
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(
@@ -348,19 +369,18 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           children: [
                             Text(
                               _endDate != null
-                                  ? "${_endDate!.day}/${_endDate!.month}/${_endDate!.year}"
+                                  ? _formatDateDisplay(_endDate!)
                                   : "Select end date",
                               style: AppTextStyles.bodyMedium(context).copyWith(
                                 color:
                                     _endDate != null
-                                        ? Colors.black
-                                        : Colors.grey,
+                                        ? AppColors.getTextColor(context)
+                                        : AppColors.getSecondaryTextColor(
+                                          context,
+                                        ),
                               ),
                             ),
-                            const Icon(
-                              Icons.calendar_today,
-                              color: AppColors.darkGreen,
-                            ),
+                            Icon(Icons.calendar_today, color: AppColors.teal),
                           ],
                         ),
                       ),
@@ -371,7 +391,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                       Text(
                         _dateErrorMessage!,
                         style: AppTextStyles.bodyMedium(context).copyWith(
-                          color: Colors.red,
+                          color: AppColors.getMissingRedColor(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -386,7 +406,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                 child: ElevatedButton(
                   onPressed: _applyFilters,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.darkGreen,
+                    backgroundColor: AppColors.teal,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -410,9 +430,10 @@ class _FilterDrawerState extends State<FilterDrawer> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: AppTextStyles.bodyLarge(
-        context,
-      ).copyWith(fontWeight: FontWeight.w500),
+      style: AppTextStyles.bodyLarge(context).copyWith(
+        fontWeight: FontWeight.w500,
+        color: AppColors.getTextColor(context),
+      ),
     );
   }
 
@@ -430,12 +451,12 @@ class _FilterDrawerState extends State<FilterDrawer> {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.teal : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.darkGreen),
+          border: Border.all(color: AppColors.teal),
         ),
         child: Text(
           range,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.darkGreen,
+            color: isSelected ? Colors.white : AppColors.teal,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -457,12 +478,12 @@ class _FilterDrawerState extends State<FilterDrawer> {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.teal : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.darkGreen),
+          border: Border.all(color: AppColors.teal),
         ),
         child: Text(
           gender,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.darkGreen,
+            color: isSelected ? Colors.white : AppColors.teal,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -486,10 +507,10 @@ class _FilterDrawerState extends State<FilterDrawer> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.getSurfaceColor(context),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? dotColor : Colors.grey.shade300,
+            color: isSelected ? dotColor : AppColors.getDividerColor(context),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -507,7 +528,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
             Text(
               label,
               style: TextStyle(
-                color: Colors.black87,
+                color: AppColors.getTextColor(context),
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

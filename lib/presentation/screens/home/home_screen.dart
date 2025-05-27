@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: AppColors.backgroundGrey,
+      backgroundColor: AppColors.getBackgroundColor(context),
 
       endDrawer: FilterDrawer(
         onClose: () {
@@ -78,11 +78,14 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.getCardColor(context),
                   borderRadius: BorderRadius.circular(8.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey,
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.grey,
                       spreadRadius: 1,
                       blurRadius: 2,
                       offset: const Offset(0, 1),
@@ -94,33 +97,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: TextField(
                         controller: _searchController,
+                        style: AppTextStyles.bodyMedium(
+                          context,
+                        ).copyWith(color: AppColors.getTextColor(context)),
                         decoration: InputDecoration(
                           hintText: 'Search',
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16.0,
                           ),
                           border: InputBorder.none,
-                          hintStyle: AppTextStyles.bodyMedium(
-                            context,
-                          ).copyWith(color: Colors.grey),
+                          hintStyle: AppTextStyles.bodyMedium(context).copyWith(
+                            color: AppColors.getSecondaryTextColor(context),
+                          ),
                         ),
                         onSubmitted: _onSearch,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(
-                        Icons.search,
-                        color: AppColors.darkGreen,
-                      ),
+                      icon: Icon(Icons.search, color: AppColors.teal),
                       onPressed: () {
                         _onSearch(_searchController.text);
                       },
                     ),
                     IconButton(
-                      icon: const Icon(
-                        Icons.filter_list,
-                        color: AppColors.darkGreen,
-                      ),
+                      icon: Icon(Icons.filter_list, color: AppColors.teal),
                       onPressed: () {
                         _scaffoldKey.currentState?.openEndDrawer();
                       },
@@ -153,9 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(left: 0),
-        child: ButtomNavBar(
-          currentIndex: 0,
-        ),
+        child: ButtomNavBar(currentIndex: 0),
       ),
     );
   }

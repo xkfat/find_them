@@ -7,18 +7,33 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:find_them/data/models/enum.dart';
 
-Color _getStatusColor(SubmissionStatus status) {
+Color _getStatusColor(SubmissionStatus status, BuildContext context) {
   switch (status.value) {
     case 'active':
-      return AppColors.missingRed;
+      return AppColors.getMissingRedColor(context);
     case 'in_progress':
-      return AppColors.investigatingYellow;
+      return AppColors.getInvestigatingYellowColor(context);
     case 'closed':
-      return AppColors.foundGreen;
+      return AppColors.getFoundGreenColor(context);
     case 'rejected':
-      return Colors.grey;
+      return AppColors.getSecondaryTextColor(context);
     default:
-      return AppColors.grey;
+      return AppColors.getSecondaryTextColor(context);
+  }
+}
+
+Color _getStatusBackgroundColor(SubmissionStatus status, BuildContext context) {
+  switch (status.value) {
+    case 'active':
+      return AppColors.getMissingRedBackground(context);
+    case 'in_progress':
+      return AppColors.getInvestigatingYellowBackground(context);
+    case 'closed':
+      return AppColors.getFoundGreenBackground(context);
+    case 'rejected':
+      return AppColors.getDividerColor(context);
+    default:
+      return AppColors.getBackgroundColor(context);
   }
 }
 
@@ -54,27 +69,35 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundGrey,
+      backgroundColor: AppColors.getBackgroundColor(context),
       body: SafeArea(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () => Navigator.pop(context),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: AppColors.getTextColor(context),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
                   ),
-                  const SizedBox(width: 16),
-                  Text(
-                    'My submitted cases',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                  Center(
+                    child: Text(
+                      'My submitted cases',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.getTextColor(context),
+                      ),
                     ),
                   ),
                 ],
@@ -88,7 +111,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
               >(
                 builder: (context, state) {
                   if (state is UserSubmittedCasesLoading) {
-                    return const Center(
+                    return Center(
                       child: CircularProgressIndicator(color: AppColors.teal),
                     );
                   } else if (state is UserSubmittedCasesError) {
@@ -99,13 +122,16 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                           Icon(
                             Icons.error_outline,
                             size: 64,
-                            color: Colors.red.withOpacity(0.5),
+                            color: AppColors.getMissingRedColor(context),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Error: ${state.message}',
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(fontSize: 16),
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              color: AppColors.getTextColor(context),
+                            ),
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton(
@@ -117,7 +143,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.teal,
                             ),
-                            child: const Text(
+                            child: Text(
                               'Retry',
                               style: TextStyle(color: Colors.white),
                             ),
@@ -134,7 +160,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                             Icon(
                               Icons.inbox_outlined,
                               size: 64,
-                              color: AppColors.darkGreen.withOpacity(0.5),
+                              color: AppColors.getSecondaryTextColor(context),
                             ),
                             const SizedBox(height: 16),
                             Text(
@@ -142,7 +168,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                               style: GoogleFonts.inter(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.darkGreen,
+                                color: AppColors.getTextColor(context),
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -151,7 +177,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 14,
-                                color: Colors.grey[600],
+                                color: AppColors.getSecondaryTextColor(context),
                               ),
                             ),
                           ],
@@ -165,6 +191,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                             .read<UserSubmittedCasesCubit>()
                             .getSubmittedCases();
                       },
+                      color: AppColors.teal,
                       child: ListView.separated(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -185,7 +212,12 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                     );
                   }
 
-                  return const Center(child: Text('Unknown state'));
+                  return Center(
+                    child: Text(
+                      'Unknown state',
+                      style: TextStyle(color: AppColors.getTextColor(context)),
+                    ),
+                  );
                 },
               ),
             ),
@@ -197,7 +229,6 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
 
   void _showCaseDetails(BuildContext context, SubmittedCase submittedCase) {
     final caseUpdatesCubit = context.read<CaseUpdatesCubit>();
-
     caseUpdatesCubit.getCaseWithUpdates(submittedCase.id);
 
     showDialog(
@@ -233,6 +264,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
   Widget _buildLoadingDialog(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: AppColors.getCardColor(context),
       child: Container(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -242,7 +274,10 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
             const SizedBox(height: 16),
             Text(
               'Loading case details...',
-              style: GoogleFonts.inter(fontSize: 16),
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                color: AppColors.getTextColor(context),
+              ),
             ),
           ],
         ),
@@ -257,6 +292,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
   ) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: AppColors.getCardColor(context),
       child: Container(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -265,7 +301,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
             Icon(
               Icons.error_outline,
               size: 48,
-              color: Colors.red.withOpacity(0.5),
+              color: AppColors.getMissingRedColor(context),
             ),
             const SizedBox(height: 16),
             Text(
@@ -273,13 +309,17 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
+                color: AppColors.getTextColor(context),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 14),
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: AppColors.getTextColor(context),
+              ),
             ),
             const SizedBox(height: 16),
             Row(
@@ -287,7 +327,10 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: AppColors.teal),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -322,23 +365,12 @@ class SubmittedCaseCard extends StatelessWidget {
     required this.onTap,
   });
 
-  Color get _statusColor {
-    return _getStatusColor(submittedCase.status);
+  Color _statusColor(BuildContext context) {
+    return _getStatusColor(submittedCase.status, context);
   }
 
-  Color get _statusBackgroundColor {
-    switch (submittedCase.status.value) {
-      case 'active':
-        return AppColors.missingRedBackground;
-      case 'in_progress':
-        return AppColors.investigatingYellowBackground;
-      case 'closed':
-        return AppColors.foundGreenBackground;
-      case 'rejected':
-        return Colors.grey.shade200;
-      default:
-        return AppColors.backgroundGrey;
-    }
+  Color _statusBackgroundColor(BuildContext context) {
+    return _getStatusBackgroundColor(submittedCase.status, context);
   }
 
   String get _statusText {
@@ -351,9 +383,9 @@ class SubmittedCaseCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.lighterMint,
+          color: AppColors.getCardColor(context),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.darkGreen, width: 1),
+          border: Border.all(color: AppColors.teal, width: 1),
         ),
         child: Column(
           children: [
@@ -368,7 +400,7 @@ class SubmittedCaseCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.black,
+                        color: AppColors.getTextColor(context),
                       ),
                     ),
                   ),
@@ -378,7 +410,7 @@ class SubmittedCaseCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: _statusBackgroundColor,
+                      color: _statusBackgroundColor(context),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -386,7 +418,7 @@ class SubmittedCaseCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: _statusColor,
+                        color: _statusColor(context),
                       ),
                     ),
                   ),
@@ -401,7 +433,7 @@ class SubmittedCaseCard extends StatelessWidget {
                   Icon(
                     Icons.calendar_today_outlined,
                     size: 16,
-                    color: AppColors.darkGreen,
+                    color: AppColors.teal,
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -409,7 +441,7 @@ class SubmittedCaseCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      color: AppColors.darkGreen,
+                      color: AppColors.teal,
                     ),
                   ),
                 ],
@@ -423,6 +455,7 @@ class SubmittedCaseCard extends StatelessWidget {
                 child: Column(
                   children: [
                     _buildUpdateItem(
+                      context,
                       CaseUpdateItem(
                         message: submittedCase.latestUpdate!.message,
                         date: submittedCase.latestUpdate!.parsedDate,
@@ -463,7 +496,7 @@ class SubmittedCaseCard extends StatelessWidget {
     );
   }
 
-  Widget _buildUpdateItem(CaseUpdateItem update) {
+  Widget _buildUpdateItem(BuildContext context, CaseUpdateItem update) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -474,7 +507,7 @@ class SubmittedCaseCard extends StatelessWidget {
             width: 8,
             height: 8,
             decoration: BoxDecoration(
-              color: _statusColor,
+              color: _statusColor(context),
               shape: BoxShape.circle,
             ),
           ),
@@ -488,7 +521,7 @@ class SubmittedCaseCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.darkGreen,
+                    color: AppColors.teal,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -497,7 +530,7 @@ class SubmittedCaseCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.black,
+                    color: AppColors.getTextColor(context),
                   ),
                 ),
               ],
@@ -514,10 +547,15 @@ class CaseDetailsDialog extends StatelessWidget {
 
   const CaseDetailsDialog({super.key, required this.submittedCase});
 
+  Color _statusColor(BuildContext context) {
+    return _getStatusColor(submittedCase.status, context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: AppColors.getCardColor(context),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
         constraints: BoxConstraints(
@@ -539,13 +577,16 @@ class CaseDetailsDialog extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.black,
+                            color: AppColors.getTextColor(context),
                           ),
                         ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
+                        icon: Icon(
+                          Icons.close,
+                          color: AppColors.getTextColor(context),
+                        ),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
@@ -559,7 +600,7 @@ class CaseDetailsDialog extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.black,
+                        color: AppColors.getTextColor(context),
                       ),
                     ),
                   ),
@@ -567,7 +608,7 @@ class CaseDetailsDialog extends StatelessWidget {
               ),
             ),
 
-            Divider(height: 1, color: Colors.grey[300]),
+            Divider(height: 1, color: AppColors.getDividerColor(context)),
 
             Flexible(
               child: SingleChildScrollView(
@@ -578,14 +619,14 @@ class CaseDetailsDialog extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.backgroundGrey,
+                          color: AppColors.getBackgroundColor(context),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               Icons.info_outline,
-                              color: Colors.grey[600],
+                              color: AppColors.getSecondaryTextColor(context),
                               size: 20,
                             ),
                             const SizedBox(width: 12),
@@ -594,7 +635,9 @@ class CaseDetailsDialog extends StatelessWidget {
                                 'No updates available yet.',
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
-                                  color: Colors.grey[600],
+                                  color: AppColors.getSecondaryTextColor(
+                                    context,
+                                  ),
                                 ),
                               ),
                             ),
@@ -627,11 +670,10 @@ class CaseDetailsDialog extends StatelessWidget {
                                             decoration: BoxDecoration(
                                               color:
                                                   isLatest
-                                                      ? _getStatusColor(
-                                                        submittedCase.status,
-                                                      )
-                                                      : Colors
-                                                          .grey, 
+                                                      ? _statusColor(context)
+                                                      : AppColors.getSecondaryTextColor(
+                                                        context,
+                                                      ),
                                               shape: BoxShape.circle,
                                             ),
                                           ),
@@ -639,7 +681,10 @@ class CaseDetailsDialog extends StatelessWidget {
                                             Expanded(
                                               child: Container(
                                                 width: 2,
-                                                color: Colors.grey[300],
+                                                color:
+                                                    AppColors.getDividerColor(
+                                                      context,
+                                                    ),
                                                 margin:
                                                     const EdgeInsets.symmetric(
                                                       vertical: 8,
@@ -647,9 +692,7 @@ class CaseDetailsDialog extends StatelessWidget {
                                               ),
                                             )
                                           else
-                                            const SizedBox(
-                                              height: 8,
-                                            ), 
+                                            const SizedBox(height: 8),
                                         ],
                                       ),
                                     ),
@@ -662,7 +705,9 @@ class CaseDetailsDialog extends StatelessWidget {
                                         ),
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
-                                          color: AppColors.backgroundGrey,
+                                          color: AppColors.getBackgroundColor(
+                                            context,
+                                          ),
                                           borderRadius: BorderRadius.circular(
                                             12,
                                           ),
@@ -676,7 +721,7 @@ class CaseDetailsDialog extends StatelessWidget {
                                               style: GoogleFonts.inter(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500,
-                                                color: AppColors.darkGreen,
+                                                color: AppColors.teal,
                                               ),
                                             ),
                                             const SizedBox(height: 8),
@@ -685,7 +730,9 @@ class CaseDetailsDialog extends StatelessWidget {
                                               style: GoogleFonts.inter(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w400,
-                                                color: AppColors.black,
+                                                color: AppColors.getTextColor(
+                                                  context,
+                                                ),
                                               ),
                                             ),
                                           ],

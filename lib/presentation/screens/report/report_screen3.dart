@@ -70,18 +70,30 @@ class _Report3ScreenState extends State<Report3Screen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error picking image: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error picking image: $e',
+            style: TextStyle(color: AppColors.getTextColor(context)),
+          ),
+          backgroundColor: AppColors.getMissingRedBackground(context),
+        ),
+      );
     }
   }
 
   void _submitReport() {
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedImage == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Please select a photo')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Please select a photo',
+              style: TextStyle(color: AppColors.getTextColor(context)),
+            ),
+            backgroundColor: AppColors.getMissingRedBackground(context),
+          ),
+        );
         return;
       }
       context.read<SubmitCaseCubit>().submitCase(
@@ -103,20 +115,20 @@ class _Report3ScreenState extends State<Report3Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.getBackgroundColor(context),
       appBar: AppBar(
         title: Text(
           'Reporting a missing person',
           style: GoogleFonts.dmSans(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.black,
+            color: AppColors.getTextColor(context),
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.getSurfaceColor(context),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: AppColors.getTextColor(context)),
           onPressed: () => Navigator.pop(context),
         ),
         elevation: 0,
@@ -141,12 +153,17 @@ class _Report3ScreenState extends State<Report3Screen> {
             setState(() {
               _isSubmitting = false;
             });
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.message,
+                  style: TextStyle(color: AppColors.getTextColor(context)),
+                ),
+                backgroundColor: AppColors.getMissingRedBackground(context),
+              ),
+            );
           }
         },
-
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -173,12 +190,16 @@ class _Report3ScreenState extends State<Report3Screen> {
                       style: GoogleFonts.inter(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: AppColors.getTextColor(context),
                       ),
                     ),
                   ),
                   const SizedBox(height: 32),
 
-                  Text('Photo'),
+                  Text(
+                    'Photo',
+                    style: TextStyle(color: AppColors.getTextColor(context)),
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
@@ -203,6 +224,9 @@ class _Report3ScreenState extends State<Report3Screen> {
                                 ? _selectedImage!.path.split('/').last
                                 : 'No photo Chosen',
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.getTextColor(context),
+                            ),
                           ),
                         ),
                       ],
@@ -210,22 +234,33 @@ class _Report3ScreenState extends State<Report3Screen> {
                   ),
                   const SizedBox(height: 24),
 
-                  Text('Contact phone number'),
+                  Text(
+                    'Contact phone number',
+                    style: TextStyle(color: AppColors.getTextColor(context)),
+                  ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
+                    style: TextStyle(color: AppColors.getTextColor(context)),
                     decoration: InputDecoration(
                       hintText: 'Enter your phone number',
+                      hintStyle: TextStyle(
+                        color: AppColors.getSecondaryTextColor(context),
+                      ),
                       filled: true,
-                      fillColor: AppColors.white,
+                      fillColor: AppColors.getCardColor(context),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(
+                          color: AppColors.getDividerColor(context),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(
+                          color: AppColors.getDividerColor(context),
+                        ),
                       ),
                     ),
                     validator: (value) {
@@ -237,23 +272,34 @@ class _Report3ScreenState extends State<Report3Screen> {
                   ),
                   const SizedBox(height: 24),
 
-                  Text('Description'),
+                  Text(
+                    'Description',
+                    style: TextStyle(color: AppColors.getTextColor(context)),
+                  ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _descriptionController,
                     maxLines: 5,
+                    style: TextStyle(color: AppColors.getTextColor(context)),
                     decoration: InputDecoration(
                       hintText:
                           'Provide details about circumstances of disappearance, clothing , etc.',
+                      hintStyle: TextStyle(
+                        color: AppColors.getSecondaryTextColor(context),
+                      ),
                       filled: true,
-                      fillColor: AppColors.white,
+                      fillColor: AppColors.getCardColor(context),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(
+                          color: AppColors.getDividerColor(context),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(
+                          color: AppColors.getDividerColor(context),
+                        ),
                       ),
                     ),
                     validator: (value) {
@@ -312,7 +358,7 @@ class _Report3ScreenState extends State<Report3Screen> {
       height: 50,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isActive ? AppColors.teal : Colors.white,
+        color: isActive ? AppColors.teal : AppColors.getCardColor(context),
         border: Border.all(color: AppColors.teal, width: 2),
       ),
       child: Center(
@@ -324,7 +370,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isActive ? AppColors.white : AppColors.teal,
+                    color: isActive ? Colors.white : AppColors.teal,
                   ),
                 ),
       ),
@@ -335,7 +381,7 @@ class _Report3ScreenState extends State<Report3Screen> {
     return Container(
       width: 50,
       height: 2,
-      color: isActive ? AppColors.teal : Colors.grey.shade300,
+      color: isActive ? AppColors.teal : AppColors.getDividerColor(context),
     );
   }
 }

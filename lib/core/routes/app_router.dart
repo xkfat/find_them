@@ -2,6 +2,7 @@ import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
 import 'package:find_them/data/repositories/case_repo.dart';
 import 'package:find_them/data/repositories/location_sharing_repo.dart';
+import 'package:find_them/data/repositories/map_repo.dart';
 import 'package:find_them/data/repositories/notification_repo.dart';
 import 'package:find_them/data/repositories/profile_repo.dart';
 import 'package:find_them/data/repositories/report_repo.dart';
@@ -9,6 +10,7 @@ import 'package:find_them/data/repositories/submitted_cases_repo.dart';
 import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/data/services/case_service.dart';
 import 'package:find_them/data/services/location_sharing_service.dart';
+import 'package:find_them/data/services/map_service.dart';
 import 'package:find_them/data/services/notification_service.dart';
 import 'package:find_them/data/services/report_service.dart';
 import 'package:find_them/data/services/submitted_cases_service.dart';
@@ -17,6 +19,7 @@ import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:find_them/logic/cubit/case_updates_cubit.dart';
 import 'package:find_them/logic/cubit/location_sharing_cubit.dart';
+import 'package:find_them/logic/cubit/map_cubit.dart';
 import 'package:find_them/logic/cubit/notification_cubit.dart';
 import 'package:find_them/logic/cubit/user_submitted_cases_cubit.dart';
 import 'package:find_them/logic/cubit/profile_cubit.dart';
@@ -48,7 +51,10 @@ import '../../presentation/screens/auth/signup_screen.dart';
 import '../../presentation/screens/auth/sms_verification_screen.dart.dart';
 
 class AppRouter {
-  static Route<dynamic> generateRoute(RouteSettings settings ,VoidCallback toggleTheme) {
+  static Route<dynamic> generateRoute(
+    RouteSettings settings,
+    VoidCallback toggleTheme,
+  ) {
     final args = settings.arguments;
 
     switch (settings.name) {
@@ -144,7 +150,16 @@ class AppRouter {
         );
 
       case '/map':
-        return MaterialPageRoute(builder: (_) => const MapScreen());
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider(
+                create:
+                    (context) => MapCubit(
+                      MapRepository(MapService(), LocationSharingService()),
+                    ),
+                child: const MapScreen(),
+              ),
+        );
 
       case '/report':
         return MaterialPageRoute(
@@ -283,7 +298,7 @@ class AppRouter {
                     create: (context) => ProfileCubit(ProfileRepository()),
                   ),
                 ],
-                child:  SettingsScreen(toggleTheme: toggleTheme),
+                child: SettingsScreen(toggleTheme: toggleTheme),
               ),
         );
       case '/settings/change-password':
@@ -294,55 +309,62 @@ class AppRouter {
                 child: const ChangePasswordScreen(),
               ),
         );
-case '/submitted-cases':
-  return MaterialPageRoute(
-    builder: (_) => MultiBlocProvider(
-      providers: [
-        BlocProvider<UserSubmittedCasesCubit>(
-          create: (context) => UserSubmittedCasesCubit(
-            SubmittedCaseRepository(SubmittedCaseService()),
-          ),
-        ),
-        BlocProvider<CaseUpdatesCubit>(
-          create: (context) => CaseUpdatesCubit(
-            SubmittedCaseRepository(SubmittedCaseService()),
-          ),
-        ),
-      ],
-      child: const SubmittedCasesScreen(),
-    ),
-  );
+      case '/submitted-cases':
+        return MaterialPageRoute(
+          builder:
+              (_) => MultiBlocProvider(
+                providers: [
+                  BlocProvider<UserSubmittedCasesCubit>(
+                    create:
+                        (context) => UserSubmittedCasesCubit(
+                          SubmittedCaseRepository(SubmittedCaseService()),
+                        ),
+                  ),
+                  BlocProvider<CaseUpdatesCubit>(
+                    create:
+                        (context) => CaseUpdatesCubit(
+                          SubmittedCaseRepository(SubmittedCaseService()),
+                        ),
+                  ),
+                ],
+                child: const SubmittedCasesScreen(),
+              ),
+        );
 
+      case '/location-sharing':
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider(
+                create:
+                    (context) => LocationSharingCubit(
+                      LocationSharingRepository(LocationSharingService()),
+                    ),
+                child: const LocationSharingScreen(),
+              ),
+        );
 
-case '/location-sharing':
-  return MaterialPageRoute(
-    builder: (_) => BlocProvider(
-      create: (context) => LocationSharingCubit(
-        LocationSharingRepository(LocationSharingService()),
-      ),
-      child: const LocationSharingScreen(),
-    ),
-  );
-     
-     case '/add-friend':
-  return MaterialPageRoute(
-    builder: (_) => BlocProvider(
-      create: (context) => AddFriendCubit(
-        LocationSharingRepository(LocationSharingService()),
-      ),
-      child: const AddFriendScreen(),
-    ),
-  );
-case '/notifications':
-  return MaterialPageRoute(
-    builder: (_) => BlocProvider(
-      create: (context) => NotificationCubit(
-        NotificationRepository(NotificationService()),
-      ),
-      child: const NotificationsScreen(),
-    ),
-  );
-
+      case '/add-friend':
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider(
+                create:
+                    (context) => AddFriendCubit(
+                      LocationSharingRepository(LocationSharingService()),
+                    ),
+                child: const AddFriendScreen(),
+              ),
+        );
+      case '/notifications':
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider(
+                create:
+                    (context) => NotificationCubit(
+                      NotificationRepository(NotificationService()),
+                    ),
+                child: const NotificationsScreen(),
+              ),
+        );
 
       default:
         return MaterialPageRoute(

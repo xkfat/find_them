@@ -25,11 +25,16 @@ class CaseListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: CircularProgressIndicator(color: AppColors.teal));
     }
 
     if (errorMessage != null) {
-      return Center(child: Text(errorMessage!));
+      return Center(
+        child: Text(
+          errorMessage!,
+          style: TextStyle(color: AppColors.getTextColor(context)),
+        ),
+      );
     }
 
     if (cases.isEmpty) {
@@ -40,10 +45,13 @@ class CaseListWidget extends StatelessWidget {
             Icon(
               Icons.search_off,
               size: 64,
-              color: AppColors.darkGreen.withOpacity(0.5),
+              color: AppColors.getSecondaryTextColor(context),
             ),
             const SizedBox(height: 16),
-            Text('No cases found matching your search'),
+            Text(
+              'No cases found matching your search',
+              style: TextStyle(color: AppColors.getTextColor(context)),
+            ),
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: () {
@@ -51,10 +59,7 @@ class CaseListWidget extends StatelessWidget {
                 cubit.clearFilters();
                 onRefresh();
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.darkGreen,
-              ),
-
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.teal),
               child: Text(
                 'Show All Cases',
                 style: TextStyle(color: Colors.white),
@@ -68,6 +73,7 @@ class CaseListWidget extends StatelessWidget {
       onRefresh: () async {
         onRefresh();
       },
+      color: AppColors.teal,
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         itemCount: cases.length,
@@ -104,9 +110,9 @@ class _CaseCard extends StatelessWidget {
         width: 370,
         height: 140,
         decoration: BoxDecoration(
-          color: AppColors.lighterMint,
+          color: AppColors.getCardColor(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF1C4D42), width: 1),
+          border: Border.all(color: AppColors.teal, width: 1),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -115,11 +121,9 @@ class _CaseCard extends StatelessWidget {
               Container(
                 width: 82,
                 height: 82,
-
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.darkGreen,
-
+                  color: AppColors.teal,
                   image:
                       caseData.photo.isNotEmpty
                           ? DecorationImage(
@@ -142,7 +146,7 @@ class _CaseCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.black,
+                        color: AppColors.getTextColor(context),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -150,7 +154,6 @@ class _CaseCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: [
                         Expanded(
                           child: Column(
@@ -161,15 +164,18 @@ class _CaseCard extends StatelessWidget {
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
-                                  color: AppColors.black,
+                                  color: AppColors.getSecondaryTextColor(
+                                    context,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 9),
                               Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     PhosphorIcons.calendar_x,
                                     size: 20,
+                                    color: AppColors.getTextColor(context),
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
@@ -177,6 +183,7 @@ class _CaseCard extends StatelessWidget {
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
+                                      color: AppColors.getTextColor(context),
                                     ),
                                   ),
                                 ],
@@ -193,7 +200,9 @@ class _CaseCard extends StatelessWidget {
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
-                                  color: AppColors.black,
+                                  color: AppColors.getSecondaryTextColor(
+                                    context,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 9),
@@ -202,6 +211,7 @@ class _CaseCard extends StatelessWidget {
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
+                                  color: AppColors.getTextColor(context),
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,

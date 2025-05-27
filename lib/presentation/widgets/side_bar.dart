@@ -18,7 +18,6 @@ class SideBar extends StatefulWidget {
 
 class _SideBarState extends State<SideBar> {
   int _selectedIndex = -1;
-  //final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -34,9 +33,7 @@ class _SideBarState extends State<SideBar> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-        return const Center(
-          child: CircularProgressIndicator(color: AppColors.darkGreen),
-        );
+        return Center(child: CircularProgressIndicator(color: AppColors.teal));
       },
     );
 
@@ -67,9 +64,14 @@ class _SideBarState extends State<SideBar> {
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Logout failed. Please try again.'),
-              backgroundColor: Colors.orange,
+            SnackBar(
+              content: Text(
+                'Logout failed. Please try again.',
+                style: TextStyle(color: AppColors.getTextColor(context)),
+              ),
+              backgroundColor: AppColors.getInvestigatingYellowBackground(
+                context,
+              ),
             ),
           );
         }
@@ -80,8 +82,11 @@ class _SideBarState extends State<SideBar> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error logging out: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            content: Text(
+              'Error logging out: ${e.toString()}',
+              style: TextStyle(color: AppColors.getTextColor(context)),
+            ),
+            backgroundColor: AppColors.getMissingRedBackground(context),
           ),
         );
 
@@ -106,7 +111,7 @@ class _SideBarState extends State<SideBar> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.75,
       decoration: BoxDecoration(
-        color: AppColors.lighterMint,
+        color: AppColors.getCardColor(context),
         borderRadius: const BorderRadius.only(
           topRight: Radius.circular(20),
           bottomRight: Radius.circular(20),
@@ -150,7 +155,7 @@ class _SideBarState extends State<SideBar> {
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: AppColors.getTextColor(context),
                           ),
                         ),
                         Text(
@@ -158,7 +163,7 @@ class _SideBarState extends State<SideBar> {
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.normal,
-                            color: Colors.grey,
+                            color: AppColors.getSecondaryTextColor(context),
                           ),
                         ),
                       ],
@@ -169,7 +174,11 @@ class _SideBarState extends State<SideBar> {
             ),
           ),
           const SizedBox(height: 48),
-          const Divider(height: 1, thickness: 1),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: AppColors.getDividerColor(context),
+          ),
           _buildMenuItemWithImageIcon(
             0,
             'assets/icons/submit.png',
@@ -208,59 +217,8 @@ class _SideBarState extends State<SideBar> {
             _handleLogout,
           ),
           const Spacer(),
-
           const SizedBox(height: 20),
         ],
-      ),
-    );
-  }
-
-  Widget _buildMenuItem(
-    int index,
-    IconData outlinedIcon,
-    IconData filledIcon,
-    String title,
-  ) {
-    bool isSelected = index == _selectedIndex;
-
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-
-        Future.delayed(Duration(milliseconds: 150), () {
-          Navigator.pop(context);
-        });
-      },
-      onHover: (hovering) {
-        if (hovering && !isSelected) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        } else if (!hovering && isSelected) {
-          setState(() {
-            _selectedIndex = -1;
-          });
-        }
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: ListTile(
-          leading: Icon(
-            isSelected ? filledIcon : outlinedIcon,
-            color: isSelected ? AppColors.darkGreen : Colors.black,
-            size: 24,
-          ),
-          title: Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: 20,
-              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-              color: isSelected ? AppColors.darkGreen : Colors.black,
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -281,7 +239,6 @@ class _SideBarState extends State<SideBar> {
         });
         onTap();
       },
-
       onHover: (hovering) {
         if (hovering && !isSelected) {
           setState(() {
@@ -300,14 +257,16 @@ class _SideBarState extends State<SideBar> {
             isSelected ? filledIconPath : outlinedIconPath,
             width: 24,
             height: 24,
-            color: isSelected ? AppColors.darkGreen : Colors.black,
+            color:
+                isSelected ? AppColors.teal : AppColors.getTextColor(context),
           ),
           title: Text(
             title,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-              color: isSelected ? AppColors.darkGreen : Colors.black,
+              color:
+                  isSelected ? AppColors.teal : AppColors.getTextColor(context),
             ),
           ),
         ),
