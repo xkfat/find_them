@@ -301,16 +301,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     languageCodes[newValue] ?? 'en';
 
                                 widget.changeLanguage(languageCode);
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Language changed to $newValue',
-                                    ),
-                                    duration: const Duration(seconds: 2),
-                                    backgroundColor: AppColors.teal,
-                                  ),
-                                );
                               },
                             ),
                           ],

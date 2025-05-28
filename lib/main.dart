@@ -26,10 +26,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool isDarkMode = false;
+  Locale _locale = const Locale('en'); 
 
   void toggleTheme() {
     setState(() {
       isDarkMode = !isDarkMode;
+    });
+  }
+
+  void changeLanguage(String languageCode) {
+    setState(() {
+      _locale = Locale(languageCode);
     });
   }
 
@@ -43,10 +50,16 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      locale: const Locale('en'),
+      locale: _locale, 
       supportedLocales: const [Locale('en'), Locale('fr'), Locale('ar')],
       builder: (context, child) {
-        return Directionality(textDirection: TextDirection.ltr, child: child!);
+        return Directionality(
+          textDirection:
+              _locale.languageCode == 'ar'
+                  ? TextDirection.ltr
+                  : TextDirection.ltr,
+          child: child!,
+        );
       },
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
@@ -54,7 +67,11 @@ class _MyAppState extends State<MyApp> {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       initialRoute: '/',
       onGenerateRoute:
-          (settings) => AppRouter.generateRoute(settings, toggleTheme, null),
+          (settings) => AppRouter.generateRoute(
+            settings,
+            toggleTheme,
+            changeLanguage, 
+          ),
     );
   }
 }
