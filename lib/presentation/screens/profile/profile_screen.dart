@@ -379,15 +379,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildUpdateButton(bool isAnyUpdating) {
     return SizedBox(
-      width: double.infinity,
+      width: 248,
       height: 50,
       child: ElevatedButton(
         onPressed: isAnyUpdating ? null : _updateProfile,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.teal,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child:
             isAnyUpdating

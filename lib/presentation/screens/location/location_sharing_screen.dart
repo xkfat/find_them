@@ -34,7 +34,10 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
             children: [
               Icon(
                 isSuccess ? Icons.check_circle : Icons.error,
-                color: isSuccess ? AppColors.foundGreen : Colors.red,
+                color:
+                    isSuccess
+                        ? AppColors.getFoundGreenColor(context)
+                        : AppColors.getMissingRedColor(context),
                 size: 48,
               ),
               const SizedBox(height: 16),
@@ -109,16 +112,14 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                   await context.read<LocationSharingCubit>().removeFriend(
                     friendId,
                   );
-                } catch (e) {
-                  // Error handled by BlocConsumer listener
-                }
+                } catch (e) {}
               },
               child: Text(
                 'Remove',
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Colors.red,
+                  color: AppColors.getMissingRedColor(context),
                 ),
               ),
             ),
@@ -205,12 +206,10 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
   Widget _buildLocationList(LocationSharingLoaded state) {
     final allItems = <Widget>[];
 
-    // Add pending requests first
     for (final request in state.requests) {
       allItems.add(_buildRequestCard(request));
     }
 
-    // Add friends
     for (final friend in state.friends) {
       allItems.add(_buildFriendCard(friend));
     }
@@ -260,7 +259,10 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
       decoration: BoxDecoration(
         color: AppColors.getCardColor(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.investigatingYellow, width: 2),
+        border: Border.all(
+          color: AppColors.getInvestigatingYellowColor(context),
+          width: 2,
+        ),
       ),
       child: Column(
         children: [
@@ -318,7 +320,9 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.investigatingYellowBackground,
+                        color: AppColors.getInvestigatingYellowBackground(
+                          context,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -326,7 +330,7 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                         style: GoogleFonts.dmSans(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.investigatingYellow,
+                          color: AppColors.getInvestigatingYellowColor(context),
                         ),
                       ),
                     ),
@@ -345,9 +349,7 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                       await context.read<LocationSharingCubit>().acceptRequest(
                         request.id,
                       );
-                    } catch (e) {
-                      // Error handled by BlocConsumer listener
-                    }
+                    } catch (e) {}
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.teal,
@@ -374,9 +376,7 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                       await context.read<LocationSharingCubit>().declineRequest(
                         request.id,
                       );
-                    } catch (e) {
-                      // Error handled by BlocConsumer listener
-                    }
+                    } catch (e) {}
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
@@ -471,7 +471,9 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                           height: 8,
                           decoration: BoxDecoration(
                             color:
-                                isSharing ? AppColors.foundGreen : Colors.red,
+                                isSharing
+                                    ? AppColors.getFoundGreenColor(context)
+                                    : AppColors.getMissingRedColor(context),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -503,6 +505,8 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                 ),
               ),
               PopupMenuButton<String>(
+                iconColor: AppColors.getSecondaryTextColor(context),
+                color: AppColors.getSurfaceColor(context),
                 onSelected: (value) async {
                   if (value == 'remove') {
                     _showRemoveDialog(
@@ -514,17 +518,13 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                       await context
                           .read<LocationSharingCubit>()
                           .toggleFriendSharing(friend.friendId, true);
-                    } catch (e) {
-                      // Error handled by BlocConsumer listener
-                    }
+                    } catch (e) {}
                   } else if (value == 'stop_sharing') {
                     try {
                       await context
                           .read<LocationSharingCubit>()
                           .toggleFriendSharing(friend.friendId, false);
-                    } catch (e) {
-                      // Error handled by BlocConsumer listener
-                    }
+                    } catch (e) {}
                   }
                 },
                 itemBuilder:
@@ -536,11 +536,16 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                             children: [
                               Icon(
                                 Icons.location_on,
-                                color: AppColors.foundGreen,
+                                color: AppColors.getFoundGreenColor(context),
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
-                              Text('Share location'),
+                              Text(
+                                'Share location',
+                                style: TextStyle(
+                                  color: AppColors.getTextColor(context),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -551,11 +556,18 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                             children: [
                               Icon(
                                 Icons.location_off,
-                                color: Colors.orange,
+                                color: AppColors.getInvestigatingYellowColor(
+                                  context,
+                                ),
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
-                              Text('Stop sharing'),
+                              Text(
+                                'Stop sharing',
+                                style: TextStyle(
+                                  color: AppColors.getTextColor(context),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -565,11 +577,16 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                           children: [
                             Icon(
                               Icons.person_remove,
-                              color: Colors.red,
+                              color: AppColors.getMissingRedColor(context),
                               size: 20,
                             ),
                             const SizedBox(width: 8),
-                            Text('Remove friend'),
+                            Text(
+                              'Remove friend',
+                              style: TextStyle(
+                                color: AppColors.getTextColor(context),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -592,9 +609,7 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                         friend.friendId,
                       );
                       _showDialog('Alert sent successfully!', true);
-                    } catch (e) {
-                      // Error handled by BlocConsumer listener
-                    }
+                    } catch (e) {}
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.teal,
@@ -624,14 +639,16 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
-                    // TODO: Navigate to map view showing friend's location
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'View ${friend.friendDetails.displayName}\'s location',
-                        ),
-                        backgroundColor: AppColors.teal,
-                      ),
+                    // Navigate to map screen with friend's location data
+                    Navigator.pushNamed(
+                      context,
+                      '/map',
+                      arguments: {
+                        'focusOnUser': true,
+                        'userId': friend.friendId,
+                        'username': friend.friendDetails.username,
+                        'displayName': friend.friendDetails.displayName,
+                      },
                     );
                   },
                   style: OutlinedButton.styleFrom(

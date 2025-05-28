@@ -21,7 +21,6 @@ class MapService {
     return headers;
   }
 
-  /// Get friends' locations for map display
   Future<List<UserLocationModel>> getFriendsLocations({String? token}) async {
     try {
       log('Fetching friends locations for map');
@@ -46,7 +45,6 @@ class MapService {
     }
   }
 
-  /// Update current user's location
   Future<void> updateMyLocation({
     required double latitude,
     required double longitude,
@@ -76,7 +74,6 @@ class MapService {
     }
   }
 
-  /// Get cases with location data for map display
   Future<List<Case>> getCasesWithLocation({String? token}) async {
     try {
       log('Fetching cases with location data');
@@ -92,7 +89,6 @@ class MapService {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final List<dynamic> results = responseData['results'] ?? [];
         
-        // Filter only cases that have location data
         final cases = results
             .map((json) => Case.fromJson(json))
             .where((case_) => case_.latitude != null && case_.longitude != null)

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/logic/cubit/submit_case_cubit.dart';
 import 'package:find_them/presentation/screens/report/report_success_screen.dart';
@@ -43,6 +45,7 @@ class _Report3ScreenState extends State<Report3Screen> {
   File? _selectedImage;
   final _imagePicker = ImagePicker();
   bool _isSubmitting = false;
+  bool _showPhotoError = false;
 
   @override
   void initState() {
@@ -67,35 +70,29 @@ class _Report3ScreenState extends State<Report3Screen> {
       if (pickedFile != null) {
         setState(() {
           _selectedImage = File(pickedFile.path);
+          _showPhotoError = false;
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Error picking image: $e',
-            style: TextStyle(color: AppColors.getTextColor(context)),
-          ),
-          backgroundColor: AppColors.getMissingRedBackground(context),
-        ),
-      );
+      log('Error picking image: $e');
     }
   }
 
   void _submitReport() {
-    if (_formKey.currentState?.validate() ?? false) {
-      if (_selectedImage == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Please select a photo',
-              style: TextStyle(color: AppColors.getTextColor(context)),
-            ),
-            backgroundColor: AppColors.getMissingRedBackground(context),
-          ),
-        );
-        return;
-      }
+    bool isFormValid = _formKey.currentState?.validate() ?? false;
+
+    if (_selectedImage == null) {
+      setState(() {
+        _showPhotoError = true;
+      });
+      isFormValid = false;
+    } else {
+      setState(() {
+        _showPhotoError = false;
+      });
+    }
+
+    if (isFormValid) {
       context.read<SubmitCaseCubit>().submitCase(
         widget.firstName,
         widget.lastName,
@@ -115,12 +112,12 @@ class _Report3ScreenState extends State<Report3Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.getBackgroundColor(context),
+      backgroundColor: AppColors.getSurfaceColor(context),
       appBar: AppBar(
         title: Text(
           'Reporting a missing person',
           style: GoogleFonts.dmSans(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
             color: AppColors.getTextColor(context),
           ),
@@ -155,11 +152,8 @@ class _Report3ScreenState extends State<Report3Screen> {
             });
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                  state.message,
-                  style: TextStyle(color: AppColors.getTextColor(context)),
-                ),
-                backgroundColor: AppColors.getMissingRedBackground(context),
+                content: Text(state.message),
+                backgroundColor: Colors.red,
               ),
             );
           }
@@ -175,11 +169,11 @@ class _Report3ScreenState extends State<Report3Screen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildStepCircle(1, true, false),
+                      _buildStepCircle(1, false, isCompleted: true),
                       _buildStepLine(true),
-                      _buildStepCircle(2, true, false),
+                      _buildStepCircle(2, false, isCompleted: true),
                       _buildStepLine(true),
-                      _buildStepCircle(3, false, true),
+                      _buildStepCircle(3, true),
                     ],
                   ),
                   const SizedBox(height: 32),
@@ -203,7 +197,10 @@ class _Report3ScreenState extends State<Report3Screen> {
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.teal, width: 1),
+                      border: Border.all(
+                        color: _showPhotoError ? Colors.red : AppColors.teal,
+                        width: 1,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -232,6 +229,14 @@ class _Report3ScreenState extends State<Report3Screen> {
                       ],
                     ),
                   ),
+                  if (_showPhotoError)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0, left: 12.0),
+                      child: Text(
+                        'Please select a photo',
+                        style: TextStyle(color: Colors.red, fontSize: 12),
+                      ),
+                    ),
                   const SizedBox(height: 24),
 
                   Text(
@@ -242,14 +247,13 @@ class _Report3ScreenState extends State<Report3Screen> {
                   TextFormField(
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
-                    style: TextStyle(color: AppColors.getTextColor(context)),
                     decoration: InputDecoration(
                       hintText: 'Enter your phone number',
+                      filled: true,
+                      fillColor: AppColors.getSurfaceColor(context),
                       hintStyle: TextStyle(
                         color: AppColors.getSecondaryTextColor(context),
                       ),
-                      filled: true,
-                      fillColor: AppColors.getCardColor(context),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
@@ -263,6 +267,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                         ),
                       ),
                     ),
+                    style: TextStyle(color: AppColors.getTextColor(context)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your phone number';
@@ -280,15 +285,14 @@ class _Report3ScreenState extends State<Report3Screen> {
                   TextFormField(
                     controller: _descriptionController,
                     maxLines: 5,
-                    style: TextStyle(color: AppColors.getTextColor(context)),
                     decoration: InputDecoration(
                       hintText:
                           'Provide details about circumstances of disappearance, clothing , etc.',
+                      filled: true,
+                      fillColor: AppColors.getSurfaceColor(context),
                       hintStyle: TextStyle(
                         color: AppColors.getSecondaryTextColor(context),
                       ),
-                      filled: true,
-                      fillColor: AppColors.getCardColor(context),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
@@ -302,6 +306,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                         ),
                       ),
                     ),
+                    style: TextStyle(color: AppColors.getTextColor(context)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please provide a description';
@@ -311,35 +316,37 @@ class _Report3ScreenState extends State<Report3Screen> {
                   ),
                   const SizedBox(height: 40),
 
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isSubmitting ? null : _submitReport,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  Center(
+                    child: SizedBox(
+                      width: 248,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _isSubmitting ? null : _submitReport,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.darkGreen,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
+                        child:
+                            _isSubmitting
+                                ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : Text(
+                                  'Submit report',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
                       ),
-                      child:
-                          _isSubmitting
-                              ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                              : Text(
-                                'Submit report',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              ),
                     ),
                   ),
                 ],
@@ -348,23 +355,29 @@ class _Report3ScreenState extends State<Report3Screen> {
           ),
         ),
       ),
-      bottomNavigationBar: const ButtomNavBar(currentIndex: 2),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(left: 0),
+        child: ButtomNavBar(currentIndex: 2),
+      ),
     );
   }
 
-  Widget _buildStepCircle(int step, bool isCompleted, bool isActive) {
+  Widget _buildStepCircle(int step, bool isActive, {bool isCompleted = false}) {
     return Container(
       width: 50,
       height: 50,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isActive ? AppColors.teal : AppColors.getCardColor(context),
+        color:
+            isActive || isCompleted
+                ? AppColors.teal
+                : AppColors.getSurfaceColor(context),
         border: Border.all(color: AppColors.teal, width: 2),
       ),
       child: Center(
         child:
             isCompleted
-                ? Icon(Icons.check, color: AppColors.teal, size: 20)
+                ? Icon(Icons.check, color: Colors.white, size: 20)
                 : Text(
                   '$step',
                   style: GoogleFonts.inter(

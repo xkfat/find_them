@@ -309,7 +309,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _handleFieldError(String field, String message) {
     setState(() {
-      _clearAllErrors(); 
+      _clearAllErrors();
 
       switch (field.toLowerCase()) {
         case 'username':

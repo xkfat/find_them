@@ -8,7 +8,7 @@ class ReportSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getSurfaceColor(context),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -35,16 +35,17 @@ class ReportSuccessScreen extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    color: AppColors.getTextColor(context),
                   ),
                 ),
                 const SizedBox(height: 16),
 
                 Text(
-                  'We will treat your information as soon as possible.',
+                  'We will look into your information as soon as possible.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 16,
-                    color: Colors.grey.shade600,
+                    color: AppColors.getSecondaryTextColor(context),
                   ),
                 ),
 
@@ -52,7 +53,7 @@ class ReportSuccessScreen extends StatelessWidget {
 
                 Center(
                   child: SizedBox(
-                    width: double.infinity,
+                    width: 248,
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
@@ -79,7 +80,7 @@ class ReportSuccessScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24), 
+                const SizedBox(height: 24),
               ],
             ),
           ),

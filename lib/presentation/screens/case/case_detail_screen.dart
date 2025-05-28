@@ -41,7 +41,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.getSurfaceColor(context),
                 elevation: 8,
                 child: Container(
                   padding: EdgeInsets.all(20),
@@ -57,13 +57,13 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.darkGreen,
+                              color: AppColors.getTextColor(context),
                             ),
                           ),
                           IconButton(
                             icon: Icon(
                               Icons.close,
-                              color: AppColors.darkGrey,
+                              color: AppColors.getSecondaryTextColor(context),
                               size: 24,
                             ),
                             padding: EdgeInsets.zero,
@@ -77,21 +77,27 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                         'Please provide any information you have about this missing person, and help us find other people loved ones.',
                         style: TextStyle(
                           fontSize: 15,
-                          color: AppColors.darkGrey,
+                          color: AppColors.getSecondaryTextColor(context),
                         ),
                       ),
                       SizedBox(height: 16),
                       Container(
                         decoration: BoxDecoration(
-                          color: AppColors.lighterMint,
+                          color: AppColors.getCardColor(context),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColors.teal, width: 1),
                         ),
                         child: TextField(
                           controller: noteController,
                           maxLines: 7,
+                          style: TextStyle(
+                            color: AppColors.getTextColor(context),
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Write your message here...',
+                            hintStyle: TextStyle(
+                              color: AppColors.getSecondaryTextColor(context),
+                            ),
                             contentPadding: EdgeInsets.all(16),
                             border: InputBorder.none,
                           ),
@@ -111,11 +117,26 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                         context: context,
                                         builder:
                                             (context) => AlertDialog(
+                                              backgroundColor:
+                                                  AppColors.getSurfaceColor(
+                                                    context,
+                                                  ),
                                               title: Text(
                                                 'Missing Information',
+                                                style: TextStyle(
+                                                  color: AppColors.getTextColor(
+                                                    context,
+                                                  ),
+                                                ),
                                               ),
                                               content: Text(
                                                 'Please enter some information',
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.getSecondaryTextColor(
+                                                        context,
+                                                      ),
+                                                ),
                                               ),
                                               actions: [
                                                 TextButton(
@@ -123,7 +144,12 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                       () => Navigator.pop(
                                                         context,
                                                       ),
-                                                  child: Text('OK'),
+                                                  child: Text(
+                                                    'OK',
+                                                    style: TextStyle(
+                                                      color: AppColors.teal,
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -147,6 +173,10 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                         context: context,
                                         builder:
                                             (context) => Dialog(
+                                              backgroundColor:
+                                                  AppColors.getSurfaceColor(
+                                                    context,
+                                                  ),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(16),
@@ -162,11 +192,8 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                     Icon(
                                                       Icons.favorite,
                                                       color:
-                                                          const Color.fromARGB(
-                                                            255,
-                                                            92,
-                                                            16,
-                                                            16,
+                                                          AppColors.getFoundGreenColor(
+                                                            context,
                                                           ),
                                                       size: 60,
                                                     ),
@@ -178,7 +205,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color:
-                                                            AppColors.darkGreen,
+                                                            AppColors.getTextColor(
+                                                              context,
+                                                            ),
                                                       ),
                                                     ),
                                                     SizedBox(height: 8),
@@ -189,7 +218,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                       style: TextStyle(
                                                         fontSize: 16,
                                                         color:
-                                                            AppColors.darkGrey,
+                                                            AppColors.getSecondaryTextColor(
+                                                              context,
+                                                            ),
                                                       ),
                                                     ),
                                                     SizedBox(height: 20),
@@ -203,8 +234,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                             ),
                                                         style: ElevatedButton.styleFrom(
                                                           backgroundColor:
-                                                              AppColors
-                                                                  .darkGreen,
+                                                              AppColors.teal,
                                                           shape: RoundedRectangleBorder(
                                                             borderRadius:
                                                                 BorderRadius.circular(
@@ -235,6 +265,10 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                         context: context,
                                         builder:
                                             (context) => Dialog(
+                                              backgroundColor:
+                                                  AppColors.getSurfaceColor(
+                                                    context,
+                                                  ),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(16),
@@ -250,7 +284,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                     Icon(
                                                       Icons.error,
                                                       color:
-                                                          AppColors.missingRed,
+                                                          AppColors.getMissingRedColor(
+                                                            context,
+                                                          ),
                                                       size: 60,
                                                     ),
                                                     SizedBox(height: 16),
@@ -260,7 +296,10 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                         fontSize: 22,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        color: Colors.black87,
+                                                        color:
+                                                            AppColors.getTextColor(
+                                                              context,
+                                                            ),
                                                       ),
                                                     ),
                                                     SizedBox(height: 8),
@@ -271,7 +310,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                       style: TextStyle(
                                                         fontSize: 16,
                                                         color:
-                                                            AppColors.darkGrey,
+                                                            AppColors.getSecondaryTextColor(
+                                                              context,
+                                                            ),
                                                       ),
                                                     ),
                                                     SizedBox(height: 20),
@@ -285,8 +326,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                             ),
                                                         style: ElevatedButton.styleFrom(
                                                           backgroundColor:
-                                                              AppColors
-                                                                  .darkGreen,
+                                                              AppColors.getMissingRedColor(
+                                                                context,
+                                                              ),
                                                           shape: RoundedRectangleBorder(
                                                             borderRadius:
                                                                 BorderRadius.circular(
@@ -362,7 +404,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
   void _makePhoneCall(String phoneNumber) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.getSurfaceColor(context),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -409,10 +451,10 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text(
+                  child: Text(
                     'Cancel',
                     style: TextStyle(
-                      color: Colors.black87,
+                      color: AppColors.getTextColor(context),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -435,26 +477,37 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getSurfaceColor(context),
       body: BlocBuilder<CaseCubit, CaseListState>(
         builder: (context, state) {
           if (state is CaseLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(color: AppColors.teal),
+            );
           } else if (state is CaseError) {
-            return Center(child: Text(state.message));
+            return Center(
+              child: Text(
+                state.message,
+                style: TextStyle(color: AppColors.getTextColor(context)),
+              ),
+            );
           } else if (state is CaseDetailLoaded) {
             final caseData = state.caseData;
             return _buildCaseDetail(context, caseData);
           }
 
-          return const Center(child: Text('Case not found'));
+          return Center(
+            child: Text(
+              'Case not found',
+              style: TextStyle(color: AppColors.getTextColor(context)),
+            ),
+          );
         },
       ),
     );
   }
 
   Widget _buildCaseDetail(BuildContext context, Case caseData) {
-
     String formattedDate = '';
     try {
       final DateTime date = caseData.lastSeenDate;
@@ -464,15 +517,18 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
           '${caseData.lastSeenDate.year}/${caseData.lastSeenDate.month}/${caseData.lastSeenDate.day}';
     }
 
-    return SafeArea(
-      child: Column(
-        children: [
-          Padding(
+    return Column(
+      children: [
+        SafeArea(
+          child: Padding(
             padding: const EdgeInsets.only(left: 16, top: 8),
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: AppColors.getTextColor(context),
+                  ),
                   onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -480,288 +536,316 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
               ],
             ),
           ),
+        ),
 
-          Expanded(
-            child: Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                Positioned(
-                  top: 80,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.lighterMint,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 130),
+        Expanded(
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              Positioned(
+                top: 80,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.getCardColor(context),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 130),
 
-                        Text(
-                          caseData.fullName,
-                          style: GoogleFonts.inter(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.black,
-                          ),
+                      Text(
+                        caseData.fullName,
+                        style: GoogleFonts.inter(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.getTextColor(context),
                         ),
+                      ),
 
-                        Expanded(
-                          child: SingleChildScrollView(
-                            physics: const BouncingScrollPhysics(),
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 24),
-                              child: Column(
-                                children: [
-                                  const SizedBox(height: 26),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 24),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 26),
 
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 30,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        _buildAgeBadge(caseData.age.toString()),
-                                        const SizedBox(width: 10),
-                                        _buildStatusBadge(
-                                          caseData.status.value,
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 30,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _buildAgeBadge(caseData.age.toString()),
+                                      const SizedBox(width: 10),
+                                      _buildStatusBadge(caseData.status.value),
+                                      const SizedBox(width: 10),
+                                      _buildGenderBadge(caseData.gender.value),
+                                    ],
+                                  ),
+                                ),
+
+                                const SizedBox(height: 40),
+
+                                SizedBox(
+                                  width: 350,
+                                  height: 90,
+                                  child: _buildDaysInfoBox(caseData),
+                                ),
+
+                                const SizedBox(height: 26),
+
+                                Text(
+                                  'Case Information',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.getTextColor(context),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 26),
+
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.getSurfaceColor(context),
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.getDividerColor(
+                                            context,
+                                          ).withOpacity(0.3),
+                                          blurRadius: 2,
+                                          offset: const Offset(0, 1),
                                         ),
-                                        const SizedBox(width: 10),
-                                        _buildGenderBadge(
-                                          caseData.gender.value,
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.getCardColor(
+                                                  context,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: Icon(
+                                                Icons.calendar_today,
+                                                size: 24,
+                                                color:
+                                                    AppColors.getPrimaryColor(
+                                                      context,
+                                                    ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Last seen date:',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color:
+                                                        AppColors.getSecondaryTextColor(
+                                                          context,
+                                                        ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                Text(
+                                                  formattedDate,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        AppColors.getTextColor(
+                                                          context,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(height: 22),
+
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.getCardColor(
+                                                  context,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: Icon(
+                                                Icons.location_on,
+                                                size: 24,
+                                                color:
+                                                    AppColors.getPrimaryColor(
+                                                      context,
+                                                    ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Last seen location:',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          AppColors.getSecondaryTextColor(
+                                                            context,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    caseData.lastSeenLocation,
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          AppColors.getTextColor(
+                                                            context,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
                                   ),
+                                ),
 
-                                  const SizedBox(height: 40),
+                                const SizedBox(height: 26),
 
-                                  SizedBox(
-                                    width: 350,
-                                    height: 90,
-                                    child: _buildDaysInfoBox(caseData),
-                                  ),
-
-                                  const SizedBox(height: 26),
-
-                                  const Text(
-                                    'Case Information',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 26),
-
+                                if (caseData.description.isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16,
                                     ),
                                     child: Container(
+                                      width: double.infinity,
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: AppColors.getSurfaceColor(
+                                          context,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.black,
-                                            blurRadius: 2,
-                                            offset: const Offset(0, 1),
-                                          ),
-                                        ],
                                       ),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                padding: const EdgeInsets.all(
-                                                  4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.lighterMint,
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.calendar_today,
-                                                  size: 24,
-                                                  color: AppColors.darkGreen,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text(
-                                                    'Last seen date:',
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color:
-                                                          AppColors.darkGreen,
-                                                    ),
+                                          Text(
+                                            'Description:',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color:
+                                                  AppColors.getSecondaryTextColor(
+                                                    context,
                                                   ),
-                                                  const SizedBox(height: 5),
-                                                  Text(
-                                                    formattedDate,
-                                                    style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                            ),
                                           ),
-
-                                          const SizedBox(height: 22),
-
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                padding: const EdgeInsets.all(
-                                                  4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.lighterMint,
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.location_on,
-                                                  size: 24,
-                                                  color: AppColors.darkGreen,
-                                                ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            caseData.description,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: AppColors.getTextColor(
+                                                context,
                                               ),
-                                              const SizedBox(width: 12),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    const Text(
-                                                      'Last seen location:',
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        color:
-                                                            AppColors.darkGreen,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 5),
-                                                    Text(
-                                                      caseData.lastSeenLocation,
-                                                      style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
                                   ),
-
-                                  const SizedBox(height: 26),
-
-                                  if (caseData.description.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                      ),
-                                      child: Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              'Description:',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: AppColors.darkGreen,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              caseData.description,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                Positioned(
-                  top: 0,
-                  child: Container(
-                    width: 198,
-                    height: 185,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.darkGreen, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.darkGreen,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                      image: DecorationImage(
-                        image:
-                            caseData.photo.isNotEmpty
-                                ? NetworkImage(caseData.photo)
-                                : const AssetImage('assets/images/profile.png')
-                                    as ImageProvider,
-                        fit: BoxFit.cover,
                       ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Positioned(
+                top: 0,
+                child: Container(
+                  width: 198,
+                  height: 185,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.getPrimaryColor(context),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.getDividerColor(
+                          context,
+                        ).withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                    image: DecorationImage(
+                      image:
+                          caseData.photo.isNotEmpty
+                              ? NetworkImage(caseData.photo)
+                              : const AssetImage('assets/images/profile.png')
+                                  as ImageProvider,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
 
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(color: AppColors.lightMint),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(color: AppColors.getCardColor(context)),
+          child: SafeArea(
+            top: false,
             child: Row(
               children: [
                 Expanded(
@@ -774,8 +858,12 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
+                              backgroundColor: AppColors.getMissingRedColor(
+                                context,
+                              ),
                               content: Text(
                                 'Cannot submit report: Invalid case ID',
+                                style: TextStyle(color: Colors.white),
                               ),
                             ),
                           );
@@ -790,7 +878,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.darkGreen,
+                        backgroundColor: AppColors.getPrimaryColor(context),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -819,8 +907,8 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -830,11 +918,11 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.lightgrey,
+        color: AppColors.getSurfaceColor(context),
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: AppColors.darkGreen,
+            color: AppColors.getDividerColor(context).withOpacity(0.3),
             blurRadius: 5,
             offset: const Offset(0, 1),
           ),
@@ -850,7 +938,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.getTextColor(context),
                 ),
               ),
               TextSpan(
@@ -858,7 +946,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: Colors.black87,
+                  color: AppColors.getTextColor(context),
                 ),
               ),
             ],
@@ -874,11 +962,11 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.lightgrey,
+        color: AppColors.getSurfaceColor(context),
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: AppColors.darkGreen,
+            color: AppColors.getDividerColor(context).withOpacity(0.3),
             blurRadius: 5,
             offset: const Offset(0, 1),
           ),
@@ -890,7 +978,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: AppColors.getTextColor(context),
           ),
         ),
       ),
@@ -899,30 +987,25 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
 
   Widget _buildStatusBadge(String status) {
     Color badgeColor;
-    Color textColor = AppColors.black;
+    Color textColor = AppColors.getTextColor(context);
     Color dotColor;
 
     switch (status.toLowerCase()) {
       case 'missing':
-        badgeColor = AppColors.missingRedBackground;
-        dotColor = AppColors.missingRed;
-
+        badgeColor = AppColors.getMissingRedBackground(context);
+        dotColor = AppColors.getMissingRedColor(context);
         break;
       case 'under_investigation':
-        badgeColor = AppColors.investigatingYellowBackground;
-        textColor = AppColors.black;
-        dotColor = AppColors.investigatingYellow;
-
+        badgeColor = AppColors.getInvestigatingYellowBackground(context);
+        dotColor = AppColors.getInvestigatingYellowColor(context);
         break;
       case 'found':
-        badgeColor = AppColors.foundGreenBackground;
-        textColor = AppColors.black;
-        dotColor = AppColors.foundGreen;
-
+        badgeColor = AppColors.getFoundGreenBackground(context);
+        dotColor = AppColors.getFoundGreenColor(context);
         break;
       default:
-        badgeColor = AppColors.grey;
-        dotColor = Colors.grey.shade600;
+        badgeColor = AppColors.getDividerColor(context);
+        dotColor = AppColors.getSecondaryTextColor(context);
     }
 
     String displayStatus = status.replaceAll('_', ' ');
@@ -972,23 +1055,23 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
 
     switch (caseData.status.value.toLowerCase()) {
       case 'missing':
-        backgroundColor = AppColors.missingRedBackground;
-        iconColor = AppColors.missingRed;
+        backgroundColor = AppColors.getMissingRedBackground(context);
+        iconColor = AppColors.getMissingRedColor(context);
         message = 'Missing for ${caseData.daysMissing} days';
         break;
       case 'under_investigation':
-        backgroundColor = AppColors.investigatingYellowBackground;
-        iconColor = AppColors.investigatingYellow;
+        backgroundColor = AppColors.getInvestigatingYellowBackground(context);
+        iconColor = AppColors.getInvestigatingYellowColor(context);
         message = 'Investigating for ${caseData.daysMissing} days';
         break;
       case 'found':
-        backgroundColor = AppColors.foundGreenBackground;
-        iconColor = AppColors.foundGreen;
+        backgroundColor = AppColors.getFoundGreenBackground(context);
+        iconColor = AppColors.getFoundGreenColor(context);
         message = 'Found after ${caseData.daysMissing} days';
         break;
       default:
-        backgroundColor = Colors.grey[200]!;
-        iconColor = Colors.grey;
+        backgroundColor = AppColors.getDividerColor(context);
+        iconColor = AppColors.getSecondaryTextColor(context);
         message = 'Status: ${caseData.status.value}';
     }
 
@@ -1011,7 +1094,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: AppColors.getTextColor(context),
             ),
           ),
         ],

@@ -600,7 +600,7 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black,
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),

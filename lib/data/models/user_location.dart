@@ -6,6 +6,9 @@ class UserLocationModel {
   final double longitude;
   final DateTime lastUpdated;
   final bool isSharing;
+  final int minutesAgo;
+  final String freshness;
+  final String displayText;
 
   UserLocationModel({
     required this.id,
@@ -15,6 +18,9 @@ class UserLocationModel {
     required this.longitude,
     required this.lastUpdated,
     required this.isSharing,
+    required this.minutesAgo,
+    required this.freshness,
+    required this.displayText,
   });
 
   factory UserLocationModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +32,9 @@ class UserLocationModel {
       longitude: double.parse(json['longitude'].toString()),
       lastUpdated: DateTime.parse(json['last_updated']),
       isSharing: json['is_sharing'] ?? false,
+      minutesAgo: json['minutes_ago'] ?? 0,
+      freshness: json['freshness'] ?? 'recent',
+      displayText: json['display_text'] ?? 'Unknown',
     );
   }
 
@@ -38,8 +47,14 @@ class UserLocationModel {
       'longitude': longitude,
       'last_updated': lastUpdated.toIso8601String(),
       'is_sharing': isSharing,
+      'minutes_ago': minutesAgo,
+      'freshness': freshness,
+      'display_text': displayText,
     };
   }
+
+  bool get isLive => freshness == 'live';
+  bool get isRecent => freshness == 'recent';
 
   UserLocationModel copyWith({
     int? id,
@@ -49,6 +64,9 @@ class UserLocationModel {
     double? longitude,
     DateTime? lastUpdated,
     bool? isSharing,
+    int? minutesAgo,
+    String? freshness,
+    String? displayText,
   }) {
     return UserLocationModel(
       id: id ?? this.id,
@@ -58,6 +76,9 @@ class UserLocationModel {
       longitude: longitude ?? this.longitude,
       lastUpdated: lastUpdated ?? this.lastUpdated,
       isSharing: isSharing ?? this.isSharing,
+      minutesAgo: minutesAgo ?? this.minutesAgo,
+      freshness: freshness ?? this.freshness,
+      displayText: displayText ?? this.displayText,
     );
   }
 
@@ -72,6 +93,6 @@ class UserLocationModel {
 
   @override
   String toString() {
-    return 'UserLocationModel(id: $id, user: $user, username: $username, latitude: $latitude, longitude: $longitude, isSharing: $isSharing)';
+    return 'UserLocationModel(id: $id, user: $user, username: $username, latitude: $latitude, longitude: $longitude, freshness: $freshness, displayText: $displayText)';
   }
 }

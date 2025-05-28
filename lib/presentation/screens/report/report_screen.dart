@@ -49,7 +49,7 @@ class _Report1ScreenState extends State<Report1Screen> {
         title: Text(
           'Reporting a missing person',
           style: GoogleFonts.dmSans(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
             color: AppColors.getTextColor(context),
           ),

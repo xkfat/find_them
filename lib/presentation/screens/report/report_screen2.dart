@@ -64,11 +64,8 @@ class _Report2ScreenState extends State<Report2Screen> {
       if (_selectedDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'Please select a date',
-              style: TextStyle(color: AppColors.getTextColor(context)),
-            ),
-            backgroundColor: AppColors.getMissingRedBackground(context),
+            content: Text('Please select a date'),
+            backgroundColor: Colors.red,
           ),
         );
         return;
@@ -119,12 +116,12 @@ class _Report2ScreenState extends State<Report2Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.getBackgroundColor(context),
+      backgroundColor: AppColors.getSurfaceColor(context),
       appBar: AppBar(
         title: Text(
           'Reporting a missing person',
           style: GoogleFonts.dmSans(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
             color: AppColors.getTextColor(context),
           ),
@@ -148,11 +145,11 @@ class _Report2ScreenState extends State<Report2Screen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildCompletedStep(),
+                    _buildStepCircle(1, false, isCompleted: true),
                     _buildStepLine(true),
-                    _buildActiveStep(2),
+                    _buildStepCircle(2, true),
                     _buildStepLine(false),
-                    _buildInactiveStep(3),
+                    _buildStepCircle(3, false),
                   ],
                 ),
                 const SizedBox(height: 32),
@@ -181,11 +178,11 @@ class _Report2ScreenState extends State<Report2Screen> {
                       controller: _lastSeenDateController,
                       decoration: InputDecoration(
                         hintText: '__/__/____',
+                        filled: true,
+                        fillColor: AppColors.getSurfaceColor(context),
                         hintStyle: TextStyle(
                           color: AppColors.getSecondaryTextColor(context),
                         ),
-                        filled: true,
-                        fillColor: AppColors.getCardColor(context),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
@@ -224,11 +221,11 @@ class _Report2ScreenState extends State<Report2Screen> {
                   controller: _lastSeenLocationController,
                   decoration: InputDecoration(
                     hintText: 'Enter location: zone, area, city, street...',
+                    filled: true,
+                    fillColor: AppColors.getSurfaceColor(context),
                     hintStyle: TextStyle(
                       color: AppColors.getSecondaryTextColor(context),
                     ),
-                    filled: true,
-                    fillColor: AppColors.getCardColor(context),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
@@ -374,23 +371,25 @@ class _Report2ScreenState extends State<Report2Screen> {
                 ),
                 const SizedBox(height: 40),
 
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _continueToNextStep,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.teal,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                Center(
+                  child: SizedBox(
+                    width: 248,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _continueToNextStep,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.teal,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Continue',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                      child: Text(
+                        'Continue',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -400,63 +399,37 @@ class _Report2ScreenState extends State<Report2Screen> {
           ),
         ),
       ),
-      bottomNavigationBar: const ButtomNavBar(currentIndex: 2),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(left: 0),
+        child: ButtomNavBar(currentIndex: 2),
+      ),
     );
   }
 
-  Widget _buildCompletedStep() {
+  Widget _buildStepCircle(int step, bool isActive, {bool isCompleted = false}) {
     return Container(
       width: 50,
       height: 50,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.getCardColor(context),
-        border: Border.all(color: AppColors.teal, width: 2),
-      ),
-      child: Center(child: Icon(Icons.check, color: AppColors.teal, size: 20)),
-    );
-  }
-
-  Widget _buildActiveStep(int step) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.teal,
+        color:
+            isActive || isCompleted
+                ? AppColors.teal
+                : AppColors.getSurfaceColor(context),
         border: Border.all(color: AppColors.teal, width: 2),
       ),
       child: Center(
-        child: Text(
-          '$step',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInactiveStep(int step) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.getCardColor(context),
-        border: Border.all(color: AppColors.teal, width: 2),
-      ),
-      child: Center(
-        child: Text(
-          '$step',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: AppColors.teal,
-          ),
-        ),
+        child:
+            isCompleted
+                ? Icon(Icons.check, color: Colors.white, size: 20)
+                : Text(
+                  '$step',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isActive ? Colors.white : AppColors.teal,
+                  ),
+                ),
       ),
     );
   }

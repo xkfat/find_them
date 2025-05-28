@@ -1,6 +1,5 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -9,10 +8,10 @@ class PhoneNumberDialog extends StatefulWidget {
   final Function(String) onPhoneSubmitted;
 
   const PhoneNumberDialog({
-    Key? key,
+    super.key,
     required this.userData,
     required this.onPhoneSubmitted,
-  }) : super(key: key);
+  });
 
   @override
   _PhoneNumberDialogState createState() => _PhoneNumberDialogState();

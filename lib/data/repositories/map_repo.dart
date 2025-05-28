@@ -16,7 +16,6 @@ class MapRepository {
     return await _apiService.getAccessToken();
   }
 
-  /// Get friends' locations for map display
   Future<List<UserLocationModel>> getFriendsLocations() async {
     try {
       final token = await getAuthToken();
@@ -26,7 +25,6 @@ class MapRepository {
     }
   }
 
-  /// Update current user's location
   Future<void> updateMyLocation({
     required double latitude,
     required double longitude,
@@ -43,7 +41,6 @@ class MapRepository {
     }
   }
 
-  /// Get cases with location data for map display
   Future<List<Case>> getCasesWithLocation() async {
     try {
       final token = await getAuthToken();
@@ -53,7 +50,6 @@ class MapRepository {
     }
   }
 
-  /// Get friends list for user details
   Future<List<LocationSharingModel>> getFriends() async {
     try {
       final token = await getAuthToken();
@@ -63,7 +59,6 @@ class MapRepository {
     }
   }
 
-  /// Send alert to friend
   Future<void> sendAlert(int friendId) async {
     try {
       final token = await getAuthToken();

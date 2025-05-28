@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:find_them/presentation/widgets/LanguageDrop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +15,7 @@ import 'package:find_them/data/services/location_sharing_service.dart';
 class SettingsScreen extends StatefulWidget {
   final VoidCallback toggleTheme;
 
-  const SettingsScreen({Key? key, required this.toggleTheme}) : super(key: key);
+  const SettingsScreen({super.key, required this.toggleTheme});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -53,8 +55,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         });
       }
     } catch (e) {
-      // Handle error silently or show minimal feedback
-      print('Error loading location sharing settings: $e');
+      log('Error loading location sharing settings: $e');
     }
   }
 
@@ -144,7 +145,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               : 'Location sharing disabled';
       _showDialog(message, true);
     } catch (e) {
-      // Revert the toggle state on error
       setState(() {
         locationSharingEnabled = !value;
       });
@@ -158,7 +158,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       bloc: _locationSharingCubit,
       listener: (context, state) {
         if (state is LocationSharingActionSuccess) {
-          // Success is already handled in _toggleLocationSharing
         } else if (state is LocationSharingError) {
           _showDialog('Error: ${state.message}', false);
         }

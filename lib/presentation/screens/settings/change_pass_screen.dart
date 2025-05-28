@@ -48,6 +48,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: AppColors.getSurfaceColor(context),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -60,10 +61,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: AppColors.foundGreen.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.check, color: Colors.green, size: 30),
+                  child: Icon(
+                    Icons.check,
+                    color: AppColors.getFoundGreenColor(context),
+                    size: 30,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -71,7 +76,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: AppColors.getTextColor(context),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -80,7 +85,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: Colors.grey[600],
+                    color: AppColors.getSecondaryTextColor(context),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -89,8 +94,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop(); 
-                      Navigator.of(context).pop(); 
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.teal,
@@ -121,6 +126,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: AppColors.getSurfaceColor(context),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -133,12 +139,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: AppColors.getMissingRedColor(
+                      context,
+                    ).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.error_outline,
-                    color: Colors.red,
+                    color: AppColors.getMissingRedColor(context),
                     size: 30,
                   ),
                 ),
@@ -148,7 +156,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: AppColors.getTextColor(context),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -157,7 +165,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: Colors.grey[600],
+                    color: AppColors.getSecondaryTextColor(context),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -167,7 +175,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.getMissingRedColor(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -193,12 +201,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getSurfaceColor(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.getSurfaceColor(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: AppColors.getTextColor(context)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -247,7 +255,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: AppColors.getTextColor(context),
                   ),
                 ),
 
@@ -256,8 +264,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 Text(
                   'Create a new password. Ensure it differs from previous ones for security',
                   style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                    fontSize: 16,
+                    color: AppColors.getSecondaryTextColor(context),
                   ),
                 ),
 
@@ -268,16 +276,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                    color: AppColors.getTextColor(context),
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _currentPasswordController,
                   obscureText: _obscureCurrentPassword,
+                  style: TextStyle(color: AppColors.getTextColor(context)),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.getSurfaceColor(context),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 16,
@@ -288,7 +297,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         color:
                             _oldPasswordError != null
                                 ? Colors.red
-                                : Colors.grey.shade300,
+                                : AppColors.getDividerColor(context),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
@@ -297,7 +306,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         color:
                             _oldPasswordError != null
                                 ? Colors.red
-                                : Colors.grey.shade300,
+                                : AppColors.getDividerColor(context),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -323,7 +332,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         _obscureCurrentPassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: Colors.grey,
+                        color: AppColors.getSecondaryTextColor(context),
                         size: 20,
                       ),
                       onPressed: () {
@@ -355,16 +364,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                    color: AppColors.getTextColor(context),
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _newPasswordController,
                   obscureText: _obscureNewPassword,
+                  style: TextStyle(color: AppColors.getTextColor(context)),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.getSurfaceColor(context),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 16,
@@ -375,7 +385,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         color:
                             _newPasswordError != null
                                 ? Colors.red
-                                : Colors.grey.shade300,
+                                : AppColors.getDividerColor(context),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
@@ -384,7 +394,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         color:
                             _newPasswordError != null
                                 ? Colors.red
-                                : Colors.grey.shade300,
+                                : AppColors.getDividerColor(context),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -410,7 +420,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         _obscureNewPassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: Colors.grey,
+                        color: AppColors.getSecondaryTextColor(context),
                         size: 20,
                       ),
                       onPressed: () {
@@ -445,27 +455,32 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                    color: AppColors.getTextColor(context),
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
+                  style: TextStyle(color: AppColors.getTextColor(context)),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.getSurfaceColor(context),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 16,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: AppColors.getDividerColor(context),
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: AppColors.getDividerColor(context),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -476,7 +491,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         _obscureConfirmPassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: Colors.grey,
+                        color: AppColors.getSecondaryTextColor(context),
                         size: 20,
                       ),
                       onPressed: () {
@@ -503,35 +518,37 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   builder: (context, state) {
                     final isLoading = state is ProfileUpdating;
 
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: isLoading ? null : _changePassword,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.teal,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                    return Center(
+                      child: SizedBox(
+                        width: 248,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : _changePassword,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.teal,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
+                          child:
+                              isLoading
+                                  ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : Text(
+                                    'Update Password',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                         ),
-                        child:
-                            isLoading
-                                ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                                : Text(
-                                  'Update Password',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
                       ),
                     );
                   },

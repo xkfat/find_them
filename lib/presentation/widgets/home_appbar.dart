@@ -13,7 +13,7 @@ class HomeAppBar extends StatelessWidget {
     return Container(
       width: 500,
       height: 220,
-      color: AppColors.backgroundGrey,
+      color: AppColors.getBackgroundColor(context),
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Stack(
         alignment: Alignment.centerLeft,
@@ -21,10 +21,13 @@ class HomeAppBar extends StatelessWidget {
           Positioned(
             left: 0,
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.menu,
                 size: 24,
-                color: AppColors.darkGreen,
+                color:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.darkGreen
+                        : AppColors.darkGreen,
               ),
               onPressed: () {
                 _showSideBar(context);

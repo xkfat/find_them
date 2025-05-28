@@ -105,4 +105,9 @@ class AppColors {
         ? darkDivider 
         : lightgrey;
   }
+  static Color getPrimaryColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+        ? darkGreen 
+        : teal;
+  }
 }
