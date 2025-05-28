@@ -1,4 +1,3 @@
-
 import 'package:find_them/data/models/location_request.dart';
 import 'package:find_them/data/models/location_sharing.dart';
 import 'package:flutter/material.dart';
@@ -114,7 +113,7 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                     friendId,
                   );
                 } catch (e) {
-//catch
+                  //catch
                 }
               },
               child: Text(

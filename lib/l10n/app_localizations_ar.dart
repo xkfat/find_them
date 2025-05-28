@@ -335,10 +335,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get error => 'خطأ';
 
   @override
-  String get mySubmittedCases => 'الحالات المقدمة';
+  String get mySubmittedCases => 'القضايا المقدمة';
 
   @override
-  String get noSubmittedCases => 'لا توجد حالات مقدمة';
+  String get noSubmittedCases => 'لا توجد قضايا مقدمة';
 
   @override
   String get noSubmittedCasesMessage =>

@@ -119,8 +119,8 @@
   "oldPasswordNotCorrect": "كلمة المرور القديمة غير صحيحة",
   "error": "خطأ",
   
-  "mySubmittedCases": "الحالات المقدمة",
-  "noSubmittedCases": "لا توجد حالات مقدمة",
+  "mySubmittedCases": "القضايا المقدمة",
+  "noSubmittedCases": "لا توجد قضايا مقدمة",
   "noSubmittedCasesMessage": "لم تقم بتقديم أي تقارير أشخاص مفقودين بعد.",
   "viewDetails": "عرض التفاصيل",
   "submittedOn": "قُدم في",

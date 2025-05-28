@@ -1,4 +1,3 @@
-
 import 'package:find_them/data/models/notification.dart';
 import 'package:find_them/presentation/widgets/notification/notification_card.dart';
 import 'package:flutter/material.dart';
@@ -157,7 +156,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       _handleNotificationTap(context, notification);
                     },
                     onDismiss: () {
-                      _showDeleteConfirmation(context, notification);
+                      context.read<NotificationCubit>().deleteNotification(
+                        notification.id,
+                      );
                     },
                     onAction: () {
                       _handleNotificationAction(context, notification);
@@ -172,53 +173,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           return const SizedBox.shrink();
         },
       ),
-    );
-  }
-
-  void _showDeleteConfirmation(
-    BuildContext context,
-    NotificationModel notification,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.getSurfaceColor(context),
-          title: Text(
-            'Delete Notification',
-            style: TextStyle(color: AppColors.getTextColor(context)),
-          ),
-          content: Text(
-            'Are you sure you want to delete this notification? This action cannot be undone.',
-            style: TextStyle(color: AppColors.getTextColor(context)),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); 
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: AppColors.getSecondaryTextColor(context),
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); 
-                context.read<NotificationCubit>().deleteNotification(
-                  notification.id,
-                );
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.getMissingRedColor(context),
-              ),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
     );
   }
 

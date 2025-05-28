@@ -493,11 +493,8 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                 ),
                 const SizedBox(height: 16),
 
-                _buildInfoRow(context, 'Email', friend.friendDetails.email),
-                const SizedBox(height: 8),
                 _buildInfoRow(
                   context,
-                  'Status',
                   locationData.isLive ? 'Live location' : 'Recent location',
                 ),
 
@@ -575,31 +572,15 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildInfoRow(BuildContext context, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 80,
-          child: Text(
-            '$label:',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.getSecondaryTextColor(context),
-            ),
-          ),
+  Widget _buildInfoRow(BuildContext context, String value) {
+    return Center(
+      child: Text(
+        value,
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          color: AppColors.getTextColor(context),
         ),
-        Expanded(
-          child: Text(
-            value,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: AppColors.getTextColor(context),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 

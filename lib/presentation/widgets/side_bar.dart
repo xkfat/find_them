@@ -10,7 +10,6 @@ import '../../core/constants/themes/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:find_them/l10n/app_localizations.dart';
 
-// Add this extension for cleaner code
 extension LocalizationHelper on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this)!;
 }
@@ -163,7 +162,7 @@ class _SideBarState extends State<SideBar> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Unknown user', // Keep this as fallback text
+                                'Unknown user',
                                 style: GoogleFonts.inter(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -323,7 +322,6 @@ class _SideBarState extends State<SideBar> {
               color:
                   isSelected ? AppColors.teal : AppColors.getTextColor(context),
             ),
-            // Add text direction support for Arabic
             textDirection:
                 Localizations.localeOf(context).languageCode == 'ar'
                     ? TextDirection.rtl
