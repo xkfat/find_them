@@ -20,13 +20,19 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthentication() async {
-    final authRepository = AuthRepository(AuthService());
-    final isLoggedIn = await authRepository.isLoggedIn();
+    try {
+      final authRepository = AuthRepository(AuthService());
+      final isLoggedIn = await authRepository.isLoggedIn();
 
-    if (isLoggedIn) {
-      Navigator.of(context).pushReplacementNamed('/home');
-    } else {
-      route();
+      if (!mounted) return;
+
+      if (isLoggedIn) {
+        Navigator.of(context).pushReplacementNamed('/home');
+      } else {
+        if (mounted) route();
+      }
+    } catch (e) {
+      if (mounted) {}
     }
   }
 

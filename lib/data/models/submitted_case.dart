@@ -116,7 +116,7 @@ class LatestUpdate {
         return DateTime(year, month, day);
       }
     } catch (e) {
-      print('Error parsing date: $date, error: $e');
+      log('Error parsing date: $date, error: $e');
     }
     return DateTime.now();
   }

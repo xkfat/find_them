@@ -82,7 +82,7 @@ class SocialAuthService {
 
       return {'success': false, 'message': 'Facebook sign in failed'};
     } catch (e) {
-      print("Facebook Sign In Error: $e");
+      log("Facebook Sign In Error: $e");
       return {'success': false, 'message': e.toString()};
     }
   }
@@ -97,7 +97,7 @@ class SocialAuthService {
         'phone_number': userData['phone_number'] ?? '',
       };
 
-      print("Sending to server: ${json.encode(authData)}");
+      log("Sending to server: ${json.encode(authData)}");
 
       final response = await http.post(
         Uri.parse('http://10.0.2.2:8000/api/accounts/social-auth/'),
@@ -105,12 +105,12 @@ class SocialAuthService {
         body: json.encode(authData),
       );
 
-      print("Server response code: ${response.statusCode}");
-      print("Server response body: ${response.body}");
+      log("Server response code: ${response.statusCode}");
+      log("Server response body: ${response.body}");
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      print("Server Authentication Error: $e");
+      log("Server Authentication Error: $e");
       return false;
     }
   }
@@ -126,11 +126,11 @@ Future<bool> updateUserPhone(String phoneNumber, String token) async {
       body: json.encode({'phone_number': phoneNumber}),
     );
 
-    print("Update phone response: ${response.statusCode} - ${response.body}");
+    log("Update phone response: ${response.statusCode} - ${response.body}");
     
     return response.statusCode == 200;
   } catch (e) {
-    print("Error updating phone: $e");
+    log("Error updating phone: $e");
     return false;
   }
 }

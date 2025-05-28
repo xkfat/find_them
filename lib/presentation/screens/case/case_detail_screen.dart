@@ -110,6 +110,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                         child: ElevatedButton(
                           onPressed:
                               isSubmitting
+                                  // ignore: dead_code
                                   ? null
                                   : () async {
                                     if (noteController.text.trim().isEmpty) {
@@ -625,7 +626,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                         BoxShadow(
                                           color: AppColors.getDividerColor(
                                             context,
-                                          ).withOpacity(0.3),
+                                          ),
                                           blurRadius: 2,
                                           offset: const Offset(0, 1),
                                         ),
@@ -819,9 +820,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.getDividerColor(
-                          context,
-                        ).withOpacity(0.3),
+                        color: AppColors.getDividerColor(context),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -922,7 +921,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: AppColors.getDividerColor(context).withOpacity(0.3),
+            color: AppColors.getDividerColor(context),
             blurRadius: 5,
             offset: const Offset(0, 1),
           ),
@@ -966,7 +965,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: AppColors.getDividerColor(context).withOpacity(0.3),
+            color: AppColors.getDividerColor(context),
             blurRadius: 5,
             offset: const Offset(0, 1),
           ),

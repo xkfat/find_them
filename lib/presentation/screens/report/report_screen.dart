@@ -222,8 +222,8 @@ class _Report1ScreenState extends State<Report1Screen> {
                           _selectedGender = newValue;
                         });
                       },
-                      fillColor: MaterialStateProperty.resolveWith<Color>((
-                        Set<MaterialState> states,
+                      fillColor: WidgetStateProperty.resolveWith<Color>((
+                        Set<WidgetState> states,
                       ) {
                         return AppColors.teal;
                       }),
@@ -241,8 +241,8 @@ class _Report1ScreenState extends State<Report1Screen> {
                           _selectedGender = newValue;
                         });
                       },
-                      fillColor: MaterialStateProperty.resolveWith<Color>((
-                        Set<MaterialState> states,
+                      fillColor: WidgetStateProperty.resolveWith<Color>((
+                        Set<WidgetState> states,
                       ) {
                         return AppColors.teal;
                       }),

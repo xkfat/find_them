@@ -60,7 +60,7 @@ class AuthRepository {
       }
       return false;
     } catch (e) {
-      print("Error deleting account: $e");
+      log("Error deleting account: $e");
       return false;
     }
   }

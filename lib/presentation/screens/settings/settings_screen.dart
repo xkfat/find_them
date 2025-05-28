@@ -1,6 +1,5 @@
 import 'dart:developer';
-
-import 'package:find_them/presentation/widgets/LanguageDrop.dart';
+import 'package:find_them/presentation/widgets/language_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
@@ -14,8 +13,13 @@ import 'package:find_them/data/services/location_sharing_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback toggleTheme;
+  final Function(String) changeLanguage;
 
-  const SettingsScreen({super.key, required this.toggleTheme});
+  const SettingsScreen({
+    super.key,
+    required this.toggleTheme,
+    required this.changeLanguage,
+  });
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -26,7 +30,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool locationPermissionEnabled = false;
   bool locationSharingEnabled = false;
   String selectedLanguage = 'English';
-  final List<String> languages = ['Arabic', 'English', 'French'];
+
+  final List<String> languages = ['English', 'العربية', 'Français'];
+
+  final Map<String, String> languageCodes = {
+    'English': 'en',
+    'العربية': 'ar',
+    'Français': 'fr',
+  };
+
   late LocationSharingCubit _locationSharingCubit;
 
   @override
@@ -38,12 +50,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _checkLocationPermission();
     _checkNotificationPermission();
     _loadLocationSharingSettings();
+    _setCurrentLanguage();
   }
 
   @override
   void dispose() {
     _locationSharingCubit.close();
     super.dispose();
+  }
+
+  void _setCurrentLanguage() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final currentLocale = Localizations.localeOf(context);
+        setState(() {
+          switch (currentLocale.languageCode) {
+            case 'ar':
+              selectedLanguage = 'العربية';
+              break;
+            case 'fr':
+              selectedLanguage = 'Français';
+              break;
+            default:
+              selectedLanguage = 'English';
+          }
+        });
+      }
+    });
   }
 
   Future<void> _loadLocationSharingSettings() async {
@@ -263,6 +296,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 setState(() {
                                   selectedLanguage = newValue;
                                 });
+
+                                final languageCode =
+                                    languageCodes[newValue] ?? 'en';
+
+                                widget.changeLanguage(languageCode);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Language changed to $newValue',
+                                    ),
+                                    duration: const Duration(seconds: 2),
+                                    backgroundColor: AppColors.teal,
+                                  ),
+                                );
                               },
                             ),
                           ],

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:find_them/data/repositories/social_auth_repo.dart';
 
@@ -25,7 +27,7 @@ class SocialAuthCubit extends Cubit<SocialAuthState> {
         emit(SocialAuthError(result['message'] ?? 'Google Sign-In failed. Please try again.'));
       }
     } catch (e) {
-      print('Google Sign In Error in Cubit: $e');
+      log('Google Sign In Error in Cubit: $e');
       if (!_isClosed) {
         emit(SocialAuthError('Google Sign-In error: ${e.toString()}'));
       }
@@ -48,7 +50,7 @@ class SocialAuthCubit extends Cubit<SocialAuthState> {
         emit(SocialAuthError(result['message'] ?? 'Facebook Sign-In failed. Please try again.'));
       }
     } catch (e) {
-      print('Facebook Sign In Error in Cubit: $e');
+      log('Facebook Sign In Error in Cubit: $e');
       if (!_isClosed) {
         emit(SocialAuthError('Facebook Sign-In error: ${e.toString()}'));
       }
@@ -62,7 +64,7 @@ class SocialAuthCubit extends Cubit<SocialAuthState> {
       await _repository.signOut();
       emit(SocialAuthInitial());
     } catch (e) {
-      print('Sign Out Error: $e');
+      log('Sign Out Error: $e');
       if (!_isClosed) {
         emit(SocialAuthError('Sign Out error: ${e.toString()}'));
       }
@@ -75,7 +77,7 @@ Future<bool> updatePhoneNumber(String phoneNumber, String token) async {
   try {
     return await _repository.updateUserPhone(phoneNumber, token);
   } catch (e) {
-    print('Error updating phone: $e');
+    log('Error updating phone: $e');
     return false;
   }
 }

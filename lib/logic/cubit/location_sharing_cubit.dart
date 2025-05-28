@@ -73,9 +73,7 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
     }
   }
 
-  // NEW SIMPLIFIED METHODS
 
-  /// Toggle global location sharing (for settings screen)
   Future<void> toggleGlobalSharing(bool isSharing) async {
     try {
       emit(LocationSharingLoading());
@@ -86,21 +84,17 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
           : 'Location sharing disabled';
       emit(LocationSharingActionSuccess(message));
       
-      // Don't reload location data here as this is for settings screen
     } catch (e) {
       emit(LocationSharingError(e.toString()));
     }
   }
 
-  /// Toggle sharing with a specific friend (can_see_me)
   Future<void> toggleFriendSharing(int friendId, bool canSeeMe) async {
     try {
-      // Optimistic update
       final currentState = state;
       if (currentState is LocationSharingLoaded) {
         final updatedFriends = currentState.friends.map((friend) {
           if (friend.friendId == friendId) {
-            // Create updated friend with new canSeeYou status
             return LocationSharingModel(
               id: friend.id,
               userId: friend.userId,
@@ -114,14 +108,12 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
           return friend;
         }).toList();
         
-        // Emit optimistic update
         emit(LocationSharingLoaded(
           requests: currentState.requests,
           friends: updatedFriends,
         ));
       }
 
-      // Make API call
       await _repository.toggleFriendSharing(friendId, canSeeMe);
       
       final message = canSeeMe 
@@ -129,16 +121,13 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
           : 'Stopped sharing location with friend';
       emit(LocationSharingActionSuccess(message));
       
-      // Reload to get actual server state
       await loadLocationData();
     } catch (e) {
       emit(LocationSharingError(e.toString()));
-      // Reload on error to revert optimistic update
       await loadLocationData();
     }
   }
 
-  /// Get current sharing settings (for settings screen)
   Future<Map<String, dynamic>?> getSharingSettings() async {
     try {
       return await _repository.getSharingSettings();

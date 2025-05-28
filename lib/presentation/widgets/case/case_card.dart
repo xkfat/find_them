@@ -14,13 +14,13 @@ class CaseListWidget extends StatelessWidget {
   final Function() onRefresh;
 
   const CaseListWidget({
-    Key? key,
+    super.key,
     required this.cases,
     required this.onCaseTap,
     this.isLoading = false,
     this.errorMessage,
     required this.onRefresh,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +95,7 @@ class _CaseCard extends StatelessWidget {
   final Case caseData;
   final Function(int caseId) onTap;
 
-  const _CaseCard({Key? key, required this.caseData, required this.onTap})
-    : super(key: key);
+  const _CaseCard({ required this.caseData, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

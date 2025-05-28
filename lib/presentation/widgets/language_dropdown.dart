@@ -54,13 +54,13 @@ class _LanguageDropdownState extends State<LanguageDropdown> {
           (context) => Positioned(
             left: position.dx,
             top: position.dy + size.height,
-            width: 80, // Fixed width of 80
+            width: 90,
             child: Material(
               elevation: 4,
               borderRadius: BorderRadius.circular(8),
               color: Colors.white,
               child: Container(
-                height: 105, // Fixed height of 105
+                height: 105,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   color: Colors.white,
@@ -76,7 +76,7 @@ class _LanguageDropdownState extends State<LanguageDropdown> {
                             _removeOverlay();
                           },
                           child: Container(
-                            height: 35, // Same height as dropdown button
+                            height: 35,
                             alignment: Alignment.center,
                             padding: const EdgeInsets.symmetric(horizontal: 10),
                             child: Text(
@@ -106,8 +106,8 @@ class _LanguageDropdownState extends State<LanguageDropdown> {
       onTap: _toggleDropdown,
       child: Container(
         key: _dropdownKey,
-        width: 80, // Fixed width of 80
-        height: 35, // Fixed height of 35
+        width: 90,
+        height: 35,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: AppColors.teal,

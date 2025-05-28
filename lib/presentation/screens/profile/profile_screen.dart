@@ -272,7 +272,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black,
               ),
               child: const Center(
                 child: CircularProgressIndicator(color: Colors.white),

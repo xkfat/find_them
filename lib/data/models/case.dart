@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:find_them/data/models/user.dart';
 import 'package:find_them/data/models/enum.dart';
 import 'package:find_them/data/models/case_update.dart';
@@ -43,85 +45,85 @@ class Case {
 
   factory Case.fromJson(Map<String, dynamic> json) {
     try {
-      print("Full JSON: $json");
+      log("Full JSON: $json");
 
       int? parsedId;
       try {
         parsedId = json['id'];
-        print("Parsed ID: $parsedId");
+        log("Parsed ID: $parsedId");
       } catch (e) {
-        print("Error parsing ID: $e");
+        log("Error parsing ID: $e");
       }
 
       String firstName;
       try {
         firstName = json['first_name'] ?? '';
-        print("Parsed firstName: $firstName");
+        log("Parsed firstName: $firstName");
       } catch (e) {
-        print("Error parsing firstName: $e");
+        log("Error parsing firstName: $e");
         firstName = '';
       }
 
       String lastName;
       try {
         lastName = json['last_name'] ?? '';
-        print("Parsed lastName: $lastName");
+        log("Parsed lastName: $lastName");
       } catch (e) {
-        print("Error parsing lastName: $e");
+        log("Error parsing lastName: $e");
         lastName = '';
       }
 
       int age;
       try {
         age = json['age'] ?? 0;
-        print("Parsed age: $age");
+        log("Parsed age: $age");
       } catch (e) {
-        print("Error parsing age: $e");
+        log("Error parsing age: $e");
         age = 0;
       }
 
       Gender gender;
       try {
         gender = GenderExtension.fromValue(json['gender'] ?? 'Male');
-        print("Parsed gender: $gender");
+        log("Parsed gender: $gender");
       } catch (e) {
-        print("Error parsing gender: $e");
+        log("Error parsing gender: $e");
         gender = GenderExtension.fromValue('Male');
       }
 
       String photo;
       try {
         photo = json['photo'] ?? '';
-        print("Parsed photo: $photo");
+        log("Parsed photo: $photo");
       } catch (e) {
-        print("Error parsing photo: $e");
+        log("Error parsing photo: $e");
         photo = '';
       }
 
       String description;
       try {
         description = json['description'] ?? '';
-        print("Parsed description: $description");
+        log("Parsed description: $description");
       } catch (e) {
-        print("Error parsing description: $e");
+        log("Error parsing description: $e");
         description = '';
       }
 
       DateTime lastSeenDate;
       try {
         lastSeenDate = DateTime.parse(json['last_seen_date']);
-        print("Parsed lastSeenDate: $lastSeenDate");
+        log("Parsed lastSeenDate: $lastSeenDate");
       } catch (e) {
-        print("Error parsing lastSeenDate: $e");
+        log("Error parsing lastSeenDate: $e");
         lastSeenDate = DateTime.now();
       }
 
       String lastSeenLocation;
       try {
         lastSeenLocation = json['last_seen_location'] ?? '';
-        print("Parsed lastSeenLocation: $lastSeenLocation");
+        log("Parsed lastSeenLocation: $lastSeenLocation");
       } catch (e) {
-        print("Error parsing lastSeenLocation: $e");
+        log("Error parsing lastSeenLocation: $e");
         lastSeenLocation = '';
       }
 
@@ -131,9 +133,9 @@ class Case {
             json['latitude'] == null
                 ? null
                 : double.tryParse(json['latitude'].toString());
-        print("Parsed latitude: $latitude");
+        log("Parsed latitude: $latitude");
       } catch (e) {
-        print("Error parsing latitude: $e");
+        log("Error parsing latitude: $e");
         latitude = null;
       }
 
@@ -143,36 +145,36 @@ class Case {
             json['longitude'] == null
                 ? null
                 : double.tryParse(json['longitude'].toString());
-        print("Parsed longitude: $longitude");
+        log("Parsed longitude: $longitude");
       } catch (e) {
-        print("Error parsing longitude: $e");
+        log("Error parsing longitude: $e");
         longitude = null;
       }
 
       String? contactPhone;
       try {
         contactPhone = json['contact_phone'];
-        print("Parsed contactPhone: $contactPhone");
+        log("Parsed contactPhone: $contactPhone");
       } catch (e) {
-        print("Error parsing contactPhone: $e");
+        log("Error parsing contactPhone: $e");
         contactPhone = null;
       }
 
       CaseStatus status;
       try {
         status = CaseStatusExtension.fromValue(json['status'] ?? 'missing');
-        print("Parsed status: $status");
+        log("Parsed status: $status");
       } catch (e) {
-        print("Error parsing status: $e");
+        log("Error parsing status: $e");
         status = CaseStatus.missing;
       }
 
       DateTime dateReported;
       try {
         dateReported = DateTime.parse(json['date_reported']);
-        print("Parsed dateReported: $dateReported");
+        log("Parsed dateReported: $dateReported");
       } catch (e) {
-        print("Error parsing dateReported: $e");
+        log("Error parsing dateReported: $e");
         dateReported = DateTime.now();
       }
 
@@ -181,9 +183,9 @@ class Case {
         submissionStatus = SubmissionStatusExtension.fromValue(
           json['submission_status'] ?? 'in_progress',
         );
-        print("Parsed submissionStatus: $submissionStatus");
+        log("Parsed submissionStatus: $submissionStatus");
       } catch (e) {
-        print("Error parsing submissionStatus: $e");
+        log("Error parsing submissionStatus: $e");
         submissionStatus = SubmissionStatus.inProgress;
       }
 
@@ -202,9 +204,9 @@ class Case {
                     )
                     : User.fromJson(json['reporter'] as Map<String, dynamic>))
                 : null;
-        print("Parsed reporter: ${reporter?.username}");
+        log("Parsed reporter: ${reporter?.username}");
       } catch (e) {
-        print("Error parsing reporter: $e");
+        log("Error parsing reporter: $e");
         reporter = null;
       }
 
@@ -216,9 +218,9 @@ class Case {
                     .map((e) => CaseUpdate.fromJson(e))
                     .toList()
                 : null;
-        print("Parsed updates count: ${updates?.length}");
+        log("Parsed updates count: ${updates?.length}");
       } catch (e) {
-        print("Error parsing updates: $e");
+        log("Error parsing updates: $e");
         updates = null;
       }
 
@@ -243,8 +245,8 @@ class Case {
 
       );
     } catch (e) {
-      print("OVERALL ERROR in Case.fromJson: $e");
-      print("Problem JSON: $json");
+      log("OVERALL ERROR in Case.fromJson: $e");
+      log("Problem JSON: $json");
       rethrow;
     }
   }

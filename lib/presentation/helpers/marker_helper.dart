@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -10,12 +11,12 @@ import 'package:http/http.dart' as http;
 
 class CustomMarkerHelper {
   static final Map<String, BitmapDescriptor> _cache = {};
+  // ignore: unused_field
   static const int _maxImageSize = 300;
-  static const double _markerSize = 150;
+  static const double _markerSize = 160;
   static const double _borderWidth = 10.0;
   static const double _shadowOffset = 2.0;
 
-  /// Create a custom marker with user photo and live indicator
   static Future<BitmapDescriptor> createUserMarkerWithLiveIndicator({
     required String imageUrl,
     required UserLocationModel locationData,
@@ -38,12 +39,11 @@ class CustomMarkerHelper {
 
       return marker;
     } catch (e) {
-      print('Error creating user marker with live indicator: $e');
+      log('Error creating user marker with live indicator: $e');
       return _createFallbackUserMarker(locationData);
     }
   }
 
-  /// Create a standard user marker (for backward compatibility)
   static Future<BitmapDescriptor> createUserMarker({
     required String imageUrl,
     String? fallbackImagePath,
@@ -65,12 +65,11 @@ class CustomMarkerHelper {
 
       return marker;
     } catch (e) {
-      print('Error creating user marker: $e');
+      log('Error creating user marker: $e');
       return _createFallbackMarker(AppColors.teal);
     }
   }
 
-  /// Create a custom marker with case photo
   static Future<BitmapDescriptor> createCaseMarker({
     required String imageUrl,
     required String status,
@@ -95,12 +94,11 @@ class CustomMarkerHelper {
 
       return marker;
     } catch (e) {
-      print('Error creating case marker: $e');
+      log('Error creating case marker: $e');
       return _createFallbackMarker(_getStatusColor(status));
     }
   }
 
-  /// Get live indicator color based on freshness
   static Color _getLiveIndicatorColor(String freshness) {
     switch (freshness) {
       case 'live':
@@ -149,7 +147,6 @@ class CustomMarkerHelper {
     paint.color = borderColor;
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint);
 
-    // Draw inner white circle
     paint.color = Colors.white;
     canvas.drawCircle(
       Offset(size / 2, size / 2),
@@ -157,7 +154,6 @@ class CustomMarkerHelper {
       paint,
     );
 
-    // Draw default icon
     paint.color = borderColor;
     canvas.drawCircle(
       Offset(size / 2, size / 2),
@@ -165,15 +161,9 @@ class CustomMarkerHelper {
       paint,
     );
 
-    // Add live indicator dot
     paint.color = borderColor;
-    canvas.drawCircle(
-      Offset(size - 15, 15), // Top right corner
-      8,
-      paint,
-    );
+    canvas.drawCircle(Offset(size - 15, 15), 8, paint);
 
-    // Add white border around indicator
     paint.color = Colors.white;
     paint.style = PaintingStyle.stroke;
     paint.strokeWidth = 2;
@@ -190,21 +180,18 @@ class CustomMarkerHelper {
     return BitmapDescriptor.fromBytes(pngBytes);
   }
 
-  /// Create fallback marker with consistent size
   static Future<BitmapDescriptor> _createFallbackMarker(Color color) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final paint = Paint()..isAntiAlias = true;
 
-    // Draw shadow
-    paint.color = Colors.black.withOpacity(0.3);
+    paint.color = Colors.black;
     canvas.drawCircle(
       Offset(_markerSize / 2 + _shadowOffset, _markerSize / 2 + _shadowOffset),
       _markerSize / 2,
       paint,
     );
 
-    // Draw outer border
     paint.color = color;
     canvas.drawCircle(
       Offset(_markerSize / 2, _markerSize / 2),
@@ -212,7 +199,6 @@ class CustomMarkerHelper {
       paint,
     );
 
-    // Draw inner white circle
     paint.color = Colors.white;
     canvas.drawCircle(
       Offset(_markerSize / 2, _markerSize / 2),
@@ -220,7 +206,6 @@ class CustomMarkerHelper {
       paint,
     );
 
-    // Draw default icon
     paint.color = color;
     canvas.drawCircle(
       Offset(_markerSize / 2, _markerSize / 2),
@@ -239,7 +224,6 @@ class CustomMarkerHelper {
     return BitmapDescriptor.fromBytes(pngBytes);
   }
 
-  /// Create a photo marker with live indicator
   static Future<BitmapDescriptor> _createPhotoMarkerWithLiveIndicator({
     required String imageUrl,
     required UserLocationModel locationData,
@@ -250,7 +234,7 @@ class CustomMarkerHelper {
       ui.Image? image = await _loadAndResizeImage(imageUrl, fallbackImagePath);
 
       if (image == null) {
-        print('Failed to load image, using fallback marker');
+        log('Failed to load image, using fallback marker');
         return _createFallbackUserMarker(locationData);
       }
 
@@ -264,12 +248,11 @@ class CustomMarkerHelper {
 
       return marker;
     } catch (e) {
-      print('Error in _createPhotoMarkerWithLiveIndicator: $e');
+      log('Error in _createPhotoMarkerWithLiveIndicator: $e');
       return _createFallbackUserMarker(locationData);
     }
   }
 
-  /// Create a standard photo marker
   static Future<BitmapDescriptor> _createPhotoMarker({
     required String imageUrl,
     required String fallbackImagePath,
@@ -281,7 +264,7 @@ class CustomMarkerHelper {
       ui.Image? image = await _loadAndResizeImage(imageUrl, fallbackImagePath);
 
       if (image == null) {
-        print('Failed to load image, using fallback marker');
+        log('Failed to load image, using fallback marker');
         return _createFallbackMarker(borderColor);
       }
 
@@ -292,12 +275,11 @@ class CustomMarkerHelper {
 
       return marker;
     } catch (e) {
-      print('Error in _createPhotoMarker: $e');
+      log('Error in _createPhotoMarker: $e');
       return _createFallbackMarker(borderColor);
     }
   }
 
-  /// Load and resize image to exact size for consistency
   static Future<ui.Image?> _loadAndResizeImage(
     String imageUrl,
     String fallbackPath,
@@ -306,32 +288,30 @@ class CustomMarkerHelper {
 
     try {
       if (imageUrl.isNotEmpty && imageUrl.startsWith('http')) {
-        print('Loading image from: $imageUrl');
+        log('Loading image from: $imageUrl');
         final response = await http
             .get(Uri.parse(imageUrl))
             .timeout(const Duration(seconds: 5));
 
         if (response.statusCode == 200) {
           imageBytes = response.bodyBytes;
-          print('Network image loaded, size: ${imageBytes.length} bytes');
+          log('Network image loaded, size: ${imageBytes.length} bytes');
         }
       }
     } catch (e) {
-      print('Failed to load network image: $e');
+      log('Failed to load network image: $e');
     }
 
     if (imageBytes == null) {
       try {
         final ByteData data = await rootBundle.load(fallbackPath);
         imageBytes = data.buffer.asUint8List();
-        print('Fallback image loaded, size: ${imageBytes.length} bytes');
+        log('Fallback image loaded, size: ${imageBytes.length} bytes');
       } catch (e) {
-        print('Failed to load fallback image: $e');
+        log('Failed to load fallback image: $e');
         return null;
       }
     }
-
-    if (imageBytes == null) return null;
 
     try {
       final Completer<ui.Image> completer = Completer();
@@ -345,12 +325,11 @@ class CustomMarkerHelper {
 
       return resizedImage;
     } catch (e) {
-      print('Error decoding/resizing image: $e');
+      log('Error decoding/resizing image: $e');
       return null;
     }
   }
 
-  /// Resize image to exact square dimensions for consistency
   static Future<ui.Image> _resizeImageToSquare(ui.Image image) async {
     const int targetSize = 200;
 
@@ -376,11 +355,10 @@ class CustomMarkerHelper {
     final resizedImage = await picture.toImage(targetSize, targetSize);
     picture.dispose();
 
-    print('Image resized to consistent ${targetSize}x${targetSize}');
+    log('Image resized to consistent ${targetSize}x${targetSize}');
     return resizedImage;
   }
 
-  /// Draw photo marker with live indicator
   static Future<BitmapDescriptor> _drawPhotoMarkerWithLiveIndicator(
     ui.Image image,
     UserLocationModel locationData,
@@ -395,19 +373,16 @@ class CustomMarkerHelper {
 
     final borderColor = _getLiveIndicatorColor(locationData.freshness);
 
-    // Draw shadow
-    paint.color = Colors.black.withOpacity(0.3);
+    paint.color = Colors.black;
     canvas.drawCircle(
       Offset(size / 2 + shadowOffset, size / 2 + shadowOffset),
       size / 2,
       paint,
     );
 
-    // Draw outer border with live color
     paint.color = borderColor;
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint);
 
-    // Draw inner white circle
     paint.color = Colors.white;
     canvas.drawCircle(
       Offset(size / 2, size / 2),
@@ -415,7 +390,6 @@ class CustomMarkerHelper {
       paint,
     );
 
-    // Clip to circle and draw image
     final imageSize = size - (borderWidth * 2) - 4;
     final imageOffset = (size - imageSize) / 2;
 
@@ -436,35 +410,25 @@ class CustomMarkerHelper {
 
     canvas.restore();
 
-    // Add live indicator dot in top-right corner
     paint.color = borderColor;
     paint.style = PaintingStyle.fill;
-    canvas.drawCircle(
-      Offset(size - 20, 20), // Top right corner
-      12,
-      paint,
-    );
+    canvas.drawCircle(Offset(size - 20, 20), 12, paint);
 
-    // Add white border around indicator
     paint.color = Colors.white;
     paint.style = PaintingStyle.stroke;
     paint.strokeWidth = 3;
     canvas.drawCircle(Offset(size - 20, 20), 12, paint);
 
-    // Add inner indicator (different for live vs recent)
     paint.style = PaintingStyle.fill;
     if (locationData.isLive) {
-      // Live: solid circle
       paint.color = Colors.white;
       canvas.drawCircle(Offset(size - 20, 20), 6, paint);
     } else {
-      // Recent: clock icon
       paint.color = Colors.white;
       paint.strokeWidth = 2;
       paint.style = PaintingStyle.stroke;
       canvas.drawCircle(Offset(size - 20, 20), 5, paint);
 
-      // Clock hands
       paint.style = PaintingStyle.fill;
       canvas.drawLine(Offset(size - 20, 20), Offset(size - 20, 16), paint);
       canvas.drawLine(Offset(size - 20, 20), Offset(size - 17, 20), paint);
@@ -481,7 +445,6 @@ class CustomMarkerHelper {
     return BitmapDescriptor.fromBytes(pngBytes);
   }
 
-  /// Draw standard photo marker
   static Future<BitmapDescriptor> _drawPhotoMarker(
     ui.Image image,
     Color borderColor,
@@ -494,19 +457,16 @@ class CustomMarkerHelper {
     const double borderWidth = _borderWidth;
     const double shadowOffset = _shadowOffset;
 
-    // Draw shadow
-    paint.color = Colors.black.withOpacity(0.3);
+    paint.color = Colors.black;
     canvas.drawCircle(
       Offset(size / 2 + shadowOffset, size / 2 + shadowOffset),
       size / 2,
       paint,
     );
 
-    // Draw outer border
     paint.color = borderColor;
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint);
 
-    // Draw inner white circle
     paint.color = Colors.white;
     canvas.drawCircle(
       Offset(size / 2, size / 2),
@@ -514,7 +474,6 @@ class CustomMarkerHelper {
       paint,
     );
 
-    // Clip to circle and draw image
     final imageSize = size - (borderWidth * 2) - 4;
     final imageOffset = (size - imageSize) / 2;
 
@@ -546,20 +505,17 @@ class CustomMarkerHelper {
     return BitmapDescriptor.fromBytes(pngBytes);
   }
 
-  /// Clear cache to free memory
   static void clearCache() {
-    print('Clearing marker cache, size: ${_cache.length}');
+    log('Clearing marker cache, size: ${_cache.length}');
     _cache.clear();
   }
 
-  /// Get cache size for debugging
   static int getCacheSize() {
     return _cache.length;
   }
 
-  /// Clear cache when memory is low
   static void onMemoryWarning() {
-    print('Memory warning - clearing marker cache');
+    log('Memory warning - clearing marker cache');
     clearCache();
   }
 }

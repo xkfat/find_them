@@ -22,7 +22,7 @@ class SocialAuthRepository {
       final result = await _socialAuthService.signInWithFacebook();
       return result;
     } catch (e) {
-      print('Repository Facebook Sign In Error: $e');
+      log('Repository Facebook Sign In Error: $e');
       return {'success': false, 'message': e.toString()};
     }
   }

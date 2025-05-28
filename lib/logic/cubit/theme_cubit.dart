@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:find_them/data/models/enum.dart' as AppEnum;
+import 'package:find_them/data/models/enum.dart' as appenum;
 
 part 'theme_state.dart';
 
@@ -16,44 +16,46 @@ class ThemeCubit extends Cubit<ThemeState> {
     if (state is ThemeChanged) {
       final currentState = state as ThemeChanged;
       final newTheme =
-          currentState.currentTheme == AppEnum.Theme.light
-              ? AppEnum.Theme.dark
-              : AppEnum.Theme.light;
+          currentState.currentTheme == appenum.Theme.light
+              ? appenum.Theme.dark
+              : appenum.Theme.light;
       emit(ThemeChanged(newTheme));
       _saveTheme(newTheme);
     } else {
-      emit(const ThemeChanged(AppEnum.Theme.dark));
-      _saveTheme(AppEnum.Theme.dark);
+      emit(const ThemeChanged(appenum.Theme.dark));
+      _saveTheme(appenum.Theme.dark);
     }
   }
 
-  void setTheme(AppEnum.Theme theme) {
+  void setTheme(appenum.Theme theme) {
     emit(ThemeChanged(theme));
     _saveTheme(theme);
   }
 
-  AppEnum.Theme getCurrentTheme() {
+  appenum.Theme getCurrentTheme() {
     if (state is ThemeChanged) {
       return (state as ThemeChanged).currentTheme;
     }
-    return AppEnum.Theme.light;
+    return appenum.Theme.light;
   }
 
   Future<void> _loadTheme() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final themeValue = prefs.getString(_themeKey) ?? 'light';
-      final theme = AppEnum.ThemeExtension.fromValue(themeValue);
+      final theme = appenum.ThemeExtension.fromValue(themeValue);
       emit(ThemeChanged(theme));
     } catch (e) {
-      emit(const ThemeChanged(AppEnum.Theme.light));
+      emit(const ThemeChanged(appenum.Theme.light));
     }
   }
 
-  Future<void> _saveTheme(AppEnum.Theme theme) async {
+  Future<void> _saveTheme(appenum.Theme theme) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_themeKey, theme.value);
-    } catch (e) {}
+    } catch (e) {
+      //catch
+    }
   }
 }

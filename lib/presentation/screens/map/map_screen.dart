@@ -35,7 +35,6 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   List<Case> _filteredCases = [];
   List<UserLocationModel> _filteredFriendsLocations = [];
 
-  // Navigation parameters
   Map<String, dynamic>? _navigationArgs;
   bool _shouldFocusOnUser = false;
   int? _focusUserId;
@@ -46,7 +45,6 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
     log('MapScreen: Initializing...');
     WidgetsBinding.instance.addObserver(this);
 
-    // Get navigation arguments if any
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final args =
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
@@ -112,31 +110,16 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
 
     final Set<Marker> newMarkers = {};
 
-    if (currentPosition != null) {
-      log(
-        'Adding current location marker: ${currentPosition.latitude}, ${currentPosition.longitude}',
-      );
-      newMarkers.add(
-        Marker(
-          markerId: const MarkerId('currentLocation'),
-          position: LatLng(currentPosition.latitude, currentPosition.longitude),
-          infoWindow: const InfoWindow(title: 'Your Location'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueTeal),
-        ),
+    if (currentPosition != null && !_shouldFocusOnUser) {
+      _initialCameraPosition = CameraPosition(
+        target: LatLng(currentPosition.latitude, currentPosition.longitude),
+        zoom: 15,
       );
 
-      // Only update camera if not focusing on a specific user
-      if (!_shouldFocusOnUser) {
-        _initialCameraPosition = CameraPosition(
-          target: LatLng(currentPosition.latitude, currentPosition.longitude),
-          zoom: 15,
+      if (_mapController != null) {
+        _mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(_initialCameraPosition),
         );
-
-        if (_mapController != null) {
-          _mapController!.animateCamera(
-            CameraUpdate.newCameraPosition(_initialCameraPosition),
-          );
-        }
       }
     }
 
@@ -202,7 +185,6 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
         'Processing friend location: ${friendLocation.username}, lat: ${friendLocation.latitude}, lng: ${friendLocation.longitude}, freshness: ${friendLocation.freshness}',
       );
 
-      // Check if this is the user we want to focus on
       if (_shouldFocusOnUser && _focusUserId == friendLocation.user) {
         targetUserLocation = friendLocation;
         log('Found target user location: ${friendLocation.username}');
@@ -300,13 +282,11 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
 
     log('Markers updated in state: ${_markers.length}');
 
-    // Focus on target user if specified
     if (_shouldFocusOnUser &&
         targetUserLocation != null &&
         _mapController != null) {
       log('Focusing on target user: ${targetUserLocation.username}');
       await _focusOnUserLocation(targetUserLocation);
-      // Reset focus flag to prevent repeated focusing
       _shouldFocusOnUser = false;
     }
   }
@@ -462,15 +442,6 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                                   : AppColors.teal,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            locationData.isLive
-                                ? Icons.circle
-                                : Icons.access_time,
-                            color: Colors.white,
-                            size: 12,
-                          ),
                         ),
                       ),
                     ),
@@ -800,7 +771,6 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                   children: [
                     Row(
                       children: [
-                        // Back button if navigated from location sharing
                         if (_navigationArgs != null)
                           IconButton(
                             icon: Icon(

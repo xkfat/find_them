@@ -7,7 +7,7 @@ import 'package:find_them/logic/cubit/case_list_cubit.dart';
 class FilterDrawer extends StatefulWidget {
   final Function onClose;
 
-  const FilterDrawer({Key? key, required this.onClose}) : super(key: key);
+  const FilterDrawer({super.key, required this.onClose});
 
   @override
   State<FilterDrawer> createState() => _FilterDrawerState();
@@ -135,7 +135,8 @@ class _FilterDrawerState extends State<FilterDrawer> {
               onPrimary: Colors.white,
               onSurface: AppColors.getTextColor(context),
             ),
-            dialogBackgroundColor: AppColors.getCardColor(context),
+            
+          //  dialogBackgroundColor: AppColors.getCardColor(context),
           ),
           child: child!,
         );
@@ -312,7 +313,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           color: AppColors.getSurfaceColor(context),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColors.teal.withOpacity(0.5),
+                            color: AppColors.teal,
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(
@@ -357,7 +358,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           color: AppColors.getSurfaceColor(context),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColors.teal.withOpacity(0.5),
+                            color: AppColors.teal,
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(

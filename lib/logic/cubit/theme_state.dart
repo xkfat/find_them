@@ -10,7 +10,7 @@ sealed class ThemeState extends Equatable {
 final class ThemeInitial extends ThemeState {}
 
 final class ThemeChanged extends ThemeState {
-  final AppEnum.Theme currentTheme;
+  final appenum.Theme currentTheme;
 
   const ThemeChanged(this.currentTheme);
 

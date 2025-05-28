@@ -18,7 +18,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // ignore: unused_field
   String _searchQuery = '';
+  // ignore: unused_field
   int _selectedIndex = 0;
   final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -35,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  // ignore: unused_element
   void _onNavItemTapped(int index) {
     if (index == 2) {
       Navigator.push(

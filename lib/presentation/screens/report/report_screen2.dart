@@ -337,7 +337,7 @@ class _Report2ScreenState extends State<Report2Screen> {
                               bottom: 0,
                               child: Container(
                                 padding: const EdgeInsets.all(8),
-                                color: Colors.black.withOpacity(0.6),
+                                color: Colors.black,
                                 child: Text(
                                   _address!,
                                   style: TextStyle(

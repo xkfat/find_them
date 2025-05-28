@@ -1,0 +1,670 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for French (`fr`).
+class AppLocalizationsFr extends AppLocalizations {
+  AppLocalizationsFr([String locale = 'fr']) : super(locale);
+
+  @override
+  String get appName => 'Find Them';
+
+  @override
+  String get welcomeTo => 'Bienvenue à';
+
+  @override
+  String get findThem => 'FindThem';
+
+  @override
+  String get whereHopeExists => 'où l\'espoir existe !';
+
+  @override
+  String get together => 'Ensemble';
+
+  @override
+  String get togetherMessage =>
+      ', nous pouvons ramener nos proches disparus à la maison.';
+
+  @override
+  String get joinOurCommunity => 'Rejoignez notre communauté ';
+
+  @override
+  String get joinOurCommunityMessage => 'pour faire la différence.';
+
+  @override
+  String get getStarted => 'Commencer';
+
+  @override
+  String get skip => 'Passer';
+
+  @override
+  String get loginOrSignUp => 'Se connecter ou s\'inscrire';
+
+  @override
+  String get loginOrSignUpMessage =>
+      'Veuillez sélectionner votre méthode préférée\npour continuer la configuration de votre compte';
+
+  @override
+  String get signUp => 'S\'inscrire';
+
+  @override
+  String get login => 'Se connecter';
+
+  @override
+  String get continueWithFacebook => 'Continuer avec Facebook';
+
+  @override
+  String get continueWithGoogle => 'Continuer avec Google';
+
+  @override
+  String get or => 'Ou';
+
+  @override
+  String get welcomeBack => 'Bon retour !';
+
+  @override
+  String get loginToAccessAccount =>
+      'Connectez-vous pour accéder à votre compte';
+
+  @override
+  String get username => 'Nom d\'utilisateur';
+
+  @override
+  String get password => 'Mot de passe';
+
+  @override
+  String get wrongUsername => 'Nom d\'utilisateur incorrect';
+
+  @override
+  String get wrongPassword => 'Mot de passe incorrect';
+
+  @override
+  String get dontHaveAccount => 'Vous n\'avez pas de compte ? ';
+
+  @override
+  String get alreadyHaveAccount => 'Vous avez déjà un compte ? ';
+
+  @override
+  String get firstName => 'Prénom';
+
+  @override
+  String get lastName => 'Nom de famille';
+
+  @override
+  String get email => 'E-mail';
+
+  @override
+  String get phoneNumber => 'Numéro de téléphone';
+
+  @override
+  String get confirmPassword => 'Confirmer le mot de passe';
+
+  @override
+  String get enterFirstName => 'Veuillez entrer votre prénom';
+
+  @override
+  String get enterLastName => 'Veuillez entrer votre nom de famille';
+
+  @override
+  String get enterUsername => 'Veuillez entrer un nom d\'utilisateur';
+
+  @override
+  String get enterValidEmail => 'Veuillez entrer une adresse e-mail valide';
+
+  @override
+  String get enterPhoneNumber => 'Veuillez entrer votre numéro de téléphone';
+
+  @override
+  String get enterPassword => 'Veuillez entrer un mot de passe';
+
+  @override
+  String get confirmYourPassword => 'Veuillez confirmer votre mot de passe';
+
+  @override
+  String get passwordMustBe6Characters =>
+      'Le mot de passe doit contenir au moins 6 caractères';
+
+  @override
+  String get passwordsDoNotMatch => 'Les mots de passe ne correspondent pas';
+
+  @override
+  String get enterCode => 'Entrer le code';
+
+  @override
+  String get enterCodeMessage =>
+      'Veuillez entrer le code à 4 chiffres envoyé à';
+
+  @override
+  String get verifyCode => 'Vérifier le code';
+
+  @override
+  String get codeExpiresIn => 'Le code expire dans';
+
+  @override
+  String get didntReceiveCode => 'Je n\'ai pas reçu de code';
+
+  @override
+  String get resend => 'Renvoyer';
+
+  @override
+  String get success => 'Succès !';
+
+  @override
+  String get congratulations =>
+      'Félicitations ! Vous avez été authentifié avec succès';
+
+  @override
+  String get continueLabel => 'Continuer';
+
+  @override
+  String get home => 'Accueil';
+
+  @override
+  String get map => 'Carte';
+
+  @override
+  String get report => 'Signaler';
+
+  @override
+  String get settings => 'Paramètres';
+
+  @override
+  String get profile => 'Profil';
+
+  @override
+  String get mapView => 'Vue carte';
+
+  @override
+  String get reportingMissingPerson => 'Signaler une personne disparue';
+
+  @override
+  String get basicInformation => 'Informations de base';
+
+  @override
+  String get lastSeenDetails => 'Détails de la dernière observation';
+
+  @override
+  String get additionalInformation => 'Informations supplémentaires';
+
+  @override
+  String get enterFirstNameHere =>
+      'Entrez le prénom de la personne disparue ici';
+
+  @override
+  String get enterLastNameHere =>
+      'Entrez le nom de famille de la personne disparue ici';
+
+  @override
+  String get age => 'Âge';
+
+  @override
+  String get gender => 'Genre';
+
+  @override
+  String get male => 'Homme';
+
+  @override
+  String get female => 'Femme';
+
+  @override
+  String get lastSeenDate => 'Date de dernière observation';
+
+  @override
+  String get lastSeenLocation => 'Lieu de dernière observation';
+
+  @override
+  String get enterLocation => 'Entrez le lieu : zone, quartier, ville, rue...';
+
+  @override
+  String get selectLocationOnMap =>
+      'Sélectionner le lieu de dernière observation sur la carte (optionnel)';
+
+  @override
+  String get tapToSelectLocation =>
+      'Appuyez pour sélectionner l\'emplacement sur la carte';
+
+  @override
+  String get photo => 'Photo';
+
+  @override
+  String get choosePhoto => 'Choisir une photo';
+
+  @override
+  String get noPhotoChosen => 'Aucune photo choisie';
+
+  @override
+  String get contactPhoneNumber => 'Numéro de téléphone de contact';
+
+  @override
+  String get enterYourPhoneNumber => 'Entrez votre numéro de téléphone';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get provideDetails =>
+      'Fournissez des détails sur les circonstances de la disparition, les vêtements, etc.';
+
+  @override
+  String get submitReport => 'Soumettre le rapport';
+
+  @override
+  String get pleaseSelectPhoto => 'Veuillez sélectionner une photo';
+
+  @override
+  String get pleaseEnterFirstName => 'Veuillez entrer le prénom';
+
+  @override
+  String get pleaseEnterLastName => 'Veuillez entrer le nom de famille';
+
+  @override
+  String get pleaseEnterAge => 'Veuillez entrer l\'âge';
+
+  @override
+  String get pleaseSelectDate => 'Veuillez sélectionner une date';
+
+  @override
+  String get pleaseEnterLocation => 'Veuillez entrer un lieu';
+
+  @override
+  String get pleaseEnterDescription => 'Veuillez fournir une description';
+
+  @override
+  String get setLocation => 'Définir la localisation';
+
+  @override
+  String get searchForLocation => 'Rechercher un lieu';
+
+  @override
+  String get selectLocation => 'Sélectionner la localisation';
+
+  @override
+  String get saveLocation => 'Enregistrer la localisation';
+
+  @override
+  String get reportSuccessMessage =>
+      'Nous examinerons vos informations dès que possible.';
+
+  @override
+  String get accountSettings => 'Paramètres du compte';
+
+  @override
+  String get editProfile => 'Modifier le profil';
+
+  @override
+  String get changePassword => 'Changer le mot de passe';
+
+  @override
+  String get changeLanguage => 'Changer la langue';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get darkMode => 'Mode sombre';
+
+  @override
+  String get locationPermission => 'Permission de localisation';
+
+  @override
+  String get locationSharing => 'Partage de localisation';
+
+  @override
+  String get updateProfile => 'Mettre à jour le profil';
+
+  @override
+  String get updatePassword => 'Mettre à jour le mot de passe';
+
+  @override
+  String get setNewPassword => 'Définir un nouveau mot de passe';
+
+  @override
+  String get createNewPassword =>
+      'Créez un nouveau mot de passe. Assurez-vous qu\'il diffère des précédents pour la sécurité';
+
+  @override
+  String get oldPassword => 'Ancien mot de passe';
+
+  @override
+  String get pleaseEnterCurrentPassword =>
+      'Veuillez entrer votre mot de passe actuel';
+
+  @override
+  String get pleaseEnterNewPassword =>
+      'Veuillez entrer un nouveau mot de passe';
+
+  @override
+  String get pleaseConfirmNewPassword =>
+      'Veuillez confirmer votre nouveau mot de passe';
+
+  @override
+  String get oldPasswordNotCorrect =>
+      'L\'ancien mot de passe n\'est pas correct';
+
+  @override
+  String get error => 'Erreur';
+
+  @override
+  String get mySubmittedCases => 'Mes cas soumis';
+
+  @override
+  String get noSubmittedCases => 'Aucun cas soumis';
+
+  @override
+  String get noSubmittedCasesMessage =>
+      'Vous n\'avez pas encore soumis de rapport de personne disparue.';
+
+  @override
+  String get viewDetails => 'Voir les détails';
+
+  @override
+  String get submittedOn => 'Soumis le';
+
+  @override
+  String get updatesTimeline => 'Chronologie des mises à jour';
+
+  @override
+  String get noUpdatesAvailable =>
+      'Aucune mise à jour disponible pour le moment.';
+
+  @override
+  String get locationSharingTitle => 'Partage de localisation';
+
+  @override
+  String get addFriend => 'Ajouter un ami';
+
+  @override
+  String get findFriends => 'Trouver des amis';
+
+  @override
+  String get searchByUsernameOrPhone =>
+      'Rechercher par nom d\'utilisateur ou numéro de téléphone';
+
+  @override
+  String get findFriendsMessage =>
+      'Recherchez par nom d\'utilisateur ou numéro de téléphone pour trouver\ndes personnes que vous connaissez et vous connecter avec elles.';
+
+  @override
+  String get noUsersFound => 'Aucun utilisateur trouvé';
+
+  @override
+  String get tryDifferentSearch =>
+      'Essayez un nom d\'utilisateur ou un numéro de téléphone différent';
+
+  @override
+  String get connect => 'Connecter';
+
+  @override
+  String get accept => 'Accepter';
+
+  @override
+  String get decline => 'Refuser';
+
+  @override
+  String get locationRequest => 'Demande de localisation';
+
+  @override
+  String get sharingWithYou => 'Partage avec vous';
+
+  @override
+  String get notSharing => 'Ne partage pas';
+
+  @override
+  String get canSeeYou => 'Peut vous voir';
+
+  @override
+  String get cannotSeeYou => 'Ne peut pas vous voir';
+
+  @override
+  String get shareLocation => 'Partager la localisation';
+
+  @override
+  String get stopSharing => 'Arrêter le partage';
+
+  @override
+  String get removeFriend => 'Supprimer l\'ami';
+
+  @override
+  String get sendAlert => 'Envoyer une alerte';
+
+  @override
+  String get view => 'Voir';
+
+  @override
+  String get noLocationSharingFriends => 'Aucun ami de partage de localisation';
+
+  @override
+  String get tapToAddFriends =>
+      'Appuyez sur + pour ajouter des amis pour le partage de localisation';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get noNotifications => 'Aucune notification';
+
+  @override
+  String get allCaughtUp => 'Vous êtes à jour !';
+
+  @override
+  String get deleteNotification => 'Supprimer la notification';
+
+  @override
+  String get deleteNotificationMessage =>
+      'Êtes-vous sûr de vouloir supprimer cette notification ? Cette action ne peut pas être annulée.';
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get delete => 'Supprimer';
+
+  @override
+  String get viewDetailsButton => 'Voir les détails';
+
+  @override
+  String get viewOnMap => 'Voir sur la carte';
+
+  @override
+  String get search => 'Rechercher';
+
+  @override
+  String get searchCasesOrFriends => 'Rechercher des cas ou des amis';
+
+  @override
+  String get all => 'Tous';
+
+  @override
+  String get cases => 'Cas';
+
+  @override
+  String get users => 'Utilisateurs';
+
+  @override
+  String get filterSearching => 'Filtrer la recherche';
+
+  @override
+  String get reset => 'Réinitialiser';
+
+  @override
+  String get ageRange => 'Tranche d\'âge';
+
+  @override
+  String get status => 'Statut';
+
+  @override
+  String get dateRange => 'Plage de dates';
+
+  @override
+  String get startDate => 'Date de début';
+
+  @override
+  String get endDate => 'Date de fin';
+
+  @override
+  String get selectStartDate => 'Sélectionner la date de début';
+
+  @override
+  String get selectEndDate => 'Sélectionner la date de fin';
+
+  @override
+  String get applyFilter => 'Appliquer le filtre';
+
+  @override
+  String get missing => 'Disparu';
+
+  @override
+  String get investigating => 'En cours d\'enquête';
+
+  @override
+  String get found => 'Trouvé';
+
+  @override
+  String get showAllCases => 'Afficher tous les cas';
+
+  @override
+  String get noCasesFound => 'Aucun cas trouvé correspondant à votre recherche';
+
+  @override
+  String get missingFrom => 'Disparu depuis';
+
+  @override
+  String get lastSeen => 'Vu pour la dernière fois';
+
+  @override
+  String get yearsOld => 'ans';
+
+  @override
+  String get missingFor => 'Disparu depuis';
+
+  @override
+  String get investigatingFor => 'En enquête depuis';
+
+  @override
+  String get foundAfter => 'Trouvé après';
+
+  @override
+  String get days => 'jours';
+
+  @override
+  String get caseInformation => 'Informations sur le cas';
+
+  @override
+  String get lastSeenDateLabel => 'Date de dernière observation :';
+
+  @override
+  String get lastSeenLocationLabel => 'Lieu de dernière observation :';
+
+  @override
+  String get descriptionLabel => 'Description :';
+
+  @override
+  String get leaveInformation => 'Laisser une information';
+
+  @override
+  String get pleaseProvideInformation =>
+      'Veuillez fournir toute information que vous avez sur cette personne disparue, et aidez-nous à retrouver les proches d\'autres personnes.';
+
+  @override
+  String get writeMessageHere => 'Écrivez votre message ici...';
+
+  @override
+  String get submit => 'Soumettre';
+
+  @override
+  String get missingInformation => 'Information manquante';
+
+  @override
+  String get pleaseEnterSomeInformation => 'Veuillez entrer des informations';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get thankYou => 'Merci !';
+
+  @override
+  String get forTryingToHelp => 'd\'essayer de nous aider.';
+
+  @override
+  String get submissionFailed => 'Échec de la soumission';
+
+  @override
+  String get failedToSubmitInformation =>
+      'Échec de la soumission des informations. Veuillez réessayer.';
+
+  @override
+  String get active => 'Actif';
+
+  @override
+  String get inProgress => 'En cours';
+
+  @override
+  String get closed => 'Fermé';
+
+  @override
+  String get rejected => 'Rejeté';
+
+  @override
+  String get pending => 'En attente';
+
+  @override
+  String get unverified => 'Non vérifié';
+
+  @override
+  String get verified => 'Vérifié';
+
+  @override
+  String get falseValue => 'Faux';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String get loading => 'Chargement...';
+
+  @override
+  String get loadingCaseDetails => 'Chargement des détails du cas...';
+
+  @override
+  String get errorLoadingDetails => 'Erreur lors du chargement des détails';
+
+  @override
+  String get unknownState => 'État inconnu';
+
+  @override
+  String get invalidCaseId => 'ID de cas invalide';
+
+  @override
+  String get caseNotFound => 'Cas non trouvé';
+
+  @override
+  String get cannotSubmitReport =>
+      'Impossible de soumettre le rapport : ID de cas invalide';
+
+  @override
+  String get locationPermissionRequired =>
+      'L\'autorisation de localisation est requise pour utiliser la carte.';
+
+  @override
+  String get grantPermission => 'Accorder l\'autorisation';
+
+  @override
+  String errorWithRetry(String error) {
+    return 'Erreur : $error';
+  }
+
+  @override
+  String get logout => 'Se déconnecter';
+
+  @override
+  String get logoutFailed => 'Échec de la déconnexion. Veuillez réessayer.';
+
+  @override
+  String get errorLoggingOut => 'Erreur lors de la déconnexion';
+}

@@ -11,7 +11,7 @@ import 'package:find_them/data/repositories/case_repo.dart';
 part 'submit_case_state.dart';
 
 class SubmitCaseCubit extends Cubit<SubmitCaseState> {
-  CaseRepository _submitCaseRepository;
+  final CaseRepository _submitCaseRepository;
   SubmitCaseCubit(this._submitCaseRepository) : super(SubmitCaseInitial()); 
 
 

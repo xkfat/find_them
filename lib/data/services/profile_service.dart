@@ -29,8 +29,8 @@ class ProfileService {
   Future<User> getUserProfile() async {
     try {
       final response = await _apiService.get(ApiConstants.profile);
-      print("Profile GET response: ${response.statusCode}");
-      print("Profile GET body: ${response.body}");
+      log("Profile GET response: ${response.statusCode}");
+      log("Profile GET body: ${response.body}");
 
       if (response.statusCode == 200) {
         final userData = json.decode(response.body);
@@ -53,14 +53,14 @@ class ProfileService {
     Map<String, dynamic> fields,
   ) async {
     try {
-      print("Updating profile with fields: $fields");
+      log("Updating profile with fields: $fields");
       final response = await _apiService.patch(
         ApiConstants.profile,
         body: fields,
       );
 
-      print("Profile PATCH response: ${response.statusCode}");
-      print("Profile PATCH body: ${response.body}");
+      log("Profile PATCH response: ${response.statusCode}");
+      log("Profile PATCH body: ${response.body}");
 
       final responseData = json.decode(response.body);
 
@@ -72,7 +72,7 @@ class ProfileService {
         try {
           user = User.fromJson(responseData['user']);
         } catch (e) {
-          print("Error parsing user: $e");
+          log("Error parsing user: $e");
         }
       }
 
@@ -90,7 +90,7 @@ class ProfileService {
 
       return ProfileResponse(success: true, message: message, user: user);
     } catch (e) {
-      print("Exception in updateProfilePartial: $e");
+      log("Exception in updateProfilePartial: $e");
       return ProfileResponse(
         success: false,
         message: 'Error in profile update: ${e.toString()}',
@@ -102,7 +102,7 @@ class ProfileService {
   Future<ProfileResponse> updateProfilePhoto(File photo) async {
     try {
       final token = await _apiService.getAccessToken();
-      print(
+      log(
         "Updating profile photo with token: ${token != null ? 'Valid token' : 'No token'}",
       );
 
@@ -122,8 +122,8 @@ class ProfileService {
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
 
-      print("Profile photo update response: ${response.statusCode}");
-      print("Profile photo update body: ${response.body}");
+      log("Profile photo update response: ${response.statusCode}");
+      log("Profile photo update body: ${response.body}");
 
       final responseData = json.decode(response.body);
 
@@ -136,7 +136,7 @@ class ProfileService {
         try {
           user = User.fromJson(responseData['user']);
         } catch (e) {
-          print("Error parsing user: $e");
+          log("Error parsing user: $e");
         }
       }
 
@@ -154,7 +154,7 @@ class ProfileService {
 
       return ProfileResponse(success: true, message: message, user: user);
     } catch (e) {
-      print("Exception in updateProfilePhoto: $e");
+      log("Exception in updateProfilePhoto: $e");
       return ProfileResponse(
         success: false,
         message: 'Error updating profile photo: ${e.toString()}',

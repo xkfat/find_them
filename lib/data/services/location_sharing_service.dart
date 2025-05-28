@@ -54,7 +54,6 @@ class LocationSharingService {
         final List<dynamic> data = json.decode(response.body);
         final friends = data.map((json) => LocationSharingModel.fromJson(json)).toList();
         
-        // Debug logging for canSeeYou status
         for (var friend in friends) {
           log('Friend ${friend.friendDetails.displayName}: canSeeYou = ${friend.canSeeYou}, isSharing = ${friend.isSharing}');
         }
@@ -194,7 +193,6 @@ class LocationSharingService {
     }
   }
 
-  // NEW: Toggle global location sharing (for settings screen)
   Future<Map<String, dynamic>> toggleGlobalSharing(bool isSharing, {String? token}) async {
     try {
       log('Toggling global sharing to $isSharing');
@@ -222,7 +220,6 @@ class LocationSharingService {
     }
   }
 
-  // NEW: Toggle sharing with specific friend
   Future<Map<String, dynamic>> toggleFriendSharing(int friendId, bool canSeeMe, {String? token}) async {
     try {
       log('Toggling friend $friendId sharing to $canSeeMe');
@@ -250,7 +247,6 @@ class LocationSharingService {
     }
   }
 
-  // NEW: Get current sharing settings
   Future<Map<String, dynamic>> getSharingSettings({String? token}) async {
     try {
       log('Getting sharing settings');

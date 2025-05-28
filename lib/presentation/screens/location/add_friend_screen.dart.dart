@@ -92,6 +92,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
       backgroundColor: AppColors.getBackgroundColor(context),
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        
         centerTitle: true,
         title: Text(
           'Add friend',

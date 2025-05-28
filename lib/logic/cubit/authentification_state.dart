@@ -17,5 +17,5 @@ class Authentificationloaded extends AuthentificationState {
 
 class Authentificationerreur extends AuthentificationState {
    final String msg;
-   Authentificationerreur(this.msg);
+   const Authentificationerreur(this.msg);
 }

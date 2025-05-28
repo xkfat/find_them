@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import '../../../core/constants/themes/app_colors.dart';
 import 'onboarding1.dart';
@@ -31,7 +33,7 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
         builder: (context) => const SignUpOptions(fromSkip: true),
       );
     } catch (e) {
-      print('Error showing signup options: $e');
+      log('Error showing signup options: $e');
       showDialog(
         context: context,
         builder:

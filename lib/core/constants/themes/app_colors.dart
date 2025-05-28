@@ -26,7 +26,7 @@ class AppColors {
   static const Color darkDivider = Color(0xFF3D3D3D);
   static const Color darkTextPrimary = Color(0xFFF5F5F5);
   static const Color darkTextSecondary = Color(0xFFB0B0B0);
-  
+
   static const Color missingRedDark = Color(0xFFFF5252);
   static const Color missingRedBackgroundDark = Color(0xFF4A1515);
   static const Color investigatingYellowDark = Color(0xFFFFD54F);
@@ -35,79 +35,78 @@ class AppColors {
   static const Color foundGreenBackgroundDark = Color(0xFF0E3B29);
 
   static Color getBackgroundColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? darkBackground 
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkBackground
         : backgroundGrey;
   }
 
   static Color getCardColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? darkCardBackground 
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkCardBackground
         : lighterMint;
   }
 
   static Color getTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? darkTextPrimary 
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkTextPrimary
         : black;
   }
 
   static Color getSecondaryTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? darkTextSecondary 
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkTextSecondary
         : darkGreen;
   }
 
   static Color getMissingRedColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? missingRedDark 
+    return Theme.of(context).brightness == Brightness.dark
+        ? missingRedDark
         : missingRed;
   }
 
   static Color getMissingRedBackground(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? missingRedBackgroundDark 
+    return Theme.of(context).brightness == Brightness.dark
+        ? missingRedBackgroundDark
         : missingRedBackground;
   }
 
   static Color getInvestigatingYellowColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? investigatingYellowDark 
+    return Theme.of(context).brightness == Brightness.dark
+        ? investigatingYellowDark
         : investigatingYellow;
   }
 
   static Color getInvestigatingYellowBackground(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? investigatingYellowBackgroundDark 
+    return Theme.of(context).brightness == Brightness.dark
+        ? investigatingYellowBackgroundDark
         : investigatingYellowBackground;
   }
 
   static Color getFoundGreenColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? foundGreenDark 
+    return Theme.of(context).brightness == Brightness.dark
+        ? foundGreenDark
         : foundGreen;
   }
 
   static Color getFoundGreenBackground(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? foundGreenBackgroundDark 
+    return Theme.of(context).brightness == Brightness.dark
+        ? foundGreenBackgroundDark
         : foundGreenBackground;
   }
 
   static Color getSurfaceColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? darkSurface 
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkSurface
         : white;
   }
 
   static Color getDividerColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? darkDivider 
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkDivider
         : lightgrey;
   }
+
   static Color getPrimaryColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark 
-        ? darkGreen 
-        : teal;
+    return Theme.of(context).brightness == Brightness.dark ? darkGreen : teal;
   }
 }

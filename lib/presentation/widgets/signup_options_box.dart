@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:find_them/data/repositories/social_auth_repo.dart';
 import 'package:find_them/data/services/social_auth_service.dart';
 import 'package:find_them/logic/cubit/social_auth_cubit.dart';
@@ -40,7 +42,7 @@ class _SignUpOptionsContent extends StatelessWidget {
 
         context.read<SocialAuthCubit>().signInWithGoogle();
       } catch (e) {
-        print("Error in handleGoogleSignIn: $e");
+        log("Error in handleGoogleSignIn: $e");
         if (context.mounted) {
           _showErrorDialog(context, "Google sign-in failed: $e");
         }
@@ -56,7 +58,7 @@ class _SignUpOptionsContent extends StatelessWidget {
 
         context.read<SocialAuthCubit>().signInWithFacebook();
       } catch (e) {
-        print("Error in handleFacebookSignIn: $e");
+        log("Error in handleFacebookSignIn: $e");
         if (context.mounted) {
           _showErrorDialog(context, "Facebook sign-in failed: $e");
         }
@@ -65,7 +67,7 @@ class _SignUpOptionsContent extends StatelessWidget {
 
     return BlocListener<SocialAuthCubit, SocialAuthState>(
       listener: (context, state) {
-        print("Current SocialAuthState: ${state.runtimeType}");
+        log("Current SocialAuthState: ${state.runtimeType}");
 
         if (!context.mounted) return;
 
@@ -74,28 +76,28 @@ class _SignUpOptionsContent extends StatelessWidget {
         }
 
         if (state is SocialAuthSuccess) {
-          print("Authentication successful!");
-          print("State userData: ${state.userData}");
+          log("Authentication successful!");
+          log("State userData: ${state.userData}");
 
           try {
-            print("Home route constant value: ${'/home'}");
-            print("Attempting to navigate to home screen...");
+            log("Home route constant value: ${'/home'}");
+            log("Attempting to navigate to home screen...");
 
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const HomeScreen()),
               (route) => false,
             );
 
-            print("Navigation completed successfully");
+            log("Navigation completed successfully");
           } catch (e) {
-            print("Navigation error: $e");
+            log("Navigation error: $e");
             _showErrorDialog(
               context,
               "Navigation error: $e. Please restart the app.",
             );
           }
         } else if (state is SocialAuthError) {
-          print("SocialAuthError state received: ${state.message}");
+          log("SocialAuthError state received: ${state.message}");
           _showErrorDialog(context, state.message);
         }
       },

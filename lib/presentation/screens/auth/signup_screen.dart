@@ -1,4 +1,7 @@
+// ignore_for_file: unused_local_variable, unused_element
+
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:find_them/logic/cubit/sign_up_cubit.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +22,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
+  // ignore: unused_field
   String _selectedCountryCode = '+222';
   String _completePhoneNumber = '';
   bool _obscurePassword = true;
@@ -88,7 +92,7 @@ class _SignupScreenState extends State<SignupScreen> {
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black,
                   blurRadius: 10,
                   spreadRadius: 2,
                 ),
@@ -372,7 +376,7 @@ class _SignupScreenState extends State<SignupScreen> {
         errorMap = json.decode(jsonStr);
       }
     } catch (e) {
-      print("Error parsing JSON: $e");
+      log("Error parsing JSON: $e");
     }
 
     setState(() {

@@ -8,6 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/themes/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:find_them/l10n/app_localizations.dart';
+
+// Add this extension for cleaner code
+extension LocalizationHelper on BuildContext {
+  AppLocalizations get l10n => AppLocalizations.of(this)!;
+}
 
 class SideBar extends StatefulWidget {
   const SideBar({super.key});
@@ -66,7 +72,7 @@ class _SideBarState extends State<SideBar> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Logout failed. Please try again.',
+                context.l10n.logoutFailed,
                 style: TextStyle(color: AppColors.getTextColor(context)),
               ),
               backgroundColor: AppColors.getInvestigatingYellowBackground(
@@ -83,7 +89,7 @@ class _SideBarState extends State<SideBar> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Error logging out: ${e.toString()}',
+              '${context.l10n.errorLoggingOut}: ${e.toString()}',
               style: TextStyle(color: AppColors.getTextColor(context)),
             ),
             backgroundColor: AppColors.getMissingRedBackground(context),
@@ -132,6 +138,7 @@ class _SideBarState extends State<SideBar> {
                 } else if (state is ProfilePhotoUploadSuccess) {
                   user = state.user;
                 }
+
                 ImageProvider<Object> profileImage;
                 if (user != null &&
                     user.profilePhoto != null &&
@@ -141,6 +148,56 @@ class _SideBarState extends State<SideBar> {
                   profileImage = const AssetImage('assets/images/profile.png');
                 }
 
+                if (user == null) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 34,
+                            backgroundImage: profileImage,
+                          ),
+                          const SizedBox(width: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Unknown user', // Keep this as fallback text
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.getTextColor(context),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              GestureDetector(
+                                onTap:
+                                    () => Navigator.of(
+                                      context,
+                                    ).pushNamed('/auth/login'),
+                                child: Text(
+                                  context.l10n.login,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.teal,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+
+                String firstName = user.firstName;
+                String lastName = user.lastName;
+                String username = user.username;
+
                 return Row(
                   children: [
                     CircleAvatar(radius: 34, backgroundImage: profileImage),
@@ -149,9 +206,7 @@ class _SideBarState extends State<SideBar> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          user != null
-                              ? '${user.firstName ?? ''} ${user.lastName ?? ''}'
-                              : 'Loading...',
+                          '$firstName $lastName',
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -159,7 +214,7 @@ class _SideBarState extends State<SideBar> {
                           ),
                         ),
                         Text(
-                          user != null ? '@${user.username ?? 'username'}' : '',
+                          '@$username',
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.normal,
@@ -183,7 +238,7 @@ class _SideBarState extends State<SideBar> {
             0,
             'assets/icons/submit.png',
             'assets/icons/submitF.png',
-            'My submitted cases',
+            context.l10n.mySubmittedCases,
             () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/submitted-cases');
@@ -193,7 +248,7 @@ class _SideBarState extends State<SideBar> {
             1,
             'assets/icons/location.png',
             'assets/icons/locationF.png',
-            'Location sharing',
+            context.l10n.locationSharing,
             () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/location-sharing');
@@ -203,7 +258,7 @@ class _SideBarState extends State<SideBar> {
             2,
             'assets/icons/notification.png',
             'assets/icons/notificationF.png',
-            'Notifications',
+            context.l10n.notifications,
             () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/notifications');
@@ -213,7 +268,7 @@ class _SideBarState extends State<SideBar> {
             3,
             'assets/icons/logout.png',
             'assets/icons/logoutF.png',
-            'Log out',
+            context.l10n.logout,
             _handleLogout,
           ),
           const Spacer(),
@@ -268,6 +323,11 @@ class _SideBarState extends State<SideBar> {
               color:
                   isSelected ? AppColors.teal : AppColors.getTextColor(context),
             ),
+            // Add text direction support for Arabic
+            textDirection:
+                Localizations.localeOf(context).languageCode == 'ar'
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
           ),
         ),
       ),

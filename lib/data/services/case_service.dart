@@ -40,8 +40,9 @@ class CaseService {
         queryParams['name_or_location'] = nameOrLocation;
       } else {
         if (name != null && name.isNotEmpty) queryParams['name'] = name;
-        if (lastSeenLocation != null && lastSeenLocation.isNotEmpty)
+        if (lastSeenLocation != null && lastSeenLocation.isNotEmpty) {
           queryParams['location'] = lastSeenLocation;
+        }
       }
       if (ageMin != null) queryParams['age_min'] = ageMin.toString();
       if (ageMax != null) queryParams['age_max'] = ageMax.toString();

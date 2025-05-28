@@ -1,3 +1,4 @@
+
 import 'package:find_them/data/models/location_request.dart';
 import 'package:find_them/data/models/location_sharing.dart';
 import 'package:flutter/material.dart';
@@ -112,7 +113,9 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                   await context.read<LocationSharingCubit>().removeFriend(
                     friendId,
                   );
-                } catch (e) {}
+                } catch (e) {
+//catch
+                }
               },
               child: Text(
                 'Remove',
@@ -349,7 +352,9 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                       await context.read<LocationSharingCubit>().acceptRequest(
                         request.id,
                       );
-                    } catch (e) {}
+                    } catch (e) {
+                      //catch
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.teal,
@@ -376,7 +381,9 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                       await context.read<LocationSharingCubit>().declineRequest(
                         request.id,
                       );
-                    } catch (e) {}
+                    } catch (e) {
+                      //catch
+                    }
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
@@ -518,13 +525,17 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                       await context
                           .read<LocationSharingCubit>()
                           .toggleFriendSharing(friend.friendId, true);
-                    } catch (e) {}
+                    } catch (e) {
+                      //catch
+                    }
                   } else if (value == 'stop_sharing') {
                     try {
                       await context
                           .read<LocationSharingCubit>()
                           .toggleFriendSharing(friend.friendId, false);
-                    } catch (e) {}
+                    } catch (e) {
+                      //catch
+                    }
                   }
                 },
                 itemBuilder:
@@ -609,7 +620,9 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                         friend.friendId,
                       );
                       _showDialog('Alert sent successfully!', true);
-                    } catch (e) {}
+                    } catch (e) {
+                      //catch
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.teal,
@@ -639,7 +652,6 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
-                    // Navigate to map screen with friend's location data
                     Navigator.pushNamed(
                       context,
                       '/map',

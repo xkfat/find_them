@@ -61,7 +61,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: AppColors.foundGreen.withOpacity(0.1),
+                    color: AppColors.foundGreen,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -141,7 +141,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.getMissingRedColor(
                       context,
-                    ).withOpacity(0.1),
+                    ),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

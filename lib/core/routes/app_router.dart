@@ -18,6 +18,7 @@ import 'package:find_them/logic/cubit/add_friend_cubit.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
 import 'package:find_them/logic/cubit/case_updates_cubit.dart';
+import 'package:find_them/logic/cubit/localization_cubit.dart';
 import 'package:find_them/logic/cubit/location_sharing_cubit.dart';
 import 'package:find_them/logic/cubit/map_cubit.dart';
 import 'package:find_them/logic/cubit/notification_cubit.dart';
@@ -40,7 +41,7 @@ import 'package:find_them/presentation/screens/settings/change_pass_screen.dart'
 import 'package:find_them/presentation/screens/settings/settings_screen.dart';
 import 'package:find_them/presentation/screens/location/add_friend_screen.dart.dart';
 import 'package:find_them/presentation/screens/location/location_sharing_screen.dart';
-import 'package:find_them/presentation/widgets/profileDialog.dart';
+import 'package:find_them/presentation/widgets/profile_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
@@ -54,6 +55,7 @@ class AppRouter {
   static Route<dynamic> generateRoute(
     RouteSettings settings,
     VoidCallback toggleTheme,
+    Function(String)? changeLanguage,
   ) {
     final args = settings.arguments;
 
@@ -245,7 +247,6 @@ class AppRouter {
                         ProfileCubit(ProfileRepository())..loadProfile(),
                 child: BlocListener<ProfileCubit, ProfileState>(
                   listener: (context, state) {
-                    // Use ProfileDialog instead of SnackBar for notifications
                     if (state is ProfileUpdateSuccess) {
                       showProfileDialog(
                         context: context,
@@ -297,8 +298,14 @@ class AppRouter {
                   BlocProvider<ProfileCubit>(
                     create: (context) => ProfileCubit(ProfileRepository()),
                   ),
+                  BlocProvider<LocalizationCubit>(
+                    create: (context) => LocalizationCubit(),
+                  ),
                 ],
-                child: SettingsScreen(toggleTheme: toggleTheme),
+                child: SettingsScreen(
+                  toggleTheme: toggleTheme,
+                  changeLanguage: changeLanguage ?? (String code) {},
+                ),
               ),
         );
       case '/settings/change-password':

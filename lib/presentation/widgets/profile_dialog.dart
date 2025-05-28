@@ -8,11 +8,11 @@ class ProfileDialog extends StatelessWidget {
   final VoidCallback? onDismiss;
 
   const ProfileDialog({
-    Key? key,
-    required this.message,
+super.key
+,    required this.message,
     this.isSuccess = true,
     this.onDismiss,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class ProfileDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: AppColors.black,
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -47,7 +47,7 @@ class ProfileDialog extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isSuccess ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+              color: isSuccess ? Colors.green : Colors.red,
               shape: BoxShape.circle,
             ),
             child: Icon(
