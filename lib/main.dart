@@ -24,8 +24,14 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-   await NotificationService().initialize();
+  // Initialize Firebase Core first
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  
+  // Set background message handler
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
+  // Only initialize basic notification service (no FCM yet)
+  await _initializeBasicServices();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -35,18 +41,16 @@ void main() async {
   runApp(const MyApp());
 }
 
-Future<void> _initializeNotificationServices() async {
+Future<void> _initializeBasicServices() async {
   try {
-    final firebaseService = FirebaseService();
-    await firebaseService.initialize();
-
+    // Only initialize basic notification service
+    // FCM will be initialized after successful login/signup
     final notificationService = NotificationService();
     await notificationService.initialize();
-
-    final authService = AuthService();
-    await authService.restoreNotificationToken();
+    
+    print('✅ Basic services initialized (FCM will initialize after auth)');
   } catch (e) {
-    print('Error initializing notification services: $e');
+    print('❌ Error initializing basic services: $e');
   }
 }
 
@@ -81,7 +85,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     switch (state) {
       case AppLifecycleState.resumed:
-        _notificationService.refreshNotifications();
+        // Only refresh if service is fully initialized (after auth)
+        if (_notificationService.isFullyInitialized) {
+          _notificationService.refreshNotifications();
+        }
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
@@ -119,7 +126,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return Directionality(
           textDirection:
               _locale.languageCode == 'ar'
-                  ? TextDirection.rtl
+                  ? TextDirection.ltr
                   : TextDirection.ltr,
           child: child!,
         );

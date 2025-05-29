@@ -40,8 +40,12 @@ class NotificationModel {
     return NotificationModel(
       id: int.tryParse(data['notification_id'] ?? '0') ?? 0,
       user: data['sender_name'] ?? data['receiver_name'] ?? 'System',
-      targetId: int.tryParse(data['target_id'] ?? data['case_id'] ?? data['report_id'] ?? '0'),
-      targetModel: data['target_model'] ?? _getModelFromType(data['notification_type'] ?? 'system'),
+      targetId: int.tryParse(
+        data['target_id'] ?? data['case_id'] ?? data['report_id'] ?? '0',
+      ),
+      targetModel:
+          data['target_model'] ??
+          _getModelFromType(data['notification_type'] ?? 'system'),
       message: data['message'] ?? data['body'] ?? 'New notification',
       notificationType: data['notification_type'] ?? 'system',
       isRead: false, // Push notifications are always unread initially
@@ -105,20 +109,16 @@ class NotificationModel {
   String get title {
     switch (notificationType) {
       case 'missing_person':
-        return 'Missing Person Alert';
+        return 'New Missing Person';
       case 'location_request':
-        return 'Location Request';
+        return 'Location Sharing Request';
       case 'location_response':
-        return 'Location Response';
+        return 'Location Sharing Accepted';
       case 'location_alert':
-        return 'Location Alert';
-      case 'case_update':
-        return 'Case Update';
-      case 'report':
-        return 'Report Update';
+        return 'Location Sharing Alert';
       case 'system':
       default:
-        return 'System Notification';
+        return 'FindThem Notification';
     }
   }
 
@@ -141,8 +141,6 @@ class NotificationModel {
         return Icons.notifications;
     }
   }
-
-
 
   String get timeAgo {
     final now = DateTime.now();

@@ -3,11 +3,13 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
+import 'package:find_them/data/services/notification_service.dart';
 
 part 'sign_up_state.dart';
 
 class SignUpCubit extends Cubit<SignUpState> {
   final AuthRepository _authRepository;
+  final NotificationService _notificationService = NotificationService();
 
   SignUpCubit(this._authRepository) : super(SignUpInitial());
 
@@ -22,7 +24,7 @@ class SignUpCubit extends Cubit<SignUpState> {
   }) async {
     emit(SignUpLoading());
     try {
-      log("Processing signup request");
+      log("🔐 Processing signup request");
 
       var responseData = await _authRepository.signup(
         firstName: firstName,
@@ -34,18 +36,20 @@ class SignUpCubit extends Cubit<SignUpState> {
         passwordConfirmation: passwordConfirmation,
       );
 
-      log("Signup response data: $responseData");
+      log("📡 Signup response data: $responseData");
 
       if (responseData is Map) {
         if (responseData.containsKey("refresh") &&
             responseData.containsKey("access")) {
-          log("Success detected - emitting SignUploaded state");
+          log("✅ Success detected - signup completed with tokens");
+          
+          // Notifications are already initialized in AuthService after successful signup
           emit(SignUploaded());
           return;
         }
 
         if (responseData.containsKey("user")) {
-          log("User object found - emitting SignUploaded state");
+          log("✅ User object found - signup completed");
           emit(SignUploaded());
           return;
         }
@@ -54,7 +58,7 @@ class SignUpCubit extends Cubit<SignUpState> {
             responseData.containsKey("message")) {
           String field = responseData["field"];
           String message = responseData["message"];
-          log("Field error detected: $field - $message");
+          log("❌ Field error detected: $field - $message");
 
           emit(SignUpFieldError(field: field, message: message));
           return;
@@ -66,10 +70,10 @@ class SignUpCubit extends Cubit<SignUpState> {
           String errorMessage;
           if (messageValue is Map) {
             errorMessage = messageValue.toString();
-               }  else {
-    errorMessage = messageValue.toString();
+          } else {
+            errorMessage = messageValue.toString();
           }
-          log("Error message: $errorMessage");
+          log("❌ Error message: $errorMessage");
 
           if (errorMessage.toLowerCase().contains("username") &&
               (errorMessage.toLowerCase().contains("already") ||
@@ -101,7 +105,8 @@ class SignUpCubit extends Cubit<SignUpState> {
       }
       emit(SignUperreur("An unexpected error occurred. Please try again."));
     } catch (e) {
-      log("Exception during signup: ${e.toString()}");
+      log("❌ Exception during signup: ${e.toString()}");
+      emit(SignUperreur("An unexpected error occurred. Please try again."));
     }
   }
 }

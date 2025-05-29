@@ -1,4 +1,4 @@
-// cubits/notification_cubit.dart
+// cubits/notification_cubit.dart - Modified to work with post-auth FCM init
 import 'dart:async';
 import 'dart:developer';
 import 'package:find_them/data/models/notification.dart';
@@ -19,20 +19,46 @@ class NotificationCubit extends Cubit<NotificationState> {
   }
 
   Future<void> _initializeService() async {
-    await _notificationService.initialize();
+    try {
+      // Only do basic initialization here (no FCM)
+      // FCM initialization happens after auth in AuthService
+      await _notificationService.initialize();
 
-    // Set up service callbacks
-    _notificationService.onNotificationsUpdated = _handleNotificationsUpdated;
-    _notificationService.onUnreadCountChanged = _handleUnreadCountChanged;
-    _notificationService.onNewNotification = _handleNewNotification;
+      // Set up service callbacks
+      _notificationService.onNotificationsUpdated = _handleNotificationsUpdated;
+      _notificationService.onUnreadCountChanged = _handleUnreadCountChanged;
+      _notificationService.onNewNotification = _handleNewNotification;
 
-    // Start periodic refresh
-    _startPeriodicRefresh();
+      // Start periodic refresh (but only if fully initialized)
+      _startPeriodicRefreshIfReady();
+      
+      log('✅ Notification Cubit - Basic initialization completed');
+    } catch (e) {
+      log('❌ Error in notification cubit initialization: $e');
+    }
+  }
+
+  // Start periodic refresh only if service is fully initialized
+  void _startPeriodicRefreshIfReady() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
+      if (!isClosed && _notificationService.isFullyInitialized) {
+        // Only refresh if service is fully initialized (after auth)
+        refreshNotifications();
+      }
+    });
   }
 
   // Load notifications
   Future<void> loadNotifications({String? filterType}) async {
     try {
+      // Check if service is fully initialized
+      if (!_notificationService.isFullyInitialized) {
+        log('⚠️ Notification service not fully initialized, showing empty state');
+        emit(NotificationEmpty(filterType: filterType));
+        return;
+      }
+
       emit(NotificationLoading());
       _currentFilter = filterType;
 
@@ -49,7 +75,7 @@ class NotificationCubit extends Cubit<NotificationState> {
         );
       }
     } catch (e) {
-      log('Error loading notifications: $e');
+      log('❌ Error loading notifications: $e');
       emit(NotificationError('Failed to load notifications: $e'));
     }
   }
@@ -57,6 +83,12 @@ class NotificationCubit extends Cubit<NotificationState> {
   // Refresh notifications
   Future<void> refreshNotifications() async {
     try {
+      // Don't refresh if service not fully initialized
+      if (!_notificationService.isFullyInitialized) {
+        log('⚠️ Cannot refresh - notification service not fully initialized');
+        return;
+      }
+
       if (state is NotificationLoaded) {
         final currentState = state as NotificationLoaded;
         emit(NotificationRefreshing(currentState.notifications));
@@ -66,7 +98,7 @@ class NotificationCubit extends Cubit<NotificationState> {
 
       // The service callbacks will handle updating the state
     } catch (e) {
-      log('Error refreshing notifications: $e');
+      log('❌ Error refreshing notifications: $e');
       if (state is NotificationRefreshing) {
         final refreshingState = state as NotificationRefreshing;
         emit(
@@ -79,33 +111,77 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  // Delete specific notification
-  Future<void> deleteNotification(int id) async {
-    try {
-      emit(NotificationDeleting(id));
+Future<void> deleteNotification(int id) async {
+  try {
+    if (!_notificationService.isFullyInitialized) {
+      emit(const NotificationError('Service not initialized. Please log in again.'));
+      return;
+    }
 
-      final success = await _notificationService.deleteNotification(id);
+    // Store current state
+    final currentState = state;
+    List<NotificationModel> currentNotifications = [];
+    
+    if (currentState is NotificationLoaded) {
+      currentNotifications = currentState.notifications;
+    }
 
-      if (success) {
-        // Service will refresh and trigger callbacks
-        await Future.delayed(
-          const Duration(milliseconds: 500),
-        ); // Brief delay for UX
+    emit(NotificationDeleting(id));
+
+    final success = await _notificationService.deleteNotification(id);
+
+    if (success) {
+      log('✅ Notification $id deleted successfully');
+      
+      // Immediately update UI by removing the notification from current list
+      final updatedNotifications = currentNotifications
+          .where((notification) => notification.id != id)
+          .toList();
+      
+      if (updatedNotifications.isEmpty) {
+        emit(NotificationEmpty(filterType: _currentFilter));
       } else {
-        emit(const NotificationError('Failed to delete notification'));
-        // Reload to restore state
+        emit(NotificationLoaded(
+          notifications: updatedNotifications,
+          filterType: _currentFilter,
+        ));
+      }
+      
+      // Also refresh from server to ensure consistency
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (!isClosed) {
+          refreshNotifications();
+        }
+      });
+      
+    } else {
+      log('❌ Failed to delete notification $id');
+      emit(const NotificationError('Failed to delete notification'));
+      
+      // Restore previous state
+      if (currentState is NotificationLoaded) {
+        emit(currentState);
+      } else {
         await loadNotifications(filterType: _currentFilter);
       }
-    } catch (e) {
-      log('Error deleting notification: $e');
-      emit(NotificationError('Failed to delete notification: $e'));
-      await loadNotifications(filterType: _currentFilter);
     }
+  } catch (e) {
+    log('❌ Error deleting notification: $e');
+    emit(NotificationError('Failed to delete notification: $e'));
+    
+    // Reload to restore proper state
+    await loadNotifications(filterType: _currentFilter);
   }
+}
 
   // Clear all notifications
   Future<void> clearAllNotifications() async {
     try {
+      if (!_notificationService.isFullyInitialized) {
+        emit(const NotificationError('Service not initialized. Please log in again.'));
+        return;
+      }
+
       emit(NotificationClearing());
 
       final success = await _notificationService.clearAllNotifications();
@@ -119,7 +195,7 @@ class NotificationCubit extends Cubit<NotificationState> {
         await loadNotifications(filterType: _currentFilter);
       }
     } catch (e) {
-      log('Error clearing notifications: $e');
+      log('❌ Error clearing notifications: $e');
       emit(NotificationError('Failed to clear notifications: $e'));
       await loadNotifications(filterType: _currentFilter);
     }
@@ -142,8 +218,6 @@ class NotificationCubit extends Cubit<NotificationState> {
                 .where((n) => n.notificationType == _currentFilter)
                 .toList();
       }
-
-      final unreadCount = notifications.where((n) => !n.isRead).length;
 
       if (filteredNotifications.isEmpty) {
         emit(NotificationEmpty(filterType: _currentFilter));
@@ -203,27 +277,28 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  // Periodic refresh
-  void _startPeriodicRefresh() {
-    _refreshTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
-      if (!isClosed) {}
-    });
-  }
-
   void _stopPeriodicRefresh() {
     _refreshTimer?.cancel();
     _refreshTimer = null;
   }
 
-  // FCM Token management
+  // Check if service is ready for operations
+  bool get isServiceReady => _notificationService.isFullyInitialized;
+
+  // FCM Token management (only works after auth)
   Future<void> updateFCMToken() async {
     try {
+      if (!_notificationService.isFullyInitialized) {
+        log('⚠️ Cannot update FCM token - service not fully initialized');
+        return;
+      }
+      
       final token = await _notificationService.getFCMToken();
       if (token != null) {
-        log('FCM token updated in service');
+        log('✅ FCM token updated in service');
       }
     } catch (e) {
-      log('Error updating FCM token: $e');
+      log('❌ Error updating FCM token: $e');
     }
   }
 
@@ -231,18 +306,11 @@ class NotificationCubit extends Cubit<NotificationState> {
     try {
       await _notificationService.removeFCMToken();
     } catch (e) {
-      log('Error removing FCM token: $e');
+      log('❌ Error removing FCM token: $e');
     }
   }
 
-  // Topic subscription (for admin broadcasts, etc.)
-  Future<void> subscribeToTopic(String topic) async {
-    await _notificationService.subscribeToTopic(topic);
-  }
-
-  Future<void> unsubscribeFromTopic(String topic) async {
-    await _notificationService.unsubscribeFromTopic(topic);
-  }
+  
 
   // Get specific notification types
   Future<void> loadMissingPersonNotifications() async {

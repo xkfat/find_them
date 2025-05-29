@@ -5,15 +5,21 @@ import 'package:find_them/data/services/auth_service.dart';
 
 class AuthRepository {
   final ApiService _apiService;
-
   final AuthService _authService;
-  // final FirebaseAuthService _firebaseAuthService;
 
   AuthRepository(this._authService, {ApiService? apiService})
     : _apiService = apiService ?? ApiService();
 
   Future<dynamic> login(String username, String pwd) async {
-    return await _authService.login(username, pwd);
+    try {
+      log("🔐 Repository: Attempting login for $username");
+      final result = await _authService.login(username, pwd);
+      log("✅ Repository: Login completed successfully");
+      return result;
+    } catch (e) {
+      log("❌ Repository: Login failed - $e");
+      rethrow;
+    }
   }
 
   Future<dynamic> signup({
@@ -25,15 +31,23 @@ class AuthRepository {
     required String password,
     required String passwordConfirmation,
   }) async {
-    return await _authService.signup(
-      firstName: firstName,
-      lastName: lastName,
-      username: username,
-      email: email,
-      phoneNumber: phoneNumber,
-      password: password,
-      passwordConfirmation: passwordConfirmation,
-    );
+    try {
+      log("🔐 Repository: Attempting signup for $username");
+      final result = await _authService.signup(
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
+        email: email,
+        phoneNumber: phoneNumber,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+      );
+      log("✅ Repository: Signup completed successfully");
+      return result;
+    } catch (e) {
+      log("❌ Repository: Signup failed - $e");
+      rethrow;
+    }
   }
 
   Future<bool> isLoggedIn() async {
@@ -42,104 +56,58 @@ class AuthRepository {
 
   Future<void> logout() async {
     try {
+      log("🚪 Repository: Starting logout process");
       final success = await _authService.logout();
       if (!success) {
         throw Exception("Failed to logout from server");
       }
+      log("✅ Repository: Logout completed successfully");
     } catch (e) {
-      log("Error logging out: $e");
+      log("❌ Repository: Error logging out - $e");
+      rethrow;
     }
   }
 
   Future<bool> deleteAccount(String username) async {
     try {
+      log("🗑️ Repository: Attempting to delete account for $username");
       final response = await _authService.deleteAccount(username);
       if (response['success'] == true) {
-       // final response = await _authService.deleteAccount(username);
+        log("✅ Repository: Account deleted successfully");
         return true;
       }
+      log("❌ Repository: Account deletion failed");
       return false;
     } catch (e) {
-      log("Error deleting account: $e");
+      log("❌ Repository: Error deleting account - $e");
       return false;
     }
   }
-}
 
-  /*
-
-  Future<User?> getCurrentUser() async {
-    return await _authService.getCurrentUser();
-  }
-
-  Future<AuthData?> getAuthData() async {
-    return await _authService.getAuthData();
-  }
-
-  Future<AuthData> login(String username, String password) async {
-    final credentials = LoginCredentials(
-      username: username,
-      password: password,
-    );
-    return await _authService.loginWithCredentials(credentials);
-  }
-
-  Future<AuthData> signup(SignUpData signupData) async {
-    return await _authService.signup(signupData);
-  }
-
-  Future<AuthData?> signInWithGoogle() async {
-    final userCredential = await _firebaseAuthService.signInWithGoogle();
-    if (userCredential == null) {
-      return null;
-    }
-    return await _authService.authenticateWithFirebase(userCredential);
-  }
-
-  Future<AuthData?> signInWithFacebook() async {
-    final userCredential = await _firebaseAuthService.signInWithFacebook();
-    if (userCredential == null) {
-      return null;
-    }
-    return await _authService.authenticateWithFirebase(userCredential);
-  }
-
-  Future<bool> changePassword(
-    String oldPassword,
-    String newPassword,
-    String confirmPassword,
-  ) async {
-    return await _authService.changePassword(
-      oldPassword,
-      newPassword,
-      confirmPassword,
-    );
-  }
-
-  Future<void> logout() async {
-    await _firebaseAuthService.signOut();
-    await _authService.logout();
-  }
-
-  Future<Map<String, dynamic>> validateSignupFields({
-    required String username,
-    required String email,
-    String? phoneNumber,
-  }) async {
+  /// Restore notification service for existing authenticated users
+  Future<void> restoreNotificationService() async {
     try {
-      await _authService.validateSignupFields(
-        username: username,
-        email: email,
-        phoneNumber: phoneNumber,
-      );
-      return {'success': true};
+      log("🔄 Repository: Restoring notification service");
+      await _authService.restoreNotificationToken();
+      log("✅ Repository: Notification service restored");
     } catch (e) {
-      if (e is DioException && e.response != null) {
-        return {'error': true, 'data': e.response?.data};
-      }
-      return {'error': true, 'message': e.toString()};
+      log("❌ Repository: Error restoring notification service - $e");
+      // Don't throw - this shouldn't prevent app from working
     }
   }
-}
-*/
 
+  /// Get current FCM token
+  Future<String?> getFCMToken() async {
+    return await _authService.getFCMToken();
+  }
+
+  /// Check if user has valid FCM token
+  Future<bool> hasValidFCMToken() async {
+    return await _authService.hasValidFCMToken();
+  }
+
+  /// Manually sync FCM token
+  Future<void> syncFCMToken() async {
+    await _authService.syncFCMToken();
+  }
+}

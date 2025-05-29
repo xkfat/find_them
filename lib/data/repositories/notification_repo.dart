@@ -1,16 +1,14 @@
-// repositories/notification_repository.dart
+// repositories/notification_repository.dart - Modified for post-auth FCM sync
 import 'dart:convert';
 import 'dart:developer';
 import 'package:find_them/data/models/notification.dart';
 import 'package:find_them/data/services/api_service.dart';
 import 'package:http/http.dart' as http;
-import '../services/auth_service.dart'; // Assume you have this
-import '../../core/constants/api_constants.dart'; // Your API constants
+import '../../core/constants/api_constants.dart';
 
 class NotificationRepository {
-  static const String _baseUrl =
-      ApiConstants.baseUrl; // e.g., 'https://your-api.com/api'
-  final ApiService _apiService = ApiService(); // Your auth service
+  static const String _baseUrl = ApiConstants.baseUrl;
+  final ApiService _apiService = ApiService();
 
   Future<Map<String, String>> get _headers async {
     final token = await _apiService.getAccessToken();
@@ -45,7 +43,7 @@ class NotificationRepository {
         throw Exception('Failed to load notifications: ${response.statusCode}');
       }
     } catch (e) {
-      log('Error getting notifications: $e');
+      log('❌ Error getting notifications: $e');
       throw Exception('Network error: $e');
     }
   }
@@ -68,7 +66,7 @@ class NotificationRepository {
         throw Exception('Failed to load notification: ${response.statusCode}');
       }
     } catch (e) {
-      log('Error getting notification: $e');
+      log('❌ Error getting notification: $e');
       throw Exception('Network error: $e');
     }
   }
@@ -86,7 +84,7 @@ class NotificationRepository {
 
       return response.statusCode == 204;
     } catch (e) {
-      log('Error deleting notification: $e');
+      log('❌ Error deleting notification: $e');
       return false;
     }
   }
@@ -104,34 +102,40 @@ class NotificationRepository {
 
       return response.statusCode == 200;
     } catch (e) {
-      log('Error clearing notifications: $e');
+      log('❌ Error clearing notifications: $e');
       return false;
     }
   }
 
-  // Update FCM token
-  Future<bool> updateFCMToken(String token) async {
+  // Sync FCM token with server (called after successful auth)
+  Future<bool> syncFCMTokenWithServer(String fcmToken) async {
     try {
+      log('🔄 Syncing FCM token with Django server...');
+      log('📤 FCM token: ${fcmToken.substring(0, 30)}...');
+
       final response = await _apiService.authenticatedRequest(() async {
         final headers = await _headers;
+        log('🔑 Authorization header: ${headers['Authorization']?.substring(0, 30)}...');
+        
         return http.post(
-          Uri.parse(
-            'http://10.0.2.2:8000/api/accounts/update-fcm-token/',
-          ), // Adjust endpoint as needed
+          Uri.parse('http://10.0.2.2:8000/api/accounts/update-fcm-token/'),
           headers: headers,
-          body: json.encode({'fcm_token': token}),
+          body: jsonEncode({'fcm_token': fcmToken}),
         );
       });
 
+      log('📨 Django response status: ${response.statusCode}');
+      log('📨 Django response body: ${response.body}');
+
       if (response.statusCode == 200) {
-        log('FCM token updated successfully');
+        log('✅ FCM token synced with Django successfully');
         return true;
       } else {
-        log('Failed to update FCM token: ${response.statusCode}');
+        log('❌ Failed to sync FCM token: ${response.statusCode}');
         return false;
       }
     } catch (e) {
-      log('Error updating FCM token: $e');
+      log('❌ Error syncing FCM token: $e');
       return false;
     }
   }
@@ -139,19 +143,27 @@ class NotificationRepository {
   // Remove FCM token (for logout)
   Future<bool> removeFCMToken() async {
     try {
+      log('🗑️ Removing FCM token from server...');
+      
       final response = await _apiService.authenticatedRequest(() async {
         final headers = await _headers;
         return http.delete(
-          Uri.parse(
-            'http://10.0.2.2:8000/api/accounts/remove-fcm-token/',
-          ), // Adjust endpoint as needed
+          Uri.parse('http://10.0.2.2:8000/api/accounts/remove-fcm-token/'),
           headers: headers,
         );
       });
 
-      return response.statusCode == 200;
+      log('📨 Remove FCM token response: ${response.statusCode}');
+      
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        log('✅ FCM token removed from server successfully');
+        return true;
+      } else {
+        log('❌ Failed to remove FCM token: ${response.statusCode}');
+        return false;
+      }
     } catch (e) {
-      log('Error removing FCM token: $e');
+      log('❌ Error removing FCM token: $e');
       return false;
     }
   }
@@ -162,9 +174,7 @@ class NotificationRepository {
       final response = await _apiService.authenticatedRequest(() async {
         final headers = await _headers;
         return http.get(
-          Uri.parse(
-            'http://10.0.2.2:8000/api/accounts/check-fcm-status/',
-          ), // Adjust endpoint as needed
+          Uri.parse('http://10.0.2.2:8000/api/accounts/check-fcm-status/'),
           headers: headers,
         );
       });
@@ -175,41 +185,14 @@ class NotificationRepository {
         return {'has_fcm_token': false};
       }
     } catch (e) {
-      log('Error checking FCM status: $e');
+      log('❌ Error checking FCM status: $e');
       return {'has_fcm_token': false};
     }
   }
 
-  Future<void> syncFCMTokenWithServer(String fcmToken) async {
-    try {
-      final token = await _apiService.getAccessToken();
-      print('🔑 Access token being sent: ${token?.substring(0, 30)}...');
-
-      print('📤 Sending FCM token to Django: ${fcmToken.substring(0, 30)}...');
-      print(
-        '📤 Request URL: http://10.0.2.2:8000/api/accounts/update-fcm-token/',
-      );
-
-      final response = await _apiService.authenticatedRequest(() async {
-        final headers = await _headers;
-        return http.post(
-          Uri.parse('http://10.0.2.2:8000/api/accounts/update-fcm-token/'),
-          headers: headers,
-          body: jsonEncode({'fcm_token': token}),
-        );
-      });
-
-      print('📨 Django response status: ${response.statusCode}');
-      print('📨 Django response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        print('✅ FCM token synced with Django successfully');
-      } else {
-        print('❌ Failed to sync FCM token: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('❌ Error syncing FCM token: $e');
-    }
+  // Legacy method - kept for backward compatibility
+  Future<bool> updateFCMToken(String token) async {
+    return await syncFCMTokenWithServer(token);
   }
 
   // Get filtered notifications by type

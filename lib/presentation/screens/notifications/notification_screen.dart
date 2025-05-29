@@ -17,7 +17,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NotificationCubit>().loadNotifications();
+      final cubit = context.read<NotificationCubit>();
+      
+      // Check if service is ready before loading
+      if (cubit.isServiceReady) {
+        cubit.loadNotifications();
+      } else {
+        // Show appropriate state for non-initialized service
+        // This could happen if user navigates here without being logged in
+      }
     });
   }
 
@@ -42,16 +50,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
         centerTitle: true,
         actions: [
-          TextButton(
-            onPressed: () => _showClearAllDialog(),
-            child: Text(
-              'Clear All',
-              style: TextStyle(
-                color: AppColors.teal,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          BlocBuilder<NotificationCubit, NotificationState>(
+            builder: (context, state) {
+              // Only show clear all if service is ready and has notifications
+              final cubit = context.read<NotificationCubit>();
+              if (cubit.isServiceReady && state is NotificationLoaded && state.notifications.isNotEmpty) {
+                return TextButton(
+                  onPressed: () => _showClearAllDialog(),
+                  child: Text(
+                    'Clear All',
+                    style: TextStyle(
+                      color: AppColors.teal,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
           ),
         ],
       ),
@@ -74,6 +91,56 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           }
         },
         builder: (context, state) {
+          final cubit = context.read<NotificationCubit>();
+          
+          // Check if service is not ready (user not logged in)
+          if (!cubit.isServiceReady) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.login,
+                    size: 64,
+                    color: AppColors.getSecondaryTextColor(context),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Please log in to view notifications',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.getTextColor(context),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'You need to be logged in to receive notifications',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.getSecondaryTextColor(context),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/auth/login',
+                        (route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.teal,
+                      foregroundColor: AppColors.white,
+                    ),
+                    child: const Text('Go to Login'),
+                  ),
+                ],
+              ),
+            );
+          }
+
           if (state is NotificationLoading) {
             return Center(
               child: CircularProgressIndicator(color: AppColors.teal),
@@ -157,7 +224,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<NotificationCubit>().loadNotifications();
+                context.read<NotificationCubit>().refreshNotifications();
               },
               color: AppColors.teal,
               child: ListView.builder(
@@ -185,6 +252,37 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             );
           }
 
+          if (state is NotificationEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.notifications_none,
+                    size: 64,
+                    color: AppColors.getSecondaryTextColor(context),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No notifications',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.getTextColor(context),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'You\'re all caught up!',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.getSecondaryTextColor(context),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
           if (state is NotificationClearing) {
             return Center(
               child: Column(
@@ -203,7 +301,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             );
           }
 
-          return const SizedBox.shrink();
+          // Default fallback
+          return Center(
+            child: Text(
+              'Loading notifications...',
+              style: TextStyle(
+                color: AppColors.getTextColor(context),
+              ),
+            ),
+          );
         },
       ),
     );

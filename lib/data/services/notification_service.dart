@@ -1,4 +1,4 @@
-// services/notification_service.dart
+// services/notification_service.dart - Modified to initialize after auth
 import 'dart:developer';
 import 'package:find_them/data/models/notification.dart';
 import 'package:find_them/data/repositories/notification_repo.dart';
@@ -12,41 +12,75 @@ class NotificationService {
   final NotificationRepository _repository = NotificationRepository();
   final FirebaseService _firebaseService = FirebaseService();
 
-  bool _isInitialized = false;
+  bool _isBasicInitialized = false;
+  bool _isFullyInitialized = false;
 
   // Callbacks for real-time updates
   Function(List<NotificationModel>)? onNotificationsUpdated;
   Function(int)? onUnreadCountChanged;
   Function(NotificationModel)? onNewNotification;
 
+  // Basic initialization (only local notifications, no FCM)
   Future<void> initialize() async {
-    if (_isInitialized) return;
+    if (_isBasicInitialized) return;
 
     try {
-      // Initialize Firebase (but don't sync token yet)
-      await _firebaseService.initialize();
+      // Only initialize basic Firebase functionality (local notifications)
+      await _firebaseService.initializeBasic();
+      
+      _isBasicInitialized = true;
+      log('✅ Notification Service - Basic initialization completed');
+    } catch (e) {
+      log('❌ Error in basic notification service initialization: $e');
+    }
+  }
+
+  // Full initialization after successful authentication
+  Future<void> initializeAfterAuth() async {
+    if (_isFullyInitialized) {
+      log('🔄 Notification Service already fully initialized');
+      return;
+    }
+
+    try {
+      log('🚀 Starting full notification service initialization after auth...');
+      
+      // Initialize Firebase with authentication
+      await _firebaseService.initializeWithAuth();
 
       // Set up Firebase callbacks
       _firebaseService.onNotificationReceived = _handleNewNotification;
       _firebaseService.onNotificationTapped = _handleNotificationTapped;
       _firebaseService.onTokenRefresh = _handleTokenRefresh;
 
-      // DON'T update FCM token on server here - wait for login/signup
+      // Get and sync FCM token with server
+      await _syncFCMTokenWithServer();
 
-      _isInitialized = true;
-      log('Notification Service initialized (FCM sync pending login)');
+      // Subscribe to general topics
+      await _firebaseService.subscribeToTopic('all_users');
+
+      _isFullyInitialized = true;
+      log('✅ Notification Service fully initialized after authentication');
     } catch (e) {
-      log('Error initializing Notification Service: $e');
+      log('❌ Error in full notification service initialization: $e');
+      throw e;
     }
   }
 
-  // NEW: Method to sync FCM token after successful login/signup
-  Future<void> syncFCMTokenAfterAuth() async {
+  // Sync FCM token with server
+  Future<void> _syncFCMTokenWithServer() async {
     try {
-      log('🔄 Syncing FCM token after authentication...');
-      await _updateFCMTokenOnServer();
+      final token = await _firebaseService.getToken();
+      if (token != null) {
+        log('🔄 Syncing FCM token with server: ${token.substring(0, 20)}...');
+        await _repository.syncFCMTokenWithServer(token);
+        log('✅ FCM token synced with server successfully');
+      } else {
+        log('❌ No FCM token available to sync');
+      }
     } catch (e) {
-      log('Error syncing FCM token after auth: $e');
+      log('❌ Error syncing FCM token with server: $e');
+      throw e;
     }
   }
 
@@ -57,7 +91,7 @@ class NotificationService {
       onNotificationsUpdated?.call(notifications);
       return notifications;
     } catch (e) {
-      log('Error getting notifications: $e');
+      log('❌ Error getting notifications: $e');
       return [];
     }
   }
@@ -67,25 +101,32 @@ class NotificationService {
     try {
       return await _repository.getNotification(id);
     } catch (e) {
-      log('Error getting notification: $e');
+      log('❌ Error getting notification: $e');
       return null;
     }
   }
 
-  // Delete notification
-  Future<bool> deleteNotification(int id) async {
-    try {
-      final success = await _repository.deleteNotification(id);
-      if (success) {
-        // Refresh notifications after deletion
-        await refreshNotifications();
-      }
-      return success;
-    } catch (e) {
-      log('Error deleting notification: $e');
+ Future<bool> deleteNotification(int id) async {
+  try {
+    log('🗑️ Attempting to delete notification $id');
+    
+    final success = await _repository.deleteNotification(id);
+    
+    if (success) {
+      log('✅ Notification $id deleted from server');
+      
+      // Don't refresh automatically here - let the cubit handle UI updates
+      // This prevents unnecessary API calls
+      return true;
+    } else {
+      log('❌ Failed to delete notification $id from server');
       return false;
     }
+  } catch (e) {
+    log('❌ Error deleting notification $id: $e');
+    return false;
   }
+}
 
   // Clear all notifications
   Future<bool> clearAllNotifications() async {
@@ -97,7 +138,7 @@ class NotificationService {
       }
       return success;
     } catch (e) {
-      log('Error clearing notifications: $e');
+      log('❌ Error clearing notifications: $e');
       return false;
     }
   }
@@ -109,40 +150,32 @@ class NotificationService {
 
   // Handle new notification from push
   void _handleNewNotification(NotificationModel notification) {
-    log('New notification received: ${notification.title}');
+    log('📱 New notification received: ${notification.title}');
     onNewNotification?.call(notification);
   }
 
   // Handle notification tap
   void _handleNotificationTapped(NotificationModel notification) {
-    log('Notification tapped: ${notification.title}');
-    
-    // You can add navigation logic here or let the UI handle it
-    // For example, you could use a navigation service:
-    // NavigationService.navigateTo(notification.navigationRoute, notification.navigationArguments);
+    log('📱 Notification tapped: ${notification.title}');
   }
 
   // Handle FCM token refresh
   Future<void> _handleTokenRefresh(String newToken) async {
     log('🔄 FCM Token refreshed, syncing with server...');
-    await _repository.syncFCMTokenWithServer(newToken);
-  }
-
-  // Update FCM token on server (private method)
-  Future<void> _updateFCMTokenOnServer() async {
     try {
-      final token = await _firebaseService.getToken();
-      if (token != null) {
-        await _repository.syncFCMTokenWithServer(token);
-        log('FCM token synced with server after auth');
-      }
+      await _repository.syncFCMTokenWithServer(newToken);
+      log('✅ New FCM token synced with server');
     } catch (e) {
-      log('Error updating FCM token on server: $e');
+      log('❌ Error syncing refreshed token: $e');
     }
   }
 
   // Subscribe to topic (for admin broadcasts, etc.)
   Future<void> subscribeToTopic(String topic) async {
+    if (!_isFullyInitialized) {
+      log('⚠️ Cannot subscribe to topic - service not fully initialized');
+      return;
+    }
     await _firebaseService.subscribeToTopic(topic);
   }
 
@@ -160,9 +193,9 @@ class NotificationService {
   Future<void> removeFCMToken() async {
     try {
       await _repository.removeFCMToken();
-      log('FCM token removed from server');
+      log('✅ FCM token removed from server');
     } catch (e) {
-      log('Error removing FCM token: $e');
+      log('❌ Error removing FCM token: $e');
     }
   }
 
@@ -172,7 +205,7 @@ class NotificationService {
       final status = await _repository.checkFCMStatus();
       return status['has_fcm_token'] ?? false;
     } catch (e) {
-      log('Error checking FCM status: $e');
+      log('❌ Error checking FCM status: $e');
       return false;
     }
   }
@@ -182,8 +215,42 @@ class NotificationService {
     return await _firebaseService.getToken();
   }
 
+  // Reset service (for logout)
+  Future<void> reset() async {
+    try {
+      // Remove FCM token from server
+      await removeFCMToken();
+      
+      // Clear local notifications
+      await clearLocalNotifications();
+      
+      // Unsubscribe from topics
+      await unsubscribeFromTopic('all_users');
+      
+      // Reset Firebase service
+      _firebaseService.reset();
+      
+      // Reset flags
+      _isFullyInitialized = false;
+      
+      // Clear callbacks
+      onNotificationsUpdated = null;
+      onUnreadCountChanged = null;
+      onNewNotification = null;
+      
+      log('🔄 Notification Service reset completed');
+    } catch (e) {
+      log('❌ Error resetting notification service: $e');
+    }
+  }
+
   // Dispose resources
   void dispose() {
     _firebaseService.dispose();
+    log('🗑️ Notification Service disposed');
   }
+
+  // Check initialization status
+  bool get isBasicInitialized => _isBasicInitialized;
+  bool get isFullyInitialized => _isFullyInitialized;
 }

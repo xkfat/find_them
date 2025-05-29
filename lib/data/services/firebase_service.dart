@@ -1,4 +1,4 @@
-// services/firebase_service.dart
+// services/firebase_service.dart - Modified to initialize only after auth
 import 'dart:developer';
 import 'package:find_them/data/models/notification.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -9,7 +9,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('Background message received: ${message.messageId}');
-  
   // Handle background message - you can store to local storage if needed
   // Don't call Flutter UI methods here as the app might not be running
 }
@@ -24,19 +23,34 @@ class FirebaseService {
 
   String? _fcmToken;
   String? get fcmToken => _fcmToken;
+  bool _isInitialized = false;
+  bool get isInitialized => _isInitialized;
 
   // Callbacks for handling notifications
   Function(NotificationModel)? onNotificationReceived;
   Function(NotificationModel)? onNotificationTapped;
   Function(String)? onTokenRefresh;
 
-  Future<void> initialize() async {
+  // Basic initialization (permissions and local notifications only)
+  Future<void> initializeBasic() async {
+    if (_isInitialized) return;
+
     try {
+      // Only initialize local notifications
+      await _initializeLocalNotifications();
+      log('Firebase Service - Basic initialization completed (local notifications only)');
+    } catch (e) {
+      log('Error in basic Firebase Service initialization: $e');
+    }
+  }
+
+  // Full initialization after successful authentication
+  Future<void> initializeWithAuth() async {
+    try {
+      log('🚀 Starting full Firebase Service initialization after auth...');
+      
       // Request permissions
       await _requestPermissions();
-      
-      // Initialize local notifications
-      await _initializeLocalNotifications();
       
       // Get FCM token
       await _getFCMToken();
@@ -51,9 +65,11 @@ class FirebaseService {
         onTokenRefresh?.call(newToken);
       });
 
-      log('Firebase Service initialized successfully');
+      _isInitialized = true;
+      log('✅ Firebase Service fully initialized with authentication');
     } catch (e) {
-      log('Error initializing Firebase Service: $e');
+      log('❌ Error in full Firebase Service initialization: $e');
+      throw e;
     }
   }
 
@@ -69,11 +85,11 @@ class FirebaseService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      log('User granted notification permissions');
+      log('✅ User granted notification permissions');
     } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-      log('User granted provisional notification permissions');
+      log('⚠️ User granted provisional notification permissions');
     } else {
-      log('User declined or has not accepted notification permissions');
+      log('❌ User declined or has not accepted notification permissions');
     }
   }
 
@@ -121,23 +137,26 @@ class FirebaseService {
     try {
       _fcmToken = await _firebaseMessaging.getToken();
       if (_fcmToken != null) {
-        log('FCM Token obtained: ${_fcmToken!.substring(0, 20)}...');
+        log('🔑 FCM Token obtained: ${_fcmToken!.substring(0, 20)}...');
+      } else {
+        log('❌ Failed to obtain FCM token');
       }
     } catch (e) {
-      log('Error getting FCM token: $e');
+      log('❌ Error getting FCM token: $e');
+      throw e;
     }
   }
 
   void _setupMessageHandlers() {
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      log('Foreground message received: ${message.messageId}');
+      log('📱 Foreground message received: ${message.messageId}');
       _handleForegroundMessage(message);
     });
 
     // Handle message tapped when app is in background but not terminated
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      log('Message tapped (background): ${message.messageId}');
+      log('📱 Message tapped (background): ${message.messageId}');
       _handleMessageTap(message);
     });
 
@@ -148,7 +167,7 @@ class FirebaseService {
   Future<void> _handleInitialMessage() async {
     final initialMessage = await _firebaseMessaging.getInitialMessage();
     if (initialMessage != null) {
-      log('App opened from terminated state via notification: ${initialMessage.messageId}');
+      log('📱 App opened from terminated state via notification: ${initialMessage.messageId}');
       _handleMessageTap(initialMessage);
     }
   }
@@ -170,9 +189,7 @@ class FirebaseService {
 
   void _handleNotificationTap(String? payload) {
     if (payload != null) {
-      // Handle local notification tap
-      // You can parse the payload to get notification data
-      log('Local notification tapped with payload: $payload');
+      log('📱 Local notification tapped with payload: $payload');
     }
   }
 
@@ -192,8 +209,6 @@ class FirebaseService {
     final notification = message.notification;
     if (notification == null) return;
 
-    final notificationType = message.data['notification_type'] ?? 'system';
-    
     const androidDetails = AndroidNotificationDetails(
       'findthem_notifications',
       'FindThem Notifications',
@@ -225,35 +240,53 @@ class FirebaseService {
 
   // Public methods
   Future<String?> getToken() async {
-    if (_fcmToken == null) {
+    if (!_isInitialized) {
+      log('⚠️ Firebase Service not fully initialized, attempting to get token anyway...');
       await _getFCMToken();
     }
     return _fcmToken;
   }
 
   Future<void> subscribeToTopic(String topic) async {
+    if (!_isInitialized) {
+      log('⚠️ Firebase Service not initialized, cannot subscribe to topic: $topic');
+      return;
+    }
+    
     try {
       await _firebaseMessaging.subscribeToTopic(topic);
-      log('Subscribed to topic: $topic');
+      log('✅ Subscribed to topic: $topic');
     } catch (e) {
-      log('Error subscribing to topic $topic: $e');
+      log('❌ Error subscribing to topic $topic: $e');
     }
   }
 
   Future<void> unsubscribeFromTopic(String topic) async {
     try {
       await _firebaseMessaging.unsubscribeFromTopic(topic);
-      log('Unsubscribed from topic: $topic');
+      log('✅ Unsubscribed from topic: $topic');
     } catch (e) {
-      log('Error unsubscribing from topic $topic: $e');
+      log('❌ Error unsubscribing from topic $topic: $e');
     }
   }
 
   Future<void> clearNotifications() async {
     await _localNotifications.cancelAll();
+    log('🧹 Local notifications cleared');
+  }
+
+  // Reset service (for logout)
+  void reset() {
+    _fcmToken = null;
+    _isInitialized = false;
+    onNotificationReceived = null;
+    onNotificationTapped = null;
+    onTokenRefresh = null;
+    log('🔄 Firebase Service reset');
   }
 
   void dispose() {
-    // Clean up resources if needed
+    reset();
+    log('🗑️ Firebase Service disposed');
   }
 }
