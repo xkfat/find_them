@@ -18,7 +18,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cubit = context.read<NotificationCubit>();
-      
+
       // Check if service is ready before loading
       if (cubit.isServiceReady) {
         cubit.loadNotifications();
@@ -54,7 +54,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             builder: (context, state) {
               // Only show clear all if service is ready and has notifications
               final cubit = context.read<NotificationCubit>();
-              if (cubit.isServiceReady && state is NotificationLoaded && state.notifications.isNotEmpty) {
+              if (cubit.isServiceReady &&
+                  state is NotificationLoaded &&
+                  state.notifications.isNotEmpty) {
                 return TextButton(
                   onPressed: () => _showClearAllDialog(),
                   child: Text(
@@ -92,7 +94,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         },
         builder: (context, state) {
           final cubit = context.read<NotificationCubit>();
-          
+
           // Check if service is not ready (user not logged in)
           if (!cubit.isServiceReady) {
             return Center(
@@ -292,9 +294,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(height: 16),
                   Text(
                     'Clearing notifications...',
-                    style: TextStyle(
-                      color: AppColors.getTextColor(context),
-                    ),
+                    style: TextStyle(color: AppColors.getTextColor(context)),
                   ),
                 ],
               ),
@@ -305,9 +305,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           return Center(
             child: Text(
               'Loading notifications...',
-              style: TextStyle(
-                color: AppColors.getTextColor(context),
-              ),
+              style: TextStyle(color: AppColors.getTextColor(context)),
             ),
           );
         },
@@ -319,27 +317,45 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     BuildContext context,
     NotificationModel notification,
   ) {
+    print('🧭 Handling notification tap: ${notification.notificationType}');
+
     switch (notification.notificationType) {
+      case 'location_request':
+      case 'location_response':
+      case 'location_alert':
+        print('🧭 Navigating to location sharing');
+        Navigator.pushNamed(context, '/location-sharing');
+        break;
+
       case 'missing_person':
         if (notification.targetId != null) {
+          print('🧭 Navigating to case details: ${notification.targetId}');
           Navigator.pushNamed(
             context,
             '/case/details',
             arguments: notification.targetId,
           );
+        } else {
+          Navigator.pushNamed(context, '/notifications');
         }
         break;
+
       case 'case_update':
+        print('🧭 Navigating to submitted cases');
+        Navigator.pushNamed(context, '/submitted-cases');
+        break;
+
+      case 'report':
         if (notification.targetId != null) {
-          Navigator.pushNamed(context, '/submitted-cases');
+          // Add your report screen navigation here
+          print('🧭 Should navigate to report: ${notification.targetId}');
+          Navigator.pushNamed(context, '/notifications'); // Fallback for now
         }
         break;
-      case 'location_request':
-      case 'location_response':
-      case 'location_alert':
-        Navigator.pushNamed(context, '/location-sharing');
-        break;
+
       default:
+        print('🧭 Default navigation to notifications');
+        Navigator.pushNamed(context, '/notifications');
         break;
     }
   }
@@ -406,7 +422,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.getSecondaryTextColor(context)),
+                style: TextStyle(
+                  color: AppColors.getSecondaryTextColor(context),
+                ),
               ),
             ),
             ElevatedButton(

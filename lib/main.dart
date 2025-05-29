@@ -1,37 +1,20 @@
 import 'package:find_them/core/routes/app_router.dart';
-import 'package:find_them/data/services/firebase_service.dart';
 import 'package:find_them/data/services/notification_service.dart';
-import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:find_them/core/constants/themes/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-@pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  print('Background message received: ${message.messageId}');
-  print('Title: ${message.notification?.title}');
-  print('Body: ${message.notification?.body}');
-  print('Data: ${message.data}');
-}
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase Core first
+  // Just initialize Firebase - nothing else
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
-  // Set background message handler
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-  // Only initialize basic notification service (no FCM yet)
-  await _initializeBasicServices();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -39,19 +22,6 @@ void main() async {
   ]);
 
   runApp(const MyApp());
-}
-
-Future<void> _initializeBasicServices() async {
-  try {
-    // Only initialize basic notification service
-    // FCM will be initialized after successful login/signup
-    final notificationService = NotificationService();
-    await notificationService.initialize();
-    
-    print('✅ Basic services initialized (FCM will initialize after auth)');
-  } catch (e) {
-    print('❌ Error initializing basic services: $e');
-  }
 }
 
 class MyApp extends StatefulWidget {
@@ -71,6 +41,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _notificationService = NotificationService();
+
+    // Initialize basic notification service
+    _notificationService.initialize();
   }
 
   @override
@@ -85,7 +58,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     switch (state) {
       case AppLifecycleState.resumed:
-        // Only refresh if service is fully initialized (after auth)
         if (_notificationService.isFullyInitialized) {
           _notificationService.refreshNotifications();
         }
@@ -114,6 +86,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Find Them',
+      navigatorKey: navigatorKey,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -126,7 +99,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return Directionality(
           textDirection:
               _locale.languageCode == 'ar'
-                  ? TextDirection.ltr
+                  ? TextDirection.rtl
                   : TextDirection.ltr,
           child: child!,
         );

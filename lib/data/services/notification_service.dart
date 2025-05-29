@@ -1,4 +1,3 @@
-// services/notification_service.dart - Modified to initialize after auth
 import 'dart:developer';
 import 'package:find_them/data/models/notification.dart';
 import 'package:find_them/data/repositories/notification_repo.dart';
@@ -25,9 +24,9 @@ class NotificationService {
     if (_isBasicInitialized) return;
 
     try {
-      // Only initialize basic Firebase functionality (local notifications)
+      // Initialize Firebase basic functionality
       await _firebaseService.initializeBasic();
-      
+
       _isBasicInitialized = true;
       log('✅ Notification Service - Basic initialization completed');
     } catch (e) {
@@ -44,13 +43,11 @@ class NotificationService {
 
     try {
       log('🚀 Starting full notification service initialization after auth...');
-      
+
       // Initialize Firebase with authentication
       await _firebaseService.initializeWithAuth();
 
-      // Set up Firebase callbacks
-      _firebaseService.onNotificationReceived = _handleNewNotification;
-      _firebaseService.onNotificationTapped = _handleNotificationTapped;
+      // Set up FCM token refresh callback only (Firebase Service handles notifications directly)
       _firebaseService.onTokenRefresh = _handleTokenRefresh;
 
       // Get and sync FCM token with server
@@ -106,27 +103,25 @@ class NotificationService {
     }
   }
 
- Future<bool> deleteNotification(int id) async {
-  try {
-    log('🗑️ Attempting to delete notification $id');
-    
-    final success = await _repository.deleteNotification(id);
-    
-    if (success) {
-      log('✅ Notification $id deleted from server');
-      
-      // Don't refresh automatically here - let the cubit handle UI updates
-      // This prevents unnecessary API calls
-      return true;
-    } else {
-      log('❌ Failed to delete notification $id from server');
+  // Delete notification
+  Future<bool> deleteNotification(int id) async {
+    try {
+      log('🗑️ Attempting to delete notification $id');
+
+      final success = await _repository.deleteNotification(id);
+
+      if (success) {
+        log('✅ Notification $id deleted from server');
+        return true;
+      } else {
+        log('❌ Failed to delete notification $id from server');
+        return false;
+      }
+    } catch (e) {
+      log('❌ Error deleting notification $id: $e');
       return false;
     }
-  } catch (e) {
-    log('❌ Error deleting notification $id: $e');
-    return false;
   }
-}
 
   // Clear all notifications
   Future<bool> clearAllNotifications() async {
@@ -146,17 +141,6 @@ class NotificationService {
   // Refresh notifications
   Future<void> refreshNotifications() async {
     await getNotifications();
-  }
-
-  // Handle new notification from push
-  void _handleNewNotification(NotificationModel notification) {
-    log('📱 New notification received: ${notification.title}');
-    onNewNotification?.call(notification);
-  }
-
-  // Handle notification tap
-  void _handleNotificationTapped(NotificationModel notification) {
-    log('📱 Notification tapped: ${notification.title}');
   }
 
   // Handle FCM token refresh
@@ -220,24 +204,24 @@ class NotificationService {
     try {
       // Remove FCM token from server
       await removeFCMToken();
-      
+
       // Clear local notifications
       await clearLocalNotifications();
-      
+
       // Unsubscribe from topics
       await unsubscribeFromTopic('all_users');
-      
+
       // Reset Firebase service
       _firebaseService.reset();
-      
+
       // Reset flags
       _isFullyInitialized = false;
-      
+
       // Clear callbacks
       onNotificationsUpdated = null;
       onUnreadCountChanged = null;
       onNewNotification = null;
-      
+
       log('🔄 Notification Service reset completed');
     } catch (e) {
       log('❌ Error resetting notification service: $e');
