@@ -1,8 +1,8 @@
 import 'package:find_them/data/models/notification.dart';
+import 'package:find_them/logic/cubit/notification_cubit.dart';
 import 'package:find_them/presentation/widgets/notification/notification_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:find_them/logic/cubit/notification_cubit.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NotificationCubit>().getNotifications();
+      context.read<NotificationCubit>().loadNotifications();
     });
   }
 
@@ -41,6 +41,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: () => _showClearAllDialog(),
+            child: Text(
+              'Clear All',
+              style: TextStyle(
+                color: AppColors.teal,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
       ),
       body: BlocConsumer<NotificationCubit, NotificationState>(
         listener: (context, state) {
@@ -49,6 +62,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               SnackBar(
                 content: Text(state.message),
                 backgroundColor: AppColors.getMissingRedColor(context),
+              ),
+            );
+          } else if (state is NotificationCleared) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('All notifications cleared'),
+                backgroundColor: AppColors.teal,
               ),
             );
           }
@@ -90,7 +110,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<NotificationCubit>().getNotifications();
+                      context.read<NotificationCubit>().loadNotifications();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.teal,
@@ -137,7 +157,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<NotificationCubit>().getNotifications();
+                context.read<NotificationCubit>().loadNotifications();
               },
               color: AppColors.teal,
               child: ListView.builder(
@@ -148,11 +168,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   return NotificationCard(
                     notification: notification,
                     onTap: () {
-                      if (!notification.isRead) {
-                        context.read<NotificationCubit>().markAsRead(
-                          notification.id,
-                        );
-                      }
                       _handleNotificationTap(context, notification);
                     },
                     onDismiss: () {
@@ -166,6 +181,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     actionText: _getActionText(notification),
                   );
                 },
+              ),
+            );
+          }
+
+          if (state is NotificationClearing) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: AppColors.teal),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Clearing notifications...',
+                    style: TextStyle(
+                      color: AppColors.getTextColor(context),
+                    ),
+                  ),
+                ],
               ),
             );
           }
@@ -246,5 +279,44 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       default:
         return null;
     }
+  }
+
+  void _showClearAllDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.getSurfaceColor(context),
+          title: Text(
+            'Clear All Notifications',
+            style: TextStyle(color: AppColors.getTextColor(context)),
+          ),
+          content: Text(
+            'Are you sure you want to clear all notifications? This action cannot be undone.',
+            style: TextStyle(color: AppColors.getTextColor(context)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: AppColors.getSecondaryTextColor(context)),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.read<NotificationCubit>().clearAllNotifications();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.teal,
+                foregroundColor: AppColors.white,
+              ),
+              child: const Text('Clear All'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

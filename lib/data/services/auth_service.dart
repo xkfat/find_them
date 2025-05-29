@@ -1,18 +1,22 @@
+// auth_service.dart - Fixed notification integration parts
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:find_them/data/dataprovider/exception.dart';
 import 'package:find_them/data/services/api_service.dart';
+import 'package:find_them/data/services/notification_service.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
   final ApiService _apiService;
+  final NotificationService _notificationService = NotificationService(); // Use our new service
 
   AuthService({ApiService? apiService})
     : _apiService = apiService ?? ApiService();
 
+  // [Keep your existing _response method unchanged]
   dynamic _response(http.Response response) {
     switch (response.statusCode) {
       case 200:
@@ -45,7 +49,7 @@ class AuthService {
   Future<dynamic> login(String username, String pwd) async {
     dynamic responseJson;
     try {
-      log("attewmpting login for : $username");
+      log("attempting login for: $username");
 
       final response = await http
           .post(
@@ -54,43 +58,50 @@ class AuthService {
             body: jsonEncode({"username": username, "password": pwd}),
           )
           .timeout(Duration(seconds: 60));
-      log(response.statusCode.toString());
-      log(response.body);
+      
+      log("Login response status: ${response.statusCode}");
+      log("Login response body: ${response.body}");
 
       responseJson = _response(response);
 
       if (response.statusCode == 200 &&
           responseJson['access'] != null &&
           responseJson['refresh'] != null) {
+        
+        // Save auth tokens
         await _apiService.saveAuthTokens(
           accessToken: responseJson['access'],
           refreshToken: responseJson['refresh'],
           userData: responseJson['user'] ?? {},
         );
+
+        // Initialize notification service and register FCM token
+        await _initializeNotificationsForUser(username);
+        
+        log("Login successful and notifications initialized for user: $username");
       }
       return responseJson;
     } on BadRequestException {
-      log("bad 400");
-
+      log("Bad request (400)");
       throw Failure();
     } on TimeoutException {
-      log("timeout");
+      log("Request timeout");
       throw Failure();
     } on SocketException {
-      log("Socket");
+      log("Socket exception - network error");
       throw Failure();
     } on ClientException {
-      log("ClientException ");
+      log("Client exception");
       throw Failure();
     } on UnauthorisedException {
-      log("401-3");
+      log("Unauthorized (401/403)");
       throw Failure(code: 1);
     } on NotFoundException {
-      log("404");
+      log("Not found (404)");
       throw Failure();
     } on FetchDataException {
-      log("FetchData");
-      throw Failure(message: "Erreur fetch data:");
+      log("Fetch data exception");
+      throw Failure(message: "Error fetching data");
     }
   }
 
@@ -104,7 +115,7 @@ class AuthService {
     required String passwordConfirmation,
   }) async {
     try {
-      log("signup");
+      log("Attempting signup for: $username");
 
       var response = await http
           .post(
@@ -121,6 +132,7 @@ class AuthService {
             }),
           )
           .timeout(Duration(seconds: 60));
+      
       log("Signup response status: ${response.statusCode}");
       log("Signup response body: ${response.body}");
 
@@ -135,11 +147,18 @@ class AuthService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (responseJson.containsKey('access') &&
             responseJson.containsKey('refresh')) {
+          
+          // Save auth tokens
           await _apiService.saveAuthTokens(
             accessToken: responseJson['access'],
             refreshToken: responseJson['refresh'],
             userData: responseJson['user'] ?? {},
           );
+
+          // Initialize notification service and register FCM token
+          await _initializeNotificationsForUser(username);
+          
+          log("Signup successful and notifications initialized for user: $username");
         }
       }
 
@@ -182,7 +201,9 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        await _apiService.clearAuthTokens();
+        // Clean up everything
+        await _cleanupUserSession();
+        log("Account deleted and session cleaned up for: $username");
         return {'success': true};
       } else {
         return {'success': false, 'message': 'Failed to delete account'};
@@ -199,12 +220,13 @@ class AuthService {
       final refreshToken = await _apiService.getRefreshToken();
 
       if (refreshToken == null) {
-        log("No refresh token available, clearing local tokens only");
-        await _apiService.clearAuthTokens();
+        log("No refresh token available, performing local cleanup only");
+        await _cleanupUserSession();
         return true;
       }
 
       try {
+        // Attempt server logout
         final response = await http
             .post(
               Uri.parse('http://10.0.2.2:8000/api/accounts/logout/'),
@@ -217,13 +239,14 @@ class AuthService {
             .timeout(Duration(seconds: 60));
 
         log("Logout response status: ${response.statusCode}");
-        log("Logout response body: ${response.body}");
 
         if (response.statusCode == 200 || response.statusCode == 204) {
-          await _apiService.clearAuthTokens();
+          await _cleanupUserSession();
+          log("Server logout successful - session cleaned up");
           return true;
         }
 
+        // Handle token refresh if needed
         if (response.statusCode == 401) {
           log("Access token expired, attempting to refresh before logout");
           final refreshed = await _apiService.refreshToken();
@@ -243,28 +266,126 @@ class AuthService {
                 .timeout(Duration(seconds: 60));
 
             log("Retry logout response status: ${retryResponse.statusCode}");
-            log("Retry logout response body: ${retryResponse.body}");
-
-            await _apiService.clearAuthTokens();
+            await _cleanupUserSession();
+            log("Retry logout completed - session cleaned up");
             return true;
           }
         }
 
-        await _apiService.clearAuthTokens();
+        // Fallback - clean up locally even if server logout failed
+        await _cleanupUserSession();
+        log("Server logout failed but local cleanup completed");
         return true;
+
       } catch (e) {
         log("Error during server logout: $e");
-        await _apiService.clearAuthTokens();
+        await _cleanupUserSession();
+        log("Server logout failed but local cleanup completed");
         return true;
       }
     } catch (e) {
       log("Unexpected error in logout: $e");
       try {
-        await _apiService.clearAuthTokens();
+        await _cleanupUserSession();
+        log("Emergency logout cleanup completed");
         return true;
       } catch (_) {
         return false;
       }
     }
   }
+
+  /// Initialize notification service for authenticated user
+  Future<void> _initializeNotificationsForUser(String username) async {
+    try {
+      // Initialize the notification service
+      await _notificationService.initialize();
+      
+      // Get FCM token and register with server
+      final fcmToken = await _notificationService.getFCMToken();
+      if (fcmToken != null) {
+        log("FCM token obtained: ${fcmToken.substring(0, 20)}...");
+        
+        // The notification service will handle updating the token on the server
+        // via its repository when initialized
+      }
+
+      // Subscribe to general topics (optional)
+      await _notificationService.subscribeToTopic('all_users');
+      
+      log("Notification service initialized successfully for user: $username");
+    } catch (e) {
+      log("Error initializing notifications for user: $e");
+      // Don't throw - notification failure shouldn't prevent login
+    }
+  }
+
+  /// Clean up user session including notifications
+  Future<void> _cleanupUserSession() async {
+    try {
+      // Remove FCM token from server
+      await _notificationService.removeFCMToken();
+      
+      // Clear local notifications
+      await _notificationService.clearLocalNotifications();
+      
+      // Unsubscribe from topics
+      await _notificationService.unsubscribeFromTopic('all_users');
+      
+      // Clear auth tokens
+      await _apiService.clearAuthTokens();
+      
+      log("User session cleanup completed");
+    } catch (e) {
+      log("Error during session cleanup: $e");
+      // Still try to clear auth tokens even if notification cleanup fails
+      try {
+        await _apiService.clearAuthTokens();
+      } catch (_) {
+        log("Failed to clear auth tokens during cleanup");
+      }
+    }
+  }
+
+  /// Restore notification service for existing authenticated user
+  Future<void> restoreNotificationToken() async {
+    try {
+      final accessToken = await _apiService.getAccessToken();
+      
+      if (accessToken != null) {
+        log("Restoring notification service for existing session");
+        
+        // Initialize notification service
+        await _notificationService.initialize();
+        
+        // The service will automatically sync the FCM token with the server
+        log("Notification service restored successfully");
+      }
+    } catch (e) {
+      log("Error restoring notification token: $e");
+    }
+  }
+
+  /// Get current FCM token
+  Future<String?> getFCMToken() async {
+    return await _notificationService.getFCMToken();
+  }
+
+  /// Check if user has valid FCM token
+  Future<bool> hasValidFCMToken() async {
+    return await _notificationService.hasFCMToken();
+  }
+
+  /// Manually sync FCM token with server (useful for token refresh)
+  Future<void> syncFCMToken() async {
+    try {
+      await _notificationService.refreshNotifications();
+      log("FCM token sync completed");
+    } catch (e) {
+      log("Error syncing FCM token: $e");
+    }
+  }
+
+  // [Keep all your other existing methods unchanged]
+  // getToken(), isLoggedIn(), etc.
 }

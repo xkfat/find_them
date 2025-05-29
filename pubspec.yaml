@@ -35,13 +35,17 @@ dependencies:
   equatable: ^2.0.7
   firebase_auth: ^4.15.0
   firebase_core: ^2.24.0
+  firebase_messaging: ^14.7.10
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_facebook_auth: ^7.1.2
   flutter_google_places: ^0.3.0
+  flutter_local_notifications: ^15.1.0 
   flutter_localisation: ^1.0.3
   flutter_localization: ^0.3.2
+  flutter_localizations:
+    sdk: flutter
   flutter_phosphor_icons: ^0.0.1+6
   flutter_secure_storage: ^9.2.4
   flutter_svg: ^2.1.0
@@ -54,15 +58,13 @@ dependencies:
   google_sign_in: ^6.3.0
   http: ^1.4.0
   image_picker: ^1.1.2
+  intl: ^0.20.2
   intl_phone_field: ^3.2.0
   location: ^8.0.0
   permission_handler: ^12.0.0+1
   phosphor_flutter: ^2.1.0
   shared_preferences: ^2.5.3
   url_launcher: ^6.3.1
-  flutter_localizations:
-    sdk: flutter
-  intl: ^0.20.2
 
 dev_dependencies:
   flutter_lints: ^5.0.0
@@ -73,8 +75,6 @@ dev_dependencies:
 dependency_overrides:
   http: ^0.13.5
   google_api_headers: ^1.6.0
-
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

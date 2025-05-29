@@ -13,18 +13,27 @@ dependencies {
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
+    
+    // Core library desugaring - REQUIRED for flutter_local_notifications
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     // Also add the dependencies for the Credential Manager libraries and specify their versions
     implementation("androidx.credentials:credentials:1.3.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    
+    // Add multidex support
+    implementation("androidx.multidex:multidex:2.0.1")
 }
 
 android {
     namespace = "com.example.find_them"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
+    
     compileOptions {
+        // ENABLE core library desugaring - THIS FIXES THE flutter_local_notifications ERROR
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -43,6 +52,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        // Enable multidex
+        multiDexEnabled = true
     }
 
     buildTypes {

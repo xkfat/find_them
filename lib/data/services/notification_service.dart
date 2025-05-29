@@ -1,120 +1,189 @@
-import 'dart:convert';
+// services/notification_service.dart
 import 'dart:developer';
-import 'package:find_them/data/dataprovider/exception.dart';
 import 'package:find_them/data/models/notification.dart';
-import 'package:http/http.dart' as http;
+import 'package:find_them/data/repositories/notification_repo.dart';
+import 'firebase_service.dart';
 
 class NotificationService {
-  final String baseUrl;
-  final http.Client _httpClient;
+  static final NotificationService _instance = NotificationService._internal();
+  factory NotificationService() => _instance;
+  NotificationService._internal();
 
-  NotificationService({
-    this.baseUrl = 'http://10.0.2.2:8000/api',
-    http.Client? httpClient,
-  }) : _httpClient = httpClient ?? http.Client();
+  final NotificationRepository _repository = NotificationRepository();
+  final FirebaseService _firebaseService = FirebaseService();
 
-  Map<String, String> _getHeaders({String? token}) {
-    final headers = {'Content-Type': 'application/json'};
-    if (token != null) {
-      headers['Authorization'] = 'Bearer $token';
+  bool _isInitialized = false;
+
+  // Callbacks for real-time updates
+  Function(List<NotificationModel>)? onNotificationsUpdated;
+  Function(int)? onUnreadCountChanged;
+  Function(NotificationModel)? onNewNotification;
+
+  Future<void> initialize() async {
+    if (_isInitialized) return;
+
+    try {
+      // Initialize Firebase (but don't sync token yet)
+      await _firebaseService.initialize();
+
+      // Set up Firebase callbacks
+      _firebaseService.onNotificationReceived = _handleNewNotification;
+      _firebaseService.onNotificationTapped = _handleNotificationTapped;
+      _firebaseService.onTokenRefresh = _handleTokenRefresh;
+
+      // DON'T update FCM token on server here - wait for login/signup
+
+      _isInitialized = true;
+      log('Notification Service initialized (FCM sync pending login)');
+    } catch (e) {
+      log('Error initializing Notification Service: $e');
     }
-    return headers;
   }
 
-  Future<List<NotificationModel>> getNotifications({String? type, String? token}) async {
+  // NEW: Method to sync FCM token after successful login/signup
+  Future<void> syncFCMTokenAfterAuth() async {
     try {
-      log('Fetching notifications${type != null ? ' of type: $type' : ''}');
-      
-      String endpoint = '$baseUrl/notifications/';
-      if (type != null && type.isNotEmpty) {
-        endpoint += '?type=$type';
-      }
-      
-      final response = await _httpClient.get(
-        Uri.parse(endpoint),
-        headers: _getHeaders(token: token),
-      );
+      log('🔄 Syncing FCM token after authentication...');
+      await _updateFCMTokenOnServer();
+    } catch (e) {
+      log('Error syncing FCM token after auth: $e');
+    }
+  }
 
-      log('Notifications response status: ${response.statusCode}');
-      log('Notifications response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => NotificationModel.fromJson(json)).toList();
-      } else if (response.statusCode == 401) {
-        throw UnauthorisedException('Authentication failed');
-      } else {
-        throw Exception('Failed to load notifications: ${response.statusCode}');
-      }
+  // Get all notifications
+  Future<List<NotificationModel>> getNotifications() async {
+    try {
+      final notifications = await _repository.getNotifications();
+      onNotificationsUpdated?.call(notifications);
+      return notifications;
     } catch (e) {
       log('Error getting notifications: $e');
-      throw Exception('Error getting notifications: $e');
+      return [];
     }
   }
 
-  Future<NotificationModel> getNotificationById(int id, {String? token}) async {
+  // Get specific notification
+  Future<NotificationModel?> getNotification(int id) async {
     try {
-      log('Fetching notification by ID: $id');
-      
-      final response = await _httpClient.get(
-        Uri.parse('$baseUrl/notifications/$id/'),
-        headers: _getHeaders(token: token),
-      );
-
-      log('Notification detail response status: ${response.statusCode}');
-      log('Notification detail response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        return NotificationModel.fromJson(json.decode(response.body));
-      } else if (response.statusCode == 401) {
-        throw UnauthorisedException('Authentication failed');
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Notification not found');
-      } else {
-        throw Exception('Failed to load notification: ${response.statusCode}');
-      }
+      return await _repository.getNotification(id);
     } catch (e) {
       log('Error getting notification: $e');
-      throw Exception('Error getting notification: $e');
+      return null;
     }
   }
 
-  Future<void> markAsRead(int notificationId, {String? token}) async {
+  // Delete notification
+  Future<bool> deleteNotification(int id) async {
     try {
-      log('Marking notification as read: $notificationId');
-      
-      final response = await _httpClient.get(
-        Uri.parse('$baseUrl/notifications/$notificationId/'),
-        headers: _getHeaders(token: token),
-      );
-
-      log('Mark as read response status: ${response.statusCode}');
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to mark notification as read: ${response.statusCode}');
+      final success = await _repository.deleteNotification(id);
+      if (success) {
+        // Refresh notifications after deletion
+        await refreshNotifications();
       }
-    } catch (e) {
-      log('Error marking notification as read: $e');
-      throw Exception('Error marking notification as read: $e');
-    }
-  }
- Future<void> deleteNotification(int notificationId, {String? token}) async {
-    try {
-      log('Deleting notification: $notificationId');
-      
-      final response = await _httpClient.delete(
-        Uri.parse('$baseUrl/notifications/$notificationId/delete/'),
-        headers: _getHeaders(token: token),
-      );
-
-      log('Delete notification response status: ${response.statusCode}');
-
-      if (response.statusCode != 204 && response.statusCode != 200) {
-        throw Exception('Failed to delete notification: ${response.statusCode}');
-      }
+      return success;
     } catch (e) {
       log('Error deleting notification: $e');
-      throw Exception('Error deleting notification: $e');
+      return false;
     }
+  }
+
+  // Clear all notifications
+  Future<bool> clearAllNotifications() async {
+    try {
+      final success = await _repository.clearAllNotifications();
+      if (success) {
+        onNotificationsUpdated?.call([]);
+        onUnreadCountChanged?.call(0);
+      }
+      return success;
+    } catch (e) {
+      log('Error clearing notifications: $e');
+      return false;
+    }
+  }
+
+  // Refresh notifications
+  Future<void> refreshNotifications() async {
+    await getNotifications();
+  }
+
+  // Handle new notification from push
+  void _handleNewNotification(NotificationModel notification) {
+    log('New notification received: ${notification.title}');
+    onNewNotification?.call(notification);
+  }
+
+  // Handle notification tap
+  void _handleNotificationTapped(NotificationModel notification) {
+    log('Notification tapped: ${notification.title}');
+    
+    // You can add navigation logic here or let the UI handle it
+    // For example, you could use a navigation service:
+    // NavigationService.navigateTo(notification.navigationRoute, notification.navigationArguments);
+  }
+
+  // Handle FCM token refresh
+  Future<void> _handleTokenRefresh(String newToken) async {
+    log('🔄 FCM Token refreshed, syncing with server...');
+    await _repository.syncFCMTokenWithServer(newToken);
+  }
+
+  // Update FCM token on server (private method)
+  Future<void> _updateFCMTokenOnServer() async {
+    try {
+      final token = await _firebaseService.getToken();
+      if (token != null) {
+        await _repository.syncFCMTokenWithServer(token);
+        log('FCM token synced with server after auth');
+      }
+    } catch (e) {
+      log('Error updating FCM token on server: $e');
+    }
+  }
+
+  // Subscribe to topic (for admin broadcasts, etc.)
+  Future<void> subscribeToTopic(String topic) async {
+    await _firebaseService.subscribeToTopic(topic);
+  }
+
+  // Unsubscribe from topic
+  Future<void> unsubscribeFromTopic(String topic) async {
+    await _firebaseService.unsubscribeFromTopic(topic);
+  }
+
+  // Clear local notifications
+  Future<void> clearLocalNotifications() async {
+    await _firebaseService.clearNotifications();
+  }
+
+  // Remove FCM token (for logout)
+  Future<void> removeFCMToken() async {
+    try {
+      await _repository.removeFCMToken();
+      log('FCM token removed from server');
+    } catch (e) {
+      log('Error removing FCM token: $e');
+    }
+  }
+
+  // Check if user has FCM token registered
+  Future<bool> hasFCMToken() async {
+    try {
+      final status = await _repository.checkFCMStatus();
+      return status['has_fcm_token'] ?? false;
+    } catch (e) {
+      log('Error checking FCM status: $e');
+      return false;
+    }
+  }
+
+  // Get FCM token
+  Future<String?> getFCMToken() async {
+    return await _firebaseService.getToken();
+  }
+
+  // Dispose resources
+  void dispose() {
+    _firebaseService.dispose();
   }
 }
