@@ -99,7 +99,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return Directionality(
           textDirection:
               _locale.languageCode == 'ar'
-                  ? TextDirection.rtl
+                  ? TextDirection.ltr
                   : TextDirection.ltr,
           child: child!,
         );

@@ -1,6 +1,7 @@
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class ReportSuccessScreen extends StatelessWidget {
   const ReportSuccessScreen({super.key});
@@ -31,7 +32,7 @@ class ReportSuccessScreen extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Success!',
+                  context.l10n.success,
                   style: GoogleFonts.inter(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -41,7 +42,7 @@ class ReportSuccessScreen extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 Text(
-                  'We will look into your information as soon as possible.',
+                  context.l10n.reportSuccessMessage,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 16,
@@ -49,37 +50,37 @@ class ReportSuccessScreen extends StatelessWidget {
                   ),
                 ),
 
-                const Spacer(flex: 3),
+                const SizedBox(height: 32),
 
-                Center(
-                  child: SizedBox(
-                    width: 248,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/home',
-                          (route) => false,
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
+                SizedBox(
+                  width: 248,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/home',
+                        (route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.teal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
                       ),
-                      child: Text(
-                        'Continue',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
+                    ),
+                    child: Text(
+                      context.l10n.continueLabel,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                 ),
+
+                const Spacer(flex: 3),
                 const SizedBox(height: 24),
               ],
             ),

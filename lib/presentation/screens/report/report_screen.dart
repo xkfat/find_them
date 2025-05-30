@@ -3,6 +3,7 @@ import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class Report1Screen extends StatefulWidget {
   const Report1Screen({super.key});
@@ -47,7 +48,7 @@ class _Report1ScreenState extends State<Report1Screen> {
       backgroundColor: AppColors.getSurfaceColor(context),
       appBar: AppBar(
         title: Text(
-          'Reporting a missing person',
+          context.l10n.reportingMissingPerson,
           style: GoogleFonts.dmSans(
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -84,7 +85,7 @@ class _Report1ScreenState extends State<Report1Screen> {
 
                 Center(
                   child: Text(
-                    'Basic Information',
+                    context.l10n.basicInformation,
                     style: GoogleFonts.inter(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -95,14 +96,14 @@ class _Report1ScreenState extends State<Report1Screen> {
                 const SizedBox(height: 32),
 
                 Text(
-                  'First name',
+                  context.l10n.firstName,
                   style: TextStyle(color: AppColors.getTextColor(context)),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _firstNameController,
                   decoration: InputDecoration(
-                    hintText: 'Enter first name of missing person here',
+                    hintText: context.l10n.enterFirstNameHere,
                     filled: true,
                     fillColor: AppColors.getSurfaceColor(context),
                     hintStyle: TextStyle(
@@ -124,7 +125,7 @@ class _Report1ScreenState extends State<Report1Screen> {
                   style: TextStyle(color: AppColors.getTextColor(context)),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter first name';
+                      return context.l10n.pleaseEnterFirstName;
                     }
                     return null;
                   },
@@ -132,14 +133,14 @@ class _Report1ScreenState extends State<Report1Screen> {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Last name',
+                  context.l10n.lastName,
                   style: TextStyle(color: AppColors.getTextColor(context)),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _lastNameController,
                   decoration: InputDecoration(
-                    hintText: 'Enter last name of missing person here',
+                    hintText: context.l10n.enterLastNameHere,
                     filled: true,
                     fillColor: AppColors.getSurfaceColor(context),
                     hintStyle: TextStyle(
@@ -161,7 +162,7 @@ class _Report1ScreenState extends State<Report1Screen> {
                   style: TextStyle(color: AppColors.getTextColor(context)),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter last name';
+                      return context.l10n.pleaseEnterLastName;
                     }
                     return null;
                   },
@@ -169,7 +170,7 @@ class _Report1ScreenState extends State<Report1Screen> {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Age',
+                  context.l10n.age,
                   style: TextStyle(color: AppColors.getTextColor(context)),
                 ),
                 const SizedBox(height: 8),
@@ -200,7 +201,7 @@ class _Report1ScreenState extends State<Report1Screen> {
                   style: TextStyle(color: AppColors.getTextColor(context)),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter age';
+                      return context.l10n.pleaseEnterAge;
                     }
                     return null;
                   },
@@ -208,7 +209,7 @@ class _Report1ScreenState extends State<Report1Screen> {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Gender',
+                  context.l10n.gender,
                   style: TextStyle(color: AppColors.getTextColor(context)),
                 ),
                 const SizedBox(height: 16),
@@ -229,7 +230,7 @@ class _Report1ScreenState extends State<Report1Screen> {
                       }),
                     ),
                     Text(
-                      'Male',
+                      context.l10n.male,
                       style: TextStyle(color: AppColors.getTextColor(context)),
                     ),
                     const SizedBox(width: 40),
@@ -248,7 +249,7 @@ class _Report1ScreenState extends State<Report1Screen> {
                       }),
                     ),
                     Text(
-                      'Female',
+                      context.l10n.female,
                       style: TextStyle(color: AppColors.getTextColor(context)),
                     ),
                   ],
@@ -268,7 +269,7 @@ class _Report1ScreenState extends State<Report1Screen> {
                         ),
                       ),
                       child: Text(
-                        'Continue',
+                        context.l10n.continueLabel,
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,

@@ -10,6 +10,9 @@ import 'package:find_them/presentation/widgets/toggle.dart';
 import 'package:find_them/logic/cubit/location_sharing_cubit.dart';
 import 'package:find_them/data/repositories/location_sharing_repo.dart';
 import 'package:find_them/data/services/location_sharing_service.dart';
+import 'package:find_them/l10n/app_localizations.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
+
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -151,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
-                'OK',
+                context.l10n.ok,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -174,14 +177,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       final message =
           value
-              ? 'Location sharing enabled - Now sharing with all friends'
-              : 'Location sharing disabled';
+              ? context.l10n.locationSharing +
+                  ' ' +
+                  context.l10n.success.toLowerCase()
+              : context.l10n.locationSharing + ' disabled';
       _showDialog(message, true);
     } catch (e) {
       setState(() {
         locationSharingEnabled = !value;
       });
-      _showDialog('Failed to update location sharing: ${e.toString()}', false);
+      _showDialog('${context.l10n.error}: ${e.toString()}', false);
     }
   }
 
@@ -192,7 +197,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       listener: (context, state) {
         if (state is LocationSharingActionSuccess) {
         } else if (state is LocationSharingError) {
-          _showDialog('Error: ${state.message}', false);
+          _showDialog('${context.l10n.error}: ${state.message}', false);
         }
       },
       child: Scaffold(
@@ -221,7 +226,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
             ),
-
             Center(
               child: Container(
                 width: 411,
@@ -249,7 +253,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Text(
-                          'Account Settings',
+                          context.l10n.accountSettings,
                           style: GoogleFonts.rubik(
                             fontSize: 18,
                             fontWeight: FontWeight.normal,
@@ -259,30 +263,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(height: 38),
                       _buildNavigationOption(
-                        'Edit profile',
+                        context.l10n.editProfile,
                         onTap: () => Navigator.pushNamed(context, '/profile'),
                       ),
-
                       const SizedBox(height: 22),
-
                       _buildNavigationOption(
-                        'Change password',
+                        context.l10n.changePassword,
                         onTap:
                             () => Navigator.pushNamed(
                               context,
                               '/settings/change-password',
                             ),
                       ),
-
                       const SizedBox(height: 22),
-
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Change language',
+                              context.l10n.changeLanguage,
                               style: GoogleFonts.rubik(
                                 fontSize: 18,
                                 fontWeight: FontWeight.normal,
@@ -306,31 +306,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 22),
-
                       _buildToggleOption(
-                        'Notifications',
+                        context.l10n.notifications,
                         notificationsEnabled,
                         onChanged: (value) async {
                           await _openNotificationSettings();
                         },
                       ),
-
                       const SizedBox(height: 22),
-
                       _buildToggleOption(
-                        'Dark mode',
+                        context.l10n.darkMode,
                         Theme.of(context).brightness == Brightness.dark,
                         onChanged: (value) {
                           widget.toggleTheme();
                         },
                       ),
-
                       const SizedBox(height: 22),
-
                       _buildToggleOption(
-                        'Location permission',
+                        context.l10n.locationPermission,
                         locationPermissionEnabled,
                         onChanged: (value) async {
                           if (value) {
@@ -340,11 +334,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           }
                         },
                       ),
-
                       const SizedBox(height: 22),
-
                       _buildToggleOption(
-                        'Location sharing',
+                        context.l10n.locationSharing,
                         locationSharingEnabled,
                         onChanged: _toggleLocationSharing,
                       ),

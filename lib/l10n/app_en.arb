@@ -122,6 +122,15 @@
   "oldPasswordNotCorrect": "Old password is not correct",
   "error": "Error",
   
+  "noProfileDataToDisplay": "No profile data to display. Please try again.",
+  "firstNameMinLength": "First name must be at least 2 characters",
+  "lastNameMinLength": "Last name must be at least 2 characters", 
+  "usernameMinLength": "Username must be at least 3 characters",
+  "usernameInvalidCharacters": "Username can only contain letters, numbers, underscores, or dots",
+  "phoneNumberDigitsOnly": "Phone number must contain only digits",
+  "passwordChangeSuccess": "Your password has been changed successfully.",
+  "invalidNewPassword": "Invalid new password",
+  
   "mySubmittedCases": "My submitted cases",
   "noSubmittedCases": "No submitted cases",
   "noSubmittedCasesMessage": "You haven't submitted any missing person reports yet.",
@@ -162,6 +171,27 @@
   "delete": "Delete",
   "viewDetailsButton": "View details",
   "viewOnMap": "View on map",
+
+  "tapForDetails": "Tap for details",
+  "liveLocation": "Live location", 
+  "recentLocation": "Recent location",
+  "locationSuffix": "s Location",
+
+  "searchingYourLocation": "Searching your location...",
+  "locationPermissionDenied": "Location permission denied",
+  "locationPermissionRequiredFeature": "Location permission is required to use this feature",
+  "locationServiceDisabled": "Location service disabled",
+  "addressNotFound": "Address not found",
+  "errorGettingAddress": "Error getting address",
+  "selectedLocation": "Selected Location",
+  "noResultsFound": "No results found. Try a different search term.",
+  "apiKeyError": "API Key error",
+  "invalidApiKey": "Invalid API key",
+  "noMatchingLocations": "No matching locations found. Try a different search term.",
+  "networkError": "Network error",
+  "errorGettingPlaceDetails": "Error getting place details",
+  "enterLocationToSearch": "Enter a location to search",
+  "makeSurePlacesApiEnabled": "Make sure Places API is enabled in Google Cloud Console",
   
   "search": "Search",
   "searchCasesOrFriends": "Search cases or friends",
@@ -183,6 +213,17 @@
   "found": "Found",
   "showAllCases": "Show All Cases",
   "noCasesFound": "No cases found matching your search",
+
+  "caseNotFound": "Case not found",
+  "call": "Call",
+  "submitting": "Submitting...",
+
+  "alertSentSuccessfully": "Alert sent successfully!",
+  "remove": "Remove",
+  "areYouSureRemoveFriend": "Are you sure you want to remove {friendName} from your friends list?",
+
+  "searchingUsers": "Searching users...",
+  "tryAgain": "Try Again",
   
   "missingFrom": "Missing from",
   "lastSeen": "Last seen",
@@ -207,7 +248,9 @@
   "forTryingToHelp": "for trying to help us.",
   "submissionFailed": "Submission Failed",
   "failedToSubmitInformation": "Failed to submit information. Please try again.",
-  
+  "enterValidPhoneNumber": "Please enter a valid phone number",
+  "endDateCannotBeBeforeStartDate": "End date cannot be before start date",
+  "endDateCannotBeInFuture": "End date cannot be in the future",
   "active": "Active",
   "inProgress": "In Progress",
   "closed": "Closed",

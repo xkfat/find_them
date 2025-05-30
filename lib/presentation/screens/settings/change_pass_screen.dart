@@ -3,6 +3,8 @@ import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:find_them/l10n/app_localizations.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -72,7 +74,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Success!',
+                  context.l10n.success,
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -81,7 +83,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your password has been changed successfully.',
+                  'Your password has been changed successfully.', // Note: This specific message isn't in your .arb files
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 14,
@@ -104,7 +106,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ),
                     ),
                     child: Text(
-                      'OK',
+                      context.l10n.ok,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -139,9 +141,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: AppColors.getMissingRedColor(
-                      context,
-                    ),
+                    color: AppColors.getMissingRedColor(context),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -152,7 +152,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Error',
+                  context.l10n.error,
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -181,7 +181,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ),
                     ),
                     child: Text(
-                      'OK',
+                      context.l10n.ok,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -232,9 +232,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     'old password is not correct',
                   ) ||
                   errorMessage.toLowerCase().contains('old_password')) {
-                _oldPasswordError = 'Old password is not correct';
+                _oldPasswordError = context.l10n.oldPasswordNotCorrect;
               } else if (errorMessage.toLowerCase().contains('new_password')) {
-                _newPasswordError = 'Invalid new password';
+                _newPasswordError =
+                    'Invalid new password'; // Could be localized if needed
               } else {
                 _showErrorDialog(errorMessage);
               }
@@ -251,7 +252,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 const SizedBox(height: 32),
 
                 Text(
-                  'Set a new password',
+                  context.l10n.setNewPassword,
                   style: GoogleFonts.inter(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
@@ -262,7 +263,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 const SizedBox(height: 8),
 
                 Text(
-                  'Create a new password. Ensure it differs from previous ones for security',
+                  context.l10n.createNewPassword,
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     color: AppColors.getSecondaryTextColor(context),
@@ -272,7 +273,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 const SizedBox(height: 40),
 
                 Text(
-                  'Old Password',
+                  context.l10n.oldPassword,
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -351,7 +352,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your current password';
+                      return context.l10n.pleaseEnterCurrentPassword;
                     }
                     return null;
                   },
@@ -360,7 +361,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Password',
+                  context.l10n.password,
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -439,10 +440,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a new password';
+                      return context.l10n.pleaseEnterNewPassword;
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return context.l10n.passwordMustBe6Characters;
                     }
                     return null;
                   },
@@ -451,7 +452,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Confirm Password',
+                  context.l10n.confirmPassword,
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -503,10 +504,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please confirm your new password';
+                      return context.l10n.pleaseConfirmNewPassword;
                     }
                     if (value != _newPasswordController.text) {
-                      return 'Passwords do not match';
+                      return context.l10n.passwordsDoNotMatch;
                     }
                     return null;
                   },
@@ -541,7 +542,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                     ),
                                   )
                                   : Text(
-                                    'Update Password',
+                                    context.l10n.updatePassword,
                                     style: GoogleFonts.inter(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,

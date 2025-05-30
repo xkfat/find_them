@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -150,7 +151,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
               infoWindow: InfoWindow(
                 title: case_.fullName,
                 snippet:
-                    '${_getStatusText(case_.status.value)} • Tap for details',
+                    '${_getStatusText(case_.status.value)} • ${context.l10n.tapForDetails}',
               ),
               onTap: () => _onCaseMarkerTapped(case_),
             ),
@@ -165,7 +166,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
               infoWindow: InfoWindow(
                 title: case_.fullName,
                 snippet:
-                    '${_getStatusText(case_.status.value)} • Tap for details',
+                    '${_getStatusText(case_.status.value)} • ${context.l10n.tapForDetails}',
               ),
               onTap: () => _onCaseMarkerTapped(case_),
             ),
@@ -234,7 +235,8 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                 title:
                     friendDetails?.friendDetails.displayName ??
                     friendLocation.username,
-                snippet: '${friendLocation.displayText} • Tap for details',
+                snippet:
+                    '${friendLocation.displayText} • ${context.l10n.tapForDetails}',
               ),
               onTap:
                   () =>
@@ -259,7 +261,8 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                 title:
                     friendDetails?.friendDetails.displayName ??
                     friendLocation.username,
-                snippet: '${friendLocation.displayText} • Tap for details',
+                snippet:
+                    '${friendLocation.displayText} • ${context.l10n.tapForDetails}',
               ),
               onTap:
                   () =>
@@ -337,14 +340,14 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   String _getStatusText(String status) {
     switch (status.toLowerCase()) {
       case 'missing':
-        return 'Missing';
+        return context.l10n.missing;
       case 'under_investigation':
       case 'investigating':
-        return 'Investigating';
+        return context.l10n.investigating;
       case 'found':
-        return 'Found';
+        return context.l10n.found;
       default:
-        return 'Missing';
+        return context.l10n.missing;
     }
   }
 
@@ -495,7 +498,9 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
 
                 _buildInfoRow(
                   context,
-                  locationData.isLive ? 'Live location' : 'Recent location',
+                  locationData.isLive
+                      ? context.l10n.liveLocation
+                      : context.l10n.recentLocation,
                 ),
 
                 const SizedBox(height: 20),
@@ -528,7 +533,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Send Alert',
+                              context.l10n.sendAlert,
                               style: GoogleFonts.inter(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -553,7 +558,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         child: Text(
-                          'Close',
+                          context.l10n.close,
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -704,6 +709,19 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
     }
   }
 
+  String _getFilterLabel(String filter) {
+    switch (filter) {
+      case 'All':
+        return context.l10n.all;
+      case 'Cases':
+        return context.l10n.cases;
+      case 'Users':
+        return context.l10n.users;
+      default:
+        return filter;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -765,8 +783,8 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                         Expanded(
                           child: Text(
                             _navigationArgs != null
-                                ? '${_navigationArgs!['displayName'] ?? _navigationArgs!['username']}\'s Location'
-                                : 'Map view',
+                                ? '${_navigationArgs!['displayName'] ?? _navigationArgs!['username']}\'${context.l10n.locationSuffix}'
+                                : context.l10n.mapView,
                             style: GoogleFonts.dmSans(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -807,7 +825,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
         controller: _searchController,
         style: TextStyle(color: AppColors.getTextColor(context)),
         decoration: InputDecoration(
-          hintText: 'Search cases or friends',
+          hintText: context.l10n.searchCasesOrFriends,
           hintStyle: TextStyle(color: AppColors.getSecondaryTextColor(context)),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -852,7 +870,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
         padding: const EdgeInsets.symmetric(vertical: 12),
       ),
       child: Text(
-        label,
+        _getFilterLabel(label),
         style: TextStyle(
           fontSize: 12,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
@@ -872,7 +890,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Location permission is required to use the map.',
+              context.l10n.locationPermissionRequired,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -888,7 +906,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                 backgroundColor: AppColors.teal,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Grant Permission'),
+              child: Text(context.l10n.grantPermission),
             ),
           ],
         ),
@@ -901,7 +919,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Error: ${state.message}',
+              '${context.l10n.error}: ${state.message}',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -917,7 +935,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                 backgroundColor: AppColors.teal,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Retry'),
+              child: Text(context.l10n.retry),
             ),
           ],
         ),

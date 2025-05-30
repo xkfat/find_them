@@ -119,6 +119,15 @@
   "oldPasswordNotCorrect": "L'ancien mot de passe n'est pas correct",
   "error": "Erreur",
   
+  "noProfileDataToDisplay": "Aucune donnée de profil à afficher. Veuillez réessayer.",
+  "firstNameMinLength": "Le prénom doit contenir au moins 2 caractères",
+  "lastNameMinLength": "Le nom de famille doit contenir au moins 2 caractères",
+  "usernameMinLength": "Le nom d'utilisateur doit contenir au moins 3 caractères", 
+  "usernameInvalidCharacters": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres, des traits de soulignement ou des points",
+  "phoneNumberDigitsOnly": "Le numéro de téléphone ne doit contenir que des chiffres",
+  "passwordChangeSuccess": "Votre mot de passe a été changé avec succès.",
+  "invalidNewPassword": "Nouveau mot de passe invalide",
+  
   "mySubmittedCases": "Mes cas soumis",
   "noSubmittedCases": "Aucun cas soumis",
   "noSubmittedCasesMessage": "Vous n'avez pas encore soumis de rapport de personne disparue.",
@@ -159,6 +168,27 @@
   "delete": "Supprimer",
   "viewDetailsButton": "Voir les détails",
   "viewOnMap": "Voir sur la carte",
+
+  "tapForDetails": "Appuyez pour plus de détails",
+  "liveLocation": "Localisation en direct",
+  "recentLocation": "Localisation récente", 
+  "locationSuffix": " - Localisation",
+
+  "searchingYourLocation": "Recherche de votre position...",
+  "locationPermissionDenied": "Autorisation de localisation refusée",
+  "locationPermissionRequiredFeature": "L'autorisation de localisation est requise pour utiliser cette fonctionnalité",
+  "locationServiceDisabled": "Service de localisation désactivé",
+  "addressNotFound": "Adresse non trouvée",
+  "errorGettingAddress": "Erreur lors de l'obtention de l'adresse",
+  "selectedLocation": "Localisation sélectionnée",
+  "noResultsFound": "Aucun résultat trouvé. Essayez un terme de recherche différent.",
+  "apiKeyError": "Erreur de clé API",
+  "invalidApiKey": "Clé API invalide",
+  "noMatchingLocations": "Aucune localisation correspondante trouvée. Essayez un terme de recherche différent.",
+  "networkError": "Erreur réseau",
+  "errorGettingPlaceDetails": "Erreur lors de l'obtention des détails du lieu",
+  "enterLocationToSearch": "Entrez un lieu à rechercher",
+  "makeSurePlacesApiEnabled": "Assurez-vous que l'API Places est activée dans Google Cloud Console",
   
   "search": "Rechercher",
   "searchCasesOrFriends": "Rechercher des cas ou des amis",
@@ -180,6 +210,17 @@
   "found": "Trouvé",
   "showAllCases": "Afficher tous les cas",
   "noCasesFound": "Aucun cas trouvé correspondant à votre recherche",
+
+  "caseNotFound": "Cas non trouvé",
+  "call": "Appeler",
+  "submitting": "Envoi en cours...",
+
+  "alertSentSuccessfully": "Alerte envoyée avec succès !",
+  "remove": "Supprimer", 
+  "areYouSureRemoveFriend": "Êtes-vous sûr de vouloir supprimer {friendName} de votre liste d'amis ?",
+
+  "searchingUsers": "Recherche d'utilisateurs...",
+  "tryAgain": "Réessayer",
   
   "missingFrom": "Disparu depuis",
   "lastSeen": "Vu pour la dernière fois",
@@ -213,7 +254,9 @@
   "unverified": "Non vérifié",
   "verified": "Vérifié",
   "falseValue": "Faux",
-  
+  "enterValidPhoneNumber": "Veuillez entrer un numéro de téléphone valide",
+  "endDateCannotBeBeforeStartDate": "La date de fin ne peut pas être antérieure à la date de début",
+  "endDateCannotBeInFuture": "La date de fin ne peut pas être dans le futur",
   "retry": "Réessayer",
   "close": "Fermer",
   "loading": "Chargement...",

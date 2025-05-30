@@ -347,6 +347,37 @@ class AppLocalizationsFr extends AppLocalizations {
   String get error => 'Erreur';
 
   @override
+  String get noProfileDataToDisplay =>
+      'Aucune donnée de profil à afficher. Veuillez réessayer.';
+
+  @override
+  String get firstNameMinLength =>
+      'Le prénom doit contenir au moins 2 caractères';
+
+  @override
+  String get lastNameMinLength =>
+      'Le nom de famille doit contenir au moins 2 caractères';
+
+  @override
+  String get usernameMinLength =>
+      'Le nom d\'utilisateur doit contenir au moins 3 caractères';
+
+  @override
+  String get usernameInvalidCharacters =>
+      'Le nom d\'utilisateur ne peut contenir que des lettres, des chiffres, des traits de soulignement ou des points';
+
+  @override
+  String get phoneNumberDigitsOnly =>
+      'Le numéro de téléphone ne doit contenir que des chiffres';
+
+  @override
+  String get passwordChangeSuccess =>
+      'Votre mot de passe a été changé avec succès.';
+
+  @override
+  String get invalidNewPassword => 'Nouveau mot de passe invalide';
+
+  @override
   String get mySubmittedCases => 'Mes cas soumis';
 
   @override
@@ -468,6 +499,68 @@ class AppLocalizationsFr extends AppLocalizations {
   String get viewOnMap => 'Voir sur la carte';
 
   @override
+  String get tapForDetails => 'Appuyez pour plus de détails';
+
+  @override
+  String get liveLocation => 'Localisation en direct';
+
+  @override
+  String get recentLocation => 'Localisation récente';
+
+  @override
+  String get locationSuffix => ' - Localisation';
+
+  @override
+  String get searchingYourLocation => 'Recherche de votre position...';
+
+  @override
+  String get locationPermissionDenied => 'Autorisation de localisation refusée';
+
+  @override
+  String get locationPermissionRequiredFeature =>
+      'L\'autorisation de localisation est requise pour utiliser cette fonctionnalité';
+
+  @override
+  String get locationServiceDisabled => 'Service de localisation désactivé';
+
+  @override
+  String get addressNotFound => 'Adresse non trouvée';
+
+  @override
+  String get errorGettingAddress => 'Erreur lors de l\'obtention de l\'adresse';
+
+  @override
+  String get selectedLocation => 'Localisation sélectionnée';
+
+  @override
+  String get noResultsFound =>
+      'Aucun résultat trouvé. Essayez un terme de recherche différent.';
+
+  @override
+  String get apiKeyError => 'Erreur de clé API';
+
+  @override
+  String get invalidApiKey => 'Clé API invalide';
+
+  @override
+  String get noMatchingLocations =>
+      'Aucune localisation correspondante trouvée. Essayez un terme de recherche différent.';
+
+  @override
+  String get networkError => 'Erreur réseau';
+
+  @override
+  String get errorGettingPlaceDetails =>
+      'Erreur lors de l\'obtention des détails du lieu';
+
+  @override
+  String get enterLocationToSearch => 'Entrez un lieu à rechercher';
+
+  @override
+  String get makeSurePlacesApiEnabled =>
+      'Assurez-vous que l\'API Places est activée dans Google Cloud Console';
+
+  @override
   String get search => 'Rechercher';
 
   @override
@@ -526,6 +619,32 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noCasesFound => 'Aucun cas trouvé correspondant à votre recherche';
+
+  @override
+  String get caseNotFound => 'Cas non trouvé';
+
+  @override
+  String get call => 'Appeler';
+
+  @override
+  String get submitting => 'Envoi en cours...';
+
+  @override
+  String get alertSentSuccessfully => 'Alerte envoyée avec succès !';
+
+  @override
+  String get remove => 'Supprimer';
+
+  @override
+  String areYouSureRemoveFriend(Object friendName) {
+    return 'Êtes-vous sûr de vouloir supprimer $friendName de votre liste d\'amis ?';
+  }
+
+  @override
+  String get searchingUsers => 'Recherche d\'utilisateurs...';
+
+  @override
+  String get tryAgain => 'Réessayer';
 
   @override
   String get missingFrom => 'Disparu depuis';
@@ -596,6 +715,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de la soumission des informations. Veuillez réessayer.';
 
   @override
+  String get enterValidPhoneNumber =>
+      'Veuillez entrer un numéro de téléphone valide';
+
+  @override
+  String get endDateCannotBeBeforeStartDate =>
+      'La date de fin ne peut pas être antérieure à la date de début';
+
+  @override
+  String get endDateCannotBeInFuture =>
+      'La date de fin ne peut pas être dans le futur';
+
+  @override
   String get active => 'Actif';
 
   @override
@@ -639,9 +770,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get invalidCaseId => 'ID de cas invalide';
-
-  @override
-  String get caseNotFound => 'Cas non trouvé';
 
   @override
   String get cannotSubmitReport =>

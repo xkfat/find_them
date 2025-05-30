@@ -5,6 +5,10 @@ import 'package:find_them/data/models/case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:find_them/l10n/app_localizations.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
+
+
 
 class CaseListWidget extends StatelessWidget {
   final List<Case> cases;
@@ -49,7 +53,7 @@ class CaseListWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No cases found matching your search',
+              context.l10n.noCasesFound,
               style: TextStyle(color: AppColors.getTextColor(context)),
             ),
             const SizedBox(height: 8),
@@ -61,7 +65,7 @@ class CaseListWidget extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.teal),
               child: Text(
-                'Show All Cases',
+                context.l10n.showAllCases,
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -95,7 +99,7 @@ class _CaseCard extends StatelessWidget {
   final Case caseData;
   final Function(int caseId) onTap;
 
-  const _CaseCard({ required this.caseData, required this.onTap});
+  const _CaseCard({required this.caseData, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +163,7 @@ class _CaseCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Missing from',
+                                context.l10n.missingFrom,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
@@ -195,7 +199,7 @@ class _CaseCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Last seen',
+                                context.l10n.lastSeen,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,

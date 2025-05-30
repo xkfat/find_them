@@ -19,13 +19,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cubit = context.read<NotificationCubit>();
 
-      // Check if service is ready before loading
       if (cubit.isServiceReady) {
         cubit.loadNotifications();
-      } else {
-        // Show appropriate state for non-initialized service
-        // This could happen if user navigates here without being logged in
-      }
+      } else {}
     });
   }
 
@@ -49,10 +45,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ),
         centerTitle: true,
+        /*
         actions: [
           BlocBuilder<NotificationCubit, NotificationState>(
             builder: (context, state) {
-              // Only show clear all if service is ready and has notifications
               final cubit = context.read<NotificationCubit>();
               if (cubit.isServiceReady &&
                   state is NotificationLoaded &&
@@ -72,7 +68,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               return const SizedBox.shrink();
             },
           ),
-        ],
+        ], 
+        */
       ),
       body: BlocConsumer<NotificationCubit, NotificationState>(
         listener: (context, state) {
@@ -95,7 +92,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         builder: (context, state) {
           final cubit = context.read<NotificationCubit>();
 
-          // Check if service is not ready (user not logged in)
           if (!cubit.isServiceReady) {
             return Center(
               child: Column(
@@ -301,7 +297,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             );
           }
 
-          // Default fallback
           return Center(
             child: Text(
               'Loading notifications...',
@@ -317,19 +312,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     BuildContext context,
     NotificationModel notification,
   ) {
-    print('🧭 Handling notification tap: ${notification.notificationType}');
-
     switch (notification.notificationType) {
       case 'location_request':
       case 'location_response':
       case 'location_alert':
-        print('🧭 Navigating to location sharing');
         Navigator.pushNamed(context, '/location-sharing');
         break;
 
       case 'missing_person':
         if (notification.targetId != null) {
-          print('🧭 Navigating to case details: ${notification.targetId}');
           Navigator.pushNamed(
             context,
             '/case/details',
@@ -341,20 +332,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         break;
 
       case 'case_update':
-        print('🧭 Navigating to submitted cases');
         Navigator.pushNamed(context, '/submitted-cases');
         break;
 
-      case 'report':
-        if (notification.targetId != null) {
-          // Add your report screen navigation here
-          print('🧭 Should navigate to report: ${notification.targetId}');
-          Navigator.pushNamed(context, '/notifications'); // Fallback for now
-        }
-        break;
-
       default:
-        print('🧭 Default navigation to notifications');
         Navigator.pushNamed(context, '/notifications');
         break;
     }
@@ -378,10 +359,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         Navigator.pushNamed(context, '/location-sharing');
         break;
       case 'location_response':
-        Navigator.pushNamed(context, '/location-sharing');
+        Navigator.pushNamed(context, '/map');
         break;
       case 'location_alert':
-        Navigator.pushNamed(context, '/location-sharing');
+        Navigator.pushNamed(context, '/map');
         break;
       default:
         break;
@@ -393,7 +374,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'missing_person':
         return 'View details';
       case 'location_request':
-        return 'Accept';
+        return 'View details';
       case 'location_response':
         return 'View on map';
       case 'location_alert':
@@ -403,6 +384,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  /*
   void _showClearAllDialog() {
     showDialog(
       context: context,
@@ -443,4 +425,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       },
     );
   }
+
+  */
 }

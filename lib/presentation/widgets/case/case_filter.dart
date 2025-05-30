@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/constants/themes/app_text.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
+import 'package:find_them/l10n/app_localizations.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class FilterDrawer extends StatefulWidget {
   final Function onClose;
@@ -64,14 +66,14 @@ class _FilterDrawerState extends State<FilterDrawer> {
 
       if (_startDate != null && _endDate != null) {
         if (_endDate!.isBefore(_startDate!)) {
-          _dateErrorMessage = 'End date cannot be before start date';
+          _dateErrorMessage = context.l10n.endDateCannotBeBeforeStartDate;
           isValid = false;
         }
       }
 
       if (_endDate != null && isValid) {
         if (_endDate!.isAfter(DateTime.now())) {
-          _dateErrorMessage = 'End date cannot be in the future';
+          _dateErrorMessage = context.l10n.endDateCannotBeInFuture;
           isValid = false;
         }
       }
@@ -135,8 +137,8 @@ class _FilterDrawerState extends State<FilterDrawer> {
               onPrimary: Colors.white,
               onSurface: AppColors.getTextColor(context),
             ),
-            
-          //  dialogBackgroundColor: AppColors.getCardColor(context),
+
+            //  dialogBackgroundColor: AppColors.getCardColor(context),
           ),
           child: child!,
         );
@@ -221,7 +223,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                     constraints: const BoxConstraints(),
                   ),
                   Text(
-                    'Filter searching',
+                    context.l10n.filterSearching,
                     style: AppTextStyles.bodyLarge(context).copyWith(
                       fontWeight: FontWeight.w500,
                       color: AppColors.getTextColor(context),
@@ -230,7 +232,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                   TextButton(
                     onPressed: _resetFilters,
                     child: Text(
-                      'Reset',
+                      context.l10n.reset,
                       style: AppTextStyles.bodyMedium(
                         context,
                       ).copyWith(color: AppColors.teal),
@@ -244,7 +246,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                   children: [
                     const SizedBox(height: 24),
 
-                    _buildSectionHeader('Age Range'),
+                    _buildSectionHeader(context.l10n.ageRange),
                     const SizedBox(height: 12),
                     Row(
                       children: [
@@ -258,37 +260,37 @@ class _FilterDrawerState extends State<FilterDrawer> {
 
                     const SizedBox(height: 24),
 
-                    _buildSectionHeader('Gender'),
+                    _buildSectionHeader(context.l10n.gender),
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        _buildGenderChip('Female'),
+                        _buildGenderChip('Female', context.l10n.female),
                         const SizedBox(width: 8),
-                        _buildGenderChip('Male'),
+                        _buildGenderChip('Male', context.l10n.male),
                       ],
                     ),
 
                     const SizedBox(height: 24),
 
-                    _buildSectionHeader('Status'),
+                    _buildSectionHeader(context.l10n.status),
                     const SizedBox(height: 12),
                     Column(
                       children: [
                         _buildStatusChip(
                           'missing',
-                          'Missing',
+                          context.l10n.missing,
                           AppColors.getMissingRedColor(context),
                         ),
                         const SizedBox(height: 8),
                         _buildStatusChip(
                           'under_investigation',
-                          'Investigating',
+                          context.l10n.investigating,
                           AppColors.getInvestigatingYellowColor(context),
                         ),
                         const SizedBox(height: 8),
                         _buildStatusChip(
                           'found',
-                          'Found',
+                          context.l10n.found,
                           AppColors.getFoundGreenColor(context),
                         ),
                       ],
@@ -296,11 +298,11 @@ class _FilterDrawerState extends State<FilterDrawer> {
 
                     const SizedBox(height: 24),
 
-                    _buildSectionHeader('Date Range'),
+                    _buildSectionHeader(context.l10n.dateRange),
                     const SizedBox(height: 12),
 
                     Text(
-                      'Start Date',
+                      context.l10n.startDate,
                       style: AppTextStyles.bodyMedium(
                         context,
                       ).copyWith(color: AppColors.getTextColor(context)),
@@ -312,9 +314,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                         decoration: BoxDecoration(
                           color: AppColors.getSurfaceColor(context),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.teal,
-                          ),
+                          border: Border.all(color: AppColors.teal),
                         ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -326,7 +326,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                             Text(
                               _startDate != null
                                   ? _formatDateDisplay(_startDate!)
-                                  : "Select start date",
+                                  : context.l10n.selectStartDate,
                               style: AppTextStyles.bodyMedium(context).copyWith(
                                 color:
                                     _startDate != null
@@ -345,7 +345,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                     const SizedBox(height: 16),
 
                     Text(
-                      'End Date',
+                      context.l10n.endDate,
                       style: AppTextStyles.bodyMedium(
                         context,
                       ).copyWith(color: AppColors.getTextColor(context)),
@@ -357,9 +357,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                         decoration: BoxDecoration(
                           color: AppColors.getSurfaceColor(context),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.teal,
-                          ),
+                          border: Border.all(color: AppColors.teal),
                         ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -371,7 +369,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                             Text(
                               _endDate != null
                                   ? _formatDateDisplay(_endDate!)
-                                  : "Select end date",
+                                  : context.l10n.selectEndDate,
                               style: AppTextStyles.bodyMedium(context).copyWith(
                                 color:
                                     _endDate != null
@@ -413,7 +411,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                     ),
                   ),
                   child: Text(
-                    'Apply filter',
+                    context.l10n.applyFilter,
                     style: AppTextStyles.bodyLarge(context).copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
@@ -465,13 +463,13 @@ class _FilterDrawerState extends State<FilterDrawer> {
     );
   }
 
-  Widget _buildGenderChip(String gender) {
-    final isSelected = _selectedGender == gender;
+  Widget _buildGenderChip(String value, String displayText) {
+    final isSelected = _selectedGender == value;
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedGender = isSelected ? null : gender;
+          _selectedGender = isSelected ? null : value;
         });
       },
       child: Container(
@@ -482,7 +480,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
           border: Border.all(color: AppColors.teal),
         ),
         child: Text(
-          gender,
+          displayText,
           style: TextStyle(
             color: isSelected ? Colors.white : AppColors.teal,
             fontWeight: FontWeight.w500,

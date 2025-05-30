@@ -1,4 +1,5 @@
 // models/notification_model.dart
+import 'package:find_them/data/models/location_sharing.dart';
 import 'package:flutter/material.dart';
 
 class NotificationModel {
@@ -10,6 +11,7 @@ class NotificationModel {
   final String notificationType;
   final bool isRead;
   final DateTime dateCreated;
+  final LocationSharingModel? friendData;
 
   const NotificationModel({
     required this.id,
@@ -20,6 +22,7 @@ class NotificationModel {
     required this.notificationType,
     required this.isRead,
     required this.dateCreated,
+    this.friendData,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {

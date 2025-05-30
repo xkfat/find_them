@@ -4,6 +4,7 @@ import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class Report2Screen extends StatefulWidget {
   final String firstName;
@@ -64,7 +65,7 @@ class _Report2ScreenState extends State<Report2Screen> {
       if (_selectedDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Please select a date'),
+            content: Text(context.l10n.pleaseSelectDate),
             backgroundColor: Colors.red,
           ),
         );
@@ -107,7 +108,10 @@ class _Report2ScreenState extends State<Report2Screen> {
         Marker(
           markerId: const MarkerId('selected_location'),
           position: LatLng(lat, lng),
-          infoWindow: InfoWindow(title: 'Last Seen Location', snippet: addr),
+          infoWindow: InfoWindow(
+            title: context.l10n.lastSeenLocationLabel.replaceAll(':', ''),
+            snippet: addr,
+          ),
         ),
       };
     });
@@ -119,7 +123,7 @@ class _Report2ScreenState extends State<Report2Screen> {
       backgroundColor: AppColors.getSurfaceColor(context),
       appBar: AppBar(
         title: Text(
-          'Reporting a missing person',
+          context.l10n.reportingMissingPerson,
           style: GoogleFonts.dmSans(
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -156,7 +160,7 @@ class _Report2ScreenState extends State<Report2Screen> {
 
                 Center(
                   child: Text(
-                    'Last seen details',
+                    context.l10n.lastSeenDetails,
                     style: GoogleFonts.inter(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -167,7 +171,7 @@ class _Report2ScreenState extends State<Report2Screen> {
                 const SizedBox(height: 32),
 
                 Text(
-                  'Last seen date',
+                  context.l10n.lastSeenDate,
                   style: TextStyle(color: AppColors.getTextColor(context)),
                 ),
                 const SizedBox(height: 8),
@@ -203,7 +207,7 @@ class _Report2ScreenState extends State<Report2Screen> {
                       style: TextStyle(color: AppColors.getTextColor(context)),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please select a date';
+                          return context.l10n.pleaseSelectDate;
                         }
                         return null;
                       },
@@ -213,14 +217,14 @@ class _Report2ScreenState extends State<Report2Screen> {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Last seen location',
+                  context.l10n.lastSeenLocation,
                   style: TextStyle(color: AppColors.getTextColor(context)),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _lastSeenLocationController,
                   decoration: InputDecoration(
-                    hintText: 'Enter location: zone, area, city, street...',
+                    hintText: context.l10n.enterLocation,
                     filled: true,
                     fillColor: AppColors.getSurfaceColor(context),
                     hintStyle: TextStyle(
@@ -242,7 +246,7 @@ class _Report2ScreenState extends State<Report2Screen> {
                   style: TextStyle(color: AppColors.getTextColor(context)),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a location';
+                      return context.l10n.pleaseEnterLocation;
                     }
                     return null;
                   },
@@ -250,7 +254,7 @@ class _Report2ScreenState extends State<Report2Screen> {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Select last seen location on map (optional)',
+                  context.l10n.selectLocationOnMap,
                   style: TextStyle(color: AppColors.getTextColor(context)),
                 ),
                 const SizedBox(height: 8),
@@ -318,7 +322,7 @@ class _Report2ScreenState extends State<Report2Screen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Tap to select location on map',
+                                    context.l10n.tapToSelectLocation,
                                     style: TextStyle(
                                       color: AppColors.getSecondaryTextColor(
                                         context,
@@ -384,7 +388,7 @@ class _Report2ScreenState extends State<Report2Screen> {
                         ),
                       ),
                       child: Text(
-                        'Continue',
+                        context.l10n.continueLabel,
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,

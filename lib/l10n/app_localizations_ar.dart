@@ -147,7 +147,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get resend => 'إعادة الإرسال';
 
   @override
-  String get success => 'نجح!';
+  String get success => '!تم';
 
   @override
   String get congratulations => 'تهانينا! تم التحقق من هويتك بنجاح';
@@ -162,13 +162,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get map => 'الخريطة';
 
   @override
-  String get report => 'بلاغ';
+  String get report => 'إبلاغ';
 
   @override
   String get settings => 'الإعدادات';
 
   @override
-  String get profile => 'الملف الشخصي';
+  String get profile => 'الحساب';
 
   @override
   String get mapView => 'عرض الخريطة';
@@ -283,7 +283,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get accountSettings => 'إعدادات الحساب';
 
   @override
-  String get editProfile => 'تعديل الملف الشخصي';
+  String get editProfile => 'تعديل الحساب';
 
   @override
   String get changePassword => 'تغيير كلمة المرور';
@@ -304,7 +304,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get locationSharing => 'مشاركة الموقع';
 
   @override
-  String get updateProfile => 'تحديث الملف الشخصي';
+  String get updateProfile => 'تحديث الحساب';
 
   @override
   String get updatePassword => 'تحديث كلمة المرور';
@@ -335,6 +335,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get error => 'خطأ';
 
   @override
+  String get noProfileDataToDisplay =>
+      'لا توجد بيانات للملف الشخصي للعرض. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get firstNameMinLength =>
+      'يجب أن يتكون الاسم الأول من حرفين على الأقل';
+
+  @override
+  String get lastNameMinLength => 'يجب أن يتكون اسم العائلة من حرفين على الأقل';
+
+  @override
+  String get usernameMinLength =>
+      'يجب أن يتكون اسم المستخدم من 3 أحرف على الأقل';
+
+  @override
+  String get usernameInvalidCharacters =>
+      'يمكن أن يحتوي اسم المستخدم على أحرف وأرقام وشرطة سفلية ونقاط فقط';
+
+  @override
+  String get phoneNumberDigitsOnly => 'يجب أن يحتوي رقم الهاتف على أرقام فقط';
+
+  @override
+  String get passwordChangeSuccess => 'تم تغيير كلمة المرور بنجاح';
+
+  @override
+  String get invalidNewPassword => 'كلمة المرور الجديدة غير صالحة';
+
+  @override
   String get mySubmittedCases => 'القضايا المقدمة';
 
   @override
@@ -351,7 +379,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get submittedOn => 'قُدم في';
 
   @override
-  String get updatesTimeline => 'جدول زمني للتحديثات';
+  String get updatesTimeline => 'آخر التحديثات';
 
   @override
   String get noUpdatesAvailable => 'لا توجد تحديثات متاحة حتى الآن.';
@@ -379,7 +407,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tryDifferentSearch => 'جرب اسم مستخدم أو رقم هاتف مختلف';
 
   @override
-  String get connect => 'ربط';
+  String get connect => 'إضافة';
 
   @override
   String get accept => 'قبول';
@@ -452,6 +480,66 @@ class AppLocalizationsAr extends AppLocalizations {
   String get viewOnMap => 'عرض على الخريطة';
 
   @override
+  String get tapForDetails => 'اضغط للتفاصيل';
+
+  @override
+  String get liveLocation => 'الموقع المباشر';
+
+  @override
+  String get recentLocation => 'الموقع الأخير';
+
+  @override
+  String get locationSuffix => ' - الموقع';
+
+  @override
+  String get searchingYourLocation => 'البحث عن موقعك...';
+
+  @override
+  String get locationPermissionDenied => 'تم رفض إذن الموقع';
+
+  @override
+  String get locationPermissionRequiredFeature =>
+      'مطلوب إذن الموقع لاستخدام هذه الميزة';
+
+  @override
+  String get locationServiceDisabled => 'خدمة الموقع معطلة';
+
+  @override
+  String get addressNotFound => 'العنوان غير موجود';
+
+  @override
+  String get errorGettingAddress => 'خطأ في الحصول على العنوان';
+
+  @override
+  String get selectedLocation => 'الموقع المحدد';
+
+  @override
+  String get noResultsFound => 'لم يتم العثور على نتائج. جرب مصطلح بحث مختلف.';
+
+  @override
+  String get apiKeyError => 'خطأ في مفتاح API';
+
+  @override
+  String get invalidApiKey => 'مفتاح API غير صالح';
+
+  @override
+  String get noMatchingLocations =>
+      'لم يتم العثور على مواقع مطابقة. جرب مصطلح بحث مختلف.';
+
+  @override
+  String get networkError => 'خطأ في الشبكة';
+
+  @override
+  String get errorGettingPlaceDetails => 'خطأ في الحصول على تفاصيل المكان';
+
+  @override
+  String get enterLocationToSearch => 'أدخل موقعاً للبحث';
+
+  @override
+  String get makeSurePlacesApiEnabled =>
+      'تأكد من تمكين Places API في Google Cloud Console';
+
+  @override
   String get search => 'بحث';
 
   @override
@@ -464,10 +552,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cases => 'الحالات';
 
   @override
-  String get users => 'المستخدمون';
+  String get users => 'الأصدقاء';
 
   @override
-  String get filterSearching => 'تصفية البحث';
+  String get filterSearching => 'تطبيق';
 
   @override
   String get reset => 'إعادة تعيين';
@@ -512,13 +600,39 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noCasesFound => 'لم يتم العثور على حالات تطابق بحثك';
 
   @override
+  String get caseNotFound => 'القضية غير موجودة';
+
+  @override
+  String get call => 'اتصل';
+
+  @override
+  String get submitting => 'جاري الإرسال...';
+
+  @override
+  String get alertSentSuccessfully => 'تم إرسال التنبيه بنجاح!';
+
+  @override
+  String get remove => 'إزالة';
+
+  @override
+  String areYouSureRemoveFriend(Object friendName) {
+    return 'هل أنت متأكد من أنك تريد إزالة $friendName من قائمة أصدقائك؟';
+  }
+
+  @override
+  String get searchingUsers => 'البحث عن المستخدمين...';
+
+  @override
+  String get tryAgain => 'المحاولة مرة أخرى';
+
+  @override
   String get missingFrom => 'مفقود منذ';
 
   @override
   String get lastSeen => 'شوهد آخر مرة';
 
   @override
-  String get yearsOld => 'سنة';
+  String get yearsOld => 'سنوات';
 
   @override
   String get missingFor => 'مفقود منذ';
@@ -545,7 +659,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get descriptionLabel => 'الوصف:';
 
   @override
-  String get leaveInformation => 'ترك معلومة';
+  String get leaveInformation => 'اترك معلومة';
 
   @override
   String get pleaseProvideInformation =>
@@ -580,10 +694,21 @@ class AppLocalizationsAr extends AppLocalizations {
       'فشل في إرسال المعلومات. يرجى المحاولة مرة أخرى.';
 
   @override
-  String get active => 'نشط';
+  String get enterValidPhoneNumber => 'يرجى إدخال رقم هاتف صالح';
 
   @override
-  String get inProgress => 'قيد التقدم';
+  String get endDateCannotBeBeforeStartDate =>
+      'لا يمكن أن يكون تاريخ النهاية قبل تاريخ البداية';
+
+  @override
+  String get endDateCannotBeInFuture =>
+      'لا يمكن أن يكون تاريخ النهاية في المستقبل';
+
+  @override
+  String get active => 'جاري البحث';
+
+  @override
+  String get inProgress => 'قيد المعالجة';
 
   @override
   String get closed => 'مغلق';
@@ -613,19 +738,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loading => 'جاري التحميل...';
 
   @override
-  String get loadingCaseDetails => 'جاري تحميل تفاصيل الحالة...';
+  String get loadingCaseDetails => 'جاري تحميل تفاصيل القضية...';
 
   @override
   String get errorLoadingDetails => 'خطأ في تحميل التفاصيل';
 
   @override
-  String get unknownState => 'حالة غير معروفة';
+  String get unknownState => 'قضية غير معروفة';
 
   @override
-  String get invalidCaseId => 'معرف حالة غير صالح';
-
-  @override
-  String get caseNotFound => 'الحالة غير موجودة';
+  String get invalidCaseId => 'معرف قضية غير صالح';
 
   @override
   String get cannotSubmitReport => 'لا يمكن إرسال التقرير: معرف حالة غير صالح';

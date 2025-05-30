@@ -2,14 +2,12 @@ import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/routes/nav_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class ButtomNavBar extends StatelessWidget {
   final int currentIndex;
 
-  const ButtomNavBar({
-    super.key,
-    required this.currentIndex,
-  });
+  const ButtomNavBar({super.key, required this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +53,7 @@ class ButtomNavBar extends StatelessWidget {
                 height: 35,
                 color: AppColors.darkGreen,
               ),
-              label: 'Home',
+              label: context.l10n.home,
             ),
             BottomNavigationBarItem(
               icon: Image.asset(
@@ -70,17 +68,17 @@ class ButtomNavBar extends StatelessWidget {
                 height: 35,
                 color: AppColors.darkGreen,
               ),
-              label: 'Map',
+              label: context.l10n.map,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.add_circle_outline, size: 35),
               activeIcon: Icon(Icons.add_circle, size: 35),
-              label: 'Report',
+              label: context.l10n.report,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings_outlined, size: 35),
               activeIcon: Icon(Icons.settings, size: 35),
-              label: 'Settings',
+              label: context.l10n.settings,
             ),
             BottomNavigationBarItem(
               icon: Image.asset(
@@ -95,7 +93,7 @@ class ButtomNavBar extends StatelessWidget {
                 height: 35,
                 color: AppColors.darkGreen,
               ),
-              label: 'Profile',
+              label: context.l10n.profile,
             ),
           ],
         ),

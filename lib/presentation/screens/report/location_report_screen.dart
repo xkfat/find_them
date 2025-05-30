@@ -8,6 +8,7 @@ import 'package:geocoding/geocoding.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class ApiKeys {
   static const String googleMaps = "AIzaSyC_EsZPIvrGW3TcBuiDhybiltDIokgGEPY";
@@ -24,7 +25,7 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
   final Completer<GoogleMapController> _controller = Completer();
   LatLng _currentPosition = const LatLng(0, 0);
   LatLng _selectedPosition = const LatLng(0, 0);
-  String _address = "Searching your location...";
+  String _address = "";
   bool _isLoading = true;
   bool _initialLocationSet = false;
   double _currentZoom = 15.0;
@@ -37,6 +38,12 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize address with localized text
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _address = context.l10n.searchingYourLocation;
+      });
+    });
     _immediatelyGetUserLocation();
   }
 
@@ -87,11 +94,11 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
     } else {
       setState(() {
         _isLoading = false;
-        _address = "Location permission denied";
+        _address = context.l10n.locationPermissionDenied;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Location permission is required to use this feature'),
+        SnackBar(
+          content: Text(context.l10n.locationPermissionRequiredFeature),
           backgroundColor: Colors.red,
         ),
       );
@@ -108,7 +115,7 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
       if (!serviceEnabled) {
         setState(() {
           _isLoading = false;
-          _address = "Location service disabled";
+          _address = context.l10n.locationServiceDisabled;
         });
         return;
       }
@@ -119,7 +126,7 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
       if (permissionStatus != loc.PermissionStatus.granted) {
         setState(() {
           _isLoading = false;
-          _address = "Location permission denied";
+          _address = context.l10n.locationPermissionDenied;
         });
         return;
       }
@@ -202,12 +209,12 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
         });
       } else {
         setState(() {
-          _address = "Address not found";
+          _address = context.l10n.addressNotFound;
         });
       }
     } catch (e) {
       setState(() {
-        _address = "Error getting address";
+        _address = context.l10n.errorGettingAddress;
       });
     }
   }
@@ -220,7 +227,10 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
           markerId: const MarkerId('selectedLocation'),
           position: _selectedPosition,
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-          infoWindow: InfoWindow(title: 'Selected Location', snippet: _address),
+          infoWindow: InfoWindow(
+            title: context.l10n.selectedLocation,
+            snippet: _address,
+          ),
         ),
       );
     });
@@ -312,24 +322,22 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                     });
                   } else {
                     final errorMsg =
-                        data['error_message'] ??
-                        "No results found. Try a different search term.";
+                        data['error_message'] ?? context.l10n.noResultsFound;
 
                     setModalState(() {
                       searchResults = [];
                       searching = false;
-                      errorMessage = "Error: $errorMsg";
+                      errorMessage = "${context.l10n.error}: $errorMsg";
                     });
 
                     if (data['status'] == 'REQUEST_DENIED') {
                       setModalState(() {
                         errorMessage =
-                            "API Key error: ${data['error_message'] ?? 'Invalid API key'}";
+                            "${context.l10n.apiKeyError}: ${data['error_message'] ?? context.l10n.invalidApiKey}";
                       });
                     } else if (data['status'] == 'ZERO_RESULTS') {
                       setModalState(() {
-                        errorMessage =
-                            "No matching locations found. Try a different search term.";
+                        errorMessage = context.l10n.noMatchingLocations;
                       });
                     }
                   }
@@ -337,14 +345,15 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                   setModalState(() {
                     searchResults = [];
                     searching = false;
-                    errorMessage = "Error: HTTP ${response.statusCode}";
+                    errorMessage =
+                        "${context.l10n.error}: HTTP ${response.statusCode}";
                   });
                 }
               } catch (e) {
                 setModalState(() {
                   searchResults = [];
                   searching = false;
-                  errorMessage = "Network error: $e";
+                  errorMessage = "${context.l10n.networkError}: $e";
                 });
               }
             }
@@ -388,7 +397,7 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          "Error getting place details: ${data['status']}",
+                          "${context.l10n.errorGettingPlaceDetails}: ${data['status']}",
                         ),
                         backgroundColor: Colors.red,
                       ),
@@ -401,7 +410,9 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("Error: ${response.statusCode}"),
+                      content: Text(
+                        "${context.l10n.error}: ${response.statusCode}",
+                      ),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -413,7 +424,9 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Error getting place details: $e"),
+                    content: Text(
+                      "${context.l10n.errorGettingPlaceDetails}: $e",
+                    ),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -443,8 +456,8 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                           child: TextField(
                             controller: searchInputController,
                             autofocus: true,
-                            decoration: const InputDecoration(
-                              hintText: 'Search for a location',
+                            decoration: InputDecoration(
+                              hintText: context.l10n.searchForLocation,
                               border: InputBorder.none,
                             ),
                             onChanged: (value) {
@@ -494,7 +507,7 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                                     Text(
                                       errorMessage.isNotEmpty
                                           ? errorMessage
-                                          : "Enter a location to search",
+                                          : context.l10n.enterLocationToSearch,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color:
@@ -503,11 +516,13 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                                                 : Colors.grey,
                                       ),
                                     ),
-                                    if (errorMessage.contains("API Key"))
+                                    if (errorMessage.contains(
+                                      context.l10n.apiKeyError,
+                                    ))
                                       Padding(
                                         padding: const EdgeInsets.all(16.0),
                                         child: Text(
-                                          "Make sure Places API is enabled in Google Cloud Console",
+                                          context.l10n.makeSurePlacesApiEnabled,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 12,
@@ -546,13 +561,11 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final bottomContainerHeight = 150.0;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.teal,
         title: Text(
-          'Set Location',
+          context.l10n.setLocation,
           style: GoogleFonts.dmSans(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -611,7 +624,7 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                 readOnly: true,
                 onTap: _searchPlace,
                 decoration: InputDecoration(
-                  hintText: 'Search for a location',
+                  hintText: context.l10n.searchForLocation,
                   prefixIcon: const Icon(Icons.search, color: AppColors.teal),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.my_location, color: AppColors.teal),
@@ -689,9 +702,9 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Select Location',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.selectLocation,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -718,16 +731,15 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text(
-                          'Save Location',
-                          style: TextStyle(
+                        child: Text(
+                          context.l10n.saveLocation,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    //const SizedBox(height: 0),
                   ],
                 ),
               ),

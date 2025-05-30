@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:find_them/data/models/enum.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 Color _getStatusColor(SubmissionStatus status, BuildContext context) {
   switch (status.value) {
@@ -37,16 +38,16 @@ Color _getStatusBackgroundColor(SubmissionStatus status, BuildContext context) {
   }
 }
 
-String _getStatusText(SubmissionStatus status) {
+String _getStatusText(SubmissionStatus status, BuildContext context) {
   switch (status.value) {
     case 'active':
-      return 'Active';
+      return context.l10n.active;
     case 'in_progress':
-      return 'In Progress';
+      return context.l10n.inProgress;
     case 'closed':
-      return 'Closed';
+      return context.l10n.closed;
     case 'rejected':
-      return 'Rejected';
+      return context.l10n.rejected;
     default:
       return status.value;
   }
@@ -92,7 +93,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                   ),
                   Center(
                     child: Text(
-                      'My submitted cases',
+                      context.l10n.mySubmittedCases,
                       style: GoogleFonts.dmSans(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -126,7 +127,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Error: ${state.message}',
+                            '${context.l10n.error}: ${state.message}',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.inter(
                               fontSize: 16,
@@ -144,7 +145,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                               backgroundColor: AppColors.teal,
                             ),
                             child: Text(
-                              'Retry',
+                              context.l10n.retry,
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
@@ -164,7 +165,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No submitted cases',
+                              context.l10n.noSubmittedCases,
                               style: GoogleFonts.inter(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,
@@ -173,7 +174,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'You haven\'t submitted any missing person reports yet.',
+                              context.l10n.noSubmittedCasesMessage,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 14,
@@ -214,7 +215,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
 
                   return Center(
                     child: Text(
-                      'Unknown state',
+                      context.l10n.unknownState,
                       style: TextStyle(color: AppColors.getTextColor(context)),
                     ),
                   );
@@ -273,7 +274,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
             const CircularProgressIndicator(color: AppColors.teal),
             const SizedBox(height: 16),
             Text(
-              'Loading case details...',
+              context.l10n.loadingCaseDetails,
               style: GoogleFonts.inter(
                 fontSize: 16,
                 color: AppColors.getTextColor(context),
@@ -305,7 +306,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Error loading details',
+              context.l10n.errorLoadingDetails,
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -328,7 +329,7 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text(
-                    'Cancel',
+                    context.l10n.cancel,
                     style: TextStyle(color: AppColors.teal),
                   ),
                 ),
@@ -341,8 +342,8 @@ class _SubmittedCasesScreenState extends State<SubmittedCasesScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.teal,
                   ),
-                  child: const Text(
-                    'Retry',
+                  child: Text(
+                    context.l10n.retry,
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -373,8 +374,8 @@ class SubmittedCaseCard extends StatelessWidget {
     return _getStatusBackgroundColor(submittedCase.status, context);
   }
 
-  String get _statusText {
-    return _getStatusText(submittedCase.status);
+  String _statusText(BuildContext context) {
+    return _getStatusText(submittedCase.status, context);
   }
 
   @override
@@ -414,7 +415,7 @@ class SubmittedCaseCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      _statusText,
+                      _statusText(context),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -437,7 +438,7 @@ class SubmittedCaseCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Submitted on ${submittedCase.formattedSubmissionDate}',
+                    '${context.l10n.submittedOn} ${submittedCase.formattedSubmissionDate}',
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
@@ -480,7 +481,7 @@ class SubmittedCaseCard extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'View details',
+                    context.l10n.viewDetails,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -596,7 +597,7 @@ class CaseDetailsDialog extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Updates Timeline',
+                      context.l10n.updatesTimeline,
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -632,7 +633,7 @@ class CaseDetailsDialog extends StatelessWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'No updates available yet.',
+                                context.l10n.noUpdatesAvailable,
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   color: AppColors.getSecondaryTextColor(

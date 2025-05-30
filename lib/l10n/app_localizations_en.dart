@@ -337,6 +337,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get error => 'Error';
 
   @override
+  String get noProfileDataToDisplay =>
+      'No profile data to display. Please try again.';
+
+  @override
+  String get firstNameMinLength => 'First name must be at least 2 characters';
+
+  @override
+  String get lastNameMinLength => 'Last name must be at least 2 characters';
+
+  @override
+  String get usernameMinLength => 'Username must be at least 3 characters';
+
+  @override
+  String get usernameInvalidCharacters =>
+      'Username can only contain letters, numbers, underscores, or dots';
+
+  @override
+  String get phoneNumberDigitsOnly => 'Phone number must contain only digits';
+
+  @override
+  String get passwordChangeSuccess =>
+      'Your password has been changed successfully.';
+
+  @override
+  String get invalidNewPassword => 'Invalid new password';
+
+  @override
   String get mySubmittedCases => 'My submitted cases';
 
   @override
@@ -454,6 +481,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewOnMap => 'View on map';
 
   @override
+  String get tapForDetails => 'Tap for details';
+
+  @override
+  String get liveLocation => 'Live location';
+
+  @override
+  String get recentLocation => 'Recent location';
+
+  @override
+  String get locationSuffix => 's Location';
+
+  @override
+  String get searchingYourLocation => 'Searching your location...';
+
+  @override
+  String get locationPermissionDenied => 'Location permission denied';
+
+  @override
+  String get locationPermissionRequiredFeature =>
+      'Location permission is required to use this feature';
+
+  @override
+  String get locationServiceDisabled => 'Location service disabled';
+
+  @override
+  String get addressNotFound => 'Address not found';
+
+  @override
+  String get errorGettingAddress => 'Error getting address';
+
+  @override
+  String get selectedLocation => 'Selected Location';
+
+  @override
+  String get noResultsFound => 'No results found. Try a different search term.';
+
+  @override
+  String get apiKeyError => 'API Key error';
+
+  @override
+  String get invalidApiKey => 'Invalid API key';
+
+  @override
+  String get noMatchingLocations =>
+      'No matching locations found. Try a different search term.';
+
+  @override
+  String get networkError => 'Network error';
+
+  @override
+  String get errorGettingPlaceDetails => 'Error getting place details';
+
+  @override
+  String get enterLocationToSearch => 'Enter a location to search';
+
+  @override
+  String get makeSurePlacesApiEnabled =>
+      'Make sure Places API is enabled in Google Cloud Console';
+
+  @override
   String get search => 'Search';
 
   @override
@@ -512,6 +599,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noCasesFound => 'No cases found matching your search';
+
+  @override
+  String get caseNotFound => 'Case not found';
+
+  @override
+  String get call => 'Call';
+
+  @override
+  String get submitting => 'Submitting...';
+
+  @override
+  String get alertSentSuccessfully => 'Alert sent successfully!';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String areYouSureRemoveFriend(Object friendName) {
+    return 'Are you sure you want to remove $friendName from your friends list?';
+  }
+
+  @override
+  String get searchingUsers => 'Searching users...';
+
+  @override
+  String get tryAgain => 'Try Again';
 
   @override
   String get missingFrom => 'Missing from';
@@ -582,6 +695,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to submit information. Please try again.';
 
   @override
+  String get enterValidPhoneNumber => 'Please enter a valid phone number';
+
+  @override
+  String get endDateCannotBeBeforeStartDate =>
+      'End date cannot be before start date';
+
+  @override
+  String get endDateCannotBeInFuture => 'End date cannot be in the future';
+
+  @override
   String get active => 'Active';
 
   @override
@@ -625,9 +748,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidCaseId => 'Invalid case ID';
-
-  @override
-  String get caseNotFound => 'Case not found';
 
   @override
   String get cannotSubmitReport => 'Cannot submit report: Invalid case ID';

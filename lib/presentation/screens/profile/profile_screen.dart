@@ -10,6 +10,9 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'dart:io';
 import 'package:find_them/data/models/user.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:find_them/l10n/app_localizations.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -55,7 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: AppColors.getBackgroundColor(context),
       appBar: AppBar(
         title: Text(
-          'Profile',
+          context.l10n.profile,
           style: GoogleFonts.dmSans(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -148,8 +151,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Text(
                       state is ProfileLoadError
-                          ? 'Error: ${state.message}'
-                          : 'No profile data to display. Please try again.',
+                          ? '${context.l10n.error}: ${state.message}'
+                          : context.l10n.noProfileDataToDisplay,
                       textAlign: TextAlign.center,
                       style: TextStyle(color: AppColors.getTextColor(context)),
                     ),
@@ -161,9 +164,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.teal,
                       ),
-                      child: const Text(
-                        'Retry',
-                        style: TextStyle(color: Colors.white),
+                      child: Text(
+                        context.l10n.retry,
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                   ],
@@ -270,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (isUploadingPhoto)
           Positioned.fill(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.black,
               ),
@@ -316,11 +319,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Expanded(
               child: _buildValidatedInputField(
-                'First Name',
+                context.l10n.firstName,
                 _firstNameController,
                 validator: (value) {
                   if (value != null && value.isNotEmpty && value.length < 2) {
-                    return 'First name must be at least 2 characters';
+                    return context.l10n.firstNameMinLength;
                   }
                   return null;
                 },
@@ -329,11 +332,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: _buildValidatedInputField(
-                'Last Name',
+                context.l10n.lastName,
                 _lastNameController,
                 validator: (value) {
                   if (value != null && value.isNotEmpty && value.length < 2) {
-                    return 'Last name must be at least 2 characters';
+                    return context.l10n.lastNameMinLength;
                   }
                   return null;
                 },
@@ -343,15 +346,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 20),
         _buildValidatedInputField(
-          'Username',
+          context.l10n.username,
           _usernameController,
           validator: (value) {
             if (value != null && value.isNotEmpty) {
               if (value.length < 3) {
-                return 'Username must be at least 3 characters';
+                return context.l10n.usernameMinLength;
               }
               if (!RegExp(r'^[a-zA-Z0-9_.]+$').hasMatch(value)) {
-                return 'Username can only contain letters, numbers, underscores, or dots.';
+                return context.l10n.usernameInvalidCharacters;
               }
             }
             return null;
@@ -361,13 +364,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _buildPhoneField(),
         const SizedBox(height: 20),
         _buildValidatedInputField(
-          'Email',
+          context.l10n.email,
           _emailController,
           keyboardType: TextInputType.emailAddress,
           validator: (value) {
             if (value != null && value.isNotEmpty) {
               if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                return 'Please enter a valid email';
+                return context.l10n.enterValidEmail;
               }
             }
             return null;
@@ -397,9 +400,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     strokeWidth: 2,
                   ),
                 )
-                : const Text(
-                  'Update Profile',
-                  style: TextStyle(
+                : Text(
+                  context.l10n.updateProfile,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: Colors.white,
@@ -531,7 +534,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       initialValue: _currentUser?.phoneNumber,
       controller: _phoneController,
       decoration: InputDecoration(
-        hintText: 'Phone Number',
+        hintText: context.l10n.phoneNumber,
         hintStyle: TextStyle(color: AppColors.getSecondaryTextColor(context)),
         filled: true,
         fillColor: isDark ? AppColors.darkSurface : Colors.grey[100],
@@ -569,13 +572,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       style: TextStyle(color: AppColors.getTextColor(context)),
       dropdownTextStyle: TextStyle(color: AppColors.getTextColor(context)),
       initialCountryCode: 'MR',
+      invalidNumberMessage: context.l10n.enterValidPhoneNumber,
       onChanged: (phone) {
         _completePhoneNumber = phone.completeNumber;
       },
       validator: (phoneNumber) {
         if (phoneNumber != null && phoneNumber.number.isNotEmpty) {
           if (!RegExp(r'^[0-9]+$').hasMatch(phoneNumber.number)) {
-            return 'Phone number must contain only digits';
+            return context.l10n.phoneNumberDigitsOnly;
           }
         }
         return null;

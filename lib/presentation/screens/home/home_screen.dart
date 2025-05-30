@@ -8,6 +8,7 @@ import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/core/constants/themes/app_text.dart';
 import 'package:find_them/presentation/widgets/bottom_nav_bar.dart';
 import 'package:find_them/logic/cubit/case_list_cubit.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 //import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -104,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                         ).copyWith(color: AppColors.getTextColor(context)),
                         decoration: InputDecoration(
-                          hintText: 'Search',
+                          hintText: context.l10n.search,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16.0,
                           ),

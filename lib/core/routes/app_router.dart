@@ -361,17 +361,18 @@ class AppRouter {
                 child: const AddFriendScreen(),
               ),
         );
-     case '/notifications':
-  return MaterialPageRoute(
-    builder: (_) => BlocProvider(
-      create: (context) {
-        final notificationService = NotificationService();
-        final notificationRepository = NotificationRepository();
-        return NotificationCubit()..loadNotifications();
-      },
-      child: const NotificationsScreen(),
-    ),
-  );
+      case '/notifications':
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider(
+                create:
+                    (context) => NotificationCubit(
+                      //
+                      //NotificationRepository(NotificationService()),
+                    )..loadNotifications(),
+                child: const NotificationsScreen(),
+              ),
+        );
 
       default:
         return MaterialPageRoute(

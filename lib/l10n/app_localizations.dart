@@ -742,6 +742,54 @@ abstract class AppLocalizations {
   /// **'Error'**
   String get error;
 
+  /// No description provided for @noProfileDataToDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'No profile data to display. Please try again.'**
+  String get noProfileDataToDisplay;
+
+  /// No description provided for @firstNameMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'First name must be at least 2 characters'**
+  String get firstNameMinLength;
+
+  /// No description provided for @lastNameMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name must be at least 2 characters'**
+  String get lastNameMinLength;
+
+  /// No description provided for @usernameMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Username must be at least 3 characters'**
+  String get usernameMinLength;
+
+  /// No description provided for @usernameInvalidCharacters.
+  ///
+  /// In en, this message translates to:
+  /// **'Username can only contain letters, numbers, underscores, or dots'**
+  String get usernameInvalidCharacters;
+
+  /// No description provided for @phoneNumberDigitsOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number must contain only digits'**
+  String get phoneNumberDigitsOnly;
+
+  /// No description provided for @passwordChangeSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed successfully.'**
+  String get passwordChangeSuccess;
+
+  /// No description provided for @invalidNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid new password'**
+  String get invalidNewPassword;
+
   /// No description provided for @mySubmittedCases.
   ///
   /// In en, this message translates to:
@@ -970,6 +1018,120 @@ abstract class AppLocalizations {
   /// **'View on map'**
   String get viewOnMap;
 
+  /// No description provided for @tapForDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap for details'**
+  String get tapForDetails;
+
+  /// No description provided for @liveLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Live location'**
+  String get liveLocation;
+
+  /// No description provided for @recentLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent location'**
+  String get recentLocation;
+
+  /// No description provided for @locationSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'s Location'**
+  String get locationSuffix;
+
+  /// No description provided for @searchingYourLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching your location...'**
+  String get searchingYourLocation;
+
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission denied'**
+  String get locationPermissionDenied;
+
+  /// No description provided for @locationPermissionRequiredFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is required to use this feature'**
+  String get locationPermissionRequiredFeature;
+
+  /// No description provided for @locationServiceDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Location service disabled'**
+  String get locationServiceDisabled;
+
+  /// No description provided for @addressNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Address not found'**
+  String get addressNotFound;
+
+  /// No description provided for @errorGettingAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting address'**
+  String get errorGettingAddress;
+
+  /// No description provided for @selectedLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Location'**
+  String get selectedLocation;
+
+  /// No description provided for @noResultsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found. Try a different search term.'**
+  String get noResultsFound;
+
+  /// No description provided for @apiKeyError.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key error'**
+  String get apiKeyError;
+
+  /// No description provided for @invalidApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid API key'**
+  String get invalidApiKey;
+
+  /// No description provided for @noMatchingLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching locations found. Try a different search term.'**
+  String get noMatchingLocations;
+
+  /// No description provided for @networkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error'**
+  String get networkError;
+
+  /// No description provided for @errorGettingPlaceDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting place details'**
+  String get errorGettingPlaceDetails;
+
+  /// No description provided for @enterLocationToSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a location to search'**
+  String get enterLocationToSearch;
+
+  /// No description provided for @makeSurePlacesApiEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure Places API is enabled in Google Cloud Console'**
+  String get makeSurePlacesApiEnabled;
+
   /// No description provided for @search.
   ///
   /// In en, this message translates to:
@@ -1089,6 +1251,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No cases found matching your search'**
   String get noCasesFound;
+
+  /// No description provided for @caseNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Case not found'**
+  String get caseNotFound;
+
+  /// No description provided for @call.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get call;
+
+  /// No description provided for @submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting...'**
+  String get submitting;
+
+  /// No description provided for @alertSentSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert sent successfully!'**
+  String get alertSentSuccessfully;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @areYouSureRemoveFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove {friendName} from your friends list?'**
+  String areYouSureRemoveFriend(Object friendName);
+
+  /// No description provided for @searchingUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching users...'**
+  String get searchingUsers;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgain;
 
   /// No description provided for @missingFrom.
   ///
@@ -1222,6 +1432,24 @@ abstract class AppLocalizations {
   /// **'Failed to submit information. Please try again.'**
   String get failedToSubmitInformation;
 
+  /// No description provided for @enterValidPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid phone number'**
+  String get enterValidPhoneNumber;
+
+  /// No description provided for @endDateCannotBeBeforeStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End date cannot be before start date'**
+  String get endDateCannotBeBeforeStartDate;
+
+  /// No description provided for @endDateCannotBeInFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'End date cannot be in the future'**
+  String get endDateCannotBeInFuture;
+
   /// No description provided for @active.
   ///
   /// In en, this message translates to:
@@ -1311,12 +1539,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid case ID'**
   String get invalidCaseId;
-
-  /// No description provided for @caseNotFound.
-  ///
-  /// In en, this message translates to:
-  /// **'Case not found'**
-  String get caseNotFound;
 
   /// No description provided for @cannotSubmitReport.
   ///

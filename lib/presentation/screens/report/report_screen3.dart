@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class Report3Screen extends StatefulWidget {
   final String firstName;
@@ -115,7 +116,7 @@ class _Report3ScreenState extends State<Report3Screen> {
       backgroundColor: AppColors.getSurfaceColor(context),
       appBar: AppBar(
         title: Text(
-          'Reporting a missing person',
+          context.l10n.reportingMissingPerson,
           style: GoogleFonts.dmSans(
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -180,7 +181,7 @@ class _Report3ScreenState extends State<Report3Screen> {
 
                   Center(
                     child: Text(
-                      'Additional information',
+                      context.l10n.additionalInformation,
                       style: GoogleFonts.inter(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -191,7 +192,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                   const SizedBox(height: 32),
 
                   Text(
-                    'Photo',
+                    context.l10n.photo,
                     style: TextStyle(color: AppColors.getTextColor(context)),
                   ),
                   const SizedBox(height: 8),
@@ -211,7 +212,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                             foregroundColor: AppColors.teal,
                           ),
                           child: Text(
-                            'Choose photo',
+                            context.l10n.choosePhoto,
                             style: TextStyle(color: AppColors.teal),
                           ),
                         ),
@@ -219,7 +220,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                           child: Text(
                             _selectedImage != null
                                 ? _selectedImage!.path.split('/').last
-                                : 'No photo Chosen',
+                                : context.l10n.noPhotoChosen,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: AppColors.getTextColor(context),
@@ -233,14 +234,14 @@ class _Report3ScreenState extends State<Report3Screen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0, left: 12.0),
                       child: Text(
-                        'Please select a photo',
+                        context.l10n.pleaseSelectPhoto,
                         style: TextStyle(color: Colors.red, fontSize: 12),
                       ),
                     ),
                   const SizedBox(height: 24),
 
                   Text(
-                    'Contact phone number',
+                    context.l10n.contactPhoneNumber,
                     style: TextStyle(color: AppColors.getTextColor(context)),
                   ),
                   const SizedBox(height: 8),
@@ -248,7 +249,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                      hintText: 'Enter your phone number',
+                      hintText: context.l10n.enterYourPhoneNumber,
                       filled: true,
                       fillColor: AppColors.getSurfaceColor(context),
                       hintStyle: TextStyle(
@@ -270,7 +271,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                     style: TextStyle(color: AppColors.getTextColor(context)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number';
+                        return context.l10n.enterPhoneNumber;
                       }
                       return null;
                     },
@@ -278,7 +279,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                   const SizedBox(height: 24),
 
                   Text(
-                    'Description',
+                    context.l10n.description,
                     style: TextStyle(color: AppColors.getTextColor(context)),
                   ),
                   const SizedBox(height: 8),
@@ -286,8 +287,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                     controller: _descriptionController,
                     maxLines: 5,
                     decoration: InputDecoration(
-                      hintText:
-                          'Provide details about circumstances of disappearance, clothing , etc.',
+                      hintText: context.l10n.provideDetails,
                       filled: true,
                       fillColor: AppColors.getSurfaceColor(context),
                       hintStyle: TextStyle(
@@ -309,7 +309,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                     style: TextStyle(color: AppColors.getTextColor(context)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please provide a description';
+                        return context.l10n.pleaseEnterDescription;
                       }
                       return null;
                     },
@@ -339,7 +339,7 @@ class _Report3ScreenState extends State<Report3Screen> {
                                   ),
                                 )
                                 : Text(
-                                  'Submit report',
+                                  context.l10n.submitReport,
                                   style: GoogleFonts.inter(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,

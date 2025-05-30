@@ -9,6 +9,7 @@ import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class CaseDetailScreen extends StatefulWidget {
   final int caseId;
@@ -53,7 +54,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Leave an information',
+                            context.l10n.leaveInformation,
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
@@ -74,7 +75,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        'Please provide any information you have about this missing person, and help us find other people loved ones.',
+                        context.l10n.pleaseProvideInformation,
                         style: TextStyle(
                           fontSize: 15,
                           color: AppColors.getSecondaryTextColor(context),
@@ -94,7 +95,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                             color: AppColors.getTextColor(context),
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Write your message here...',
+                            hintText: context.l10n.writeMessageHere,
                             hintStyle: TextStyle(
                               color: AppColors.getSecondaryTextColor(context),
                             ),
@@ -110,7 +111,6 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                         child: ElevatedButton(
                           onPressed:
                               isSubmitting
-                                  // ignore: dead_code
                                   ? null
                                   : () async {
                                     if (noteController.text.trim().isEmpty) {
@@ -123,7 +123,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                     context,
                                                   ),
                                               title: Text(
-                                                'Missing Information',
+                                                context.l10n.missingInformation,
                                                 style: TextStyle(
                                                   color: AppColors.getTextColor(
                                                     context,
@@ -131,7 +131,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                 ),
                                               ),
                                               content: Text(
-                                                'Please enter some information',
+                                                context
+                                                    .l10n
+                                                    .pleaseEnterSomeInformation,
                                                 style: TextStyle(
                                                   color:
                                                       AppColors.getSecondaryTextColor(
@@ -146,7 +148,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                         context,
                                                       ),
                                                   child: Text(
-                                                    'OK',
+                                                    context.l10n.ok,
                                                     style: TextStyle(
                                                       color: AppColors.teal,
                                                     ),
@@ -200,7 +202,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                     ),
                                                     SizedBox(height: 16),
                                                     Text(
-                                                      'Thank You!',
+                                                      context.l10n.thankYou,
                                                       style: TextStyle(
                                                         fontSize: 22,
                                                         fontWeight:
@@ -213,7 +215,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                     ),
                                                     SizedBox(height: 8),
                                                     Text(
-                                                      'for trying to help us.',
+                                                      context
+                                                          .l10n
+                                                          .forTryingToHelp,
                                                       textAlign:
                                                           TextAlign.center,
                                                       style: TextStyle(
@@ -244,7 +248,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                           ),
                                                         ),
                                                         child: Text(
-                                                          'OK',
+                                                          context.l10n.ok,
                                                           style: TextStyle(
                                                             fontSize: 16,
                                                             color: Colors.white,
@@ -292,7 +296,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                     ),
                                                     SizedBox(height: 16),
                                                     Text(
-                                                      'Submission Failed',
+                                                      context
+                                                          .l10n
+                                                          .submissionFailed,
                                                       style: TextStyle(
                                                         fontSize: 22,
                                                         fontWeight:
@@ -305,7 +311,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                     ),
                                                     SizedBox(height: 8),
                                                     Text(
-                                                      'Failed to submit information. Please try again.',
+                                                      context
+                                                          .l10n
+                                                          .failedToSubmitInformation,
                                                       textAlign:
                                                           TextAlign.center,
                                                       style: TextStyle(
@@ -338,7 +346,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                           ),
                                                         ),
                                                         child: Text(
-                                                          'OK',
+                                                          context.l10n.ok,
                                                           style: TextStyle(
                                                             fontSize: 16,
                                                             color: Colors.white,
@@ -375,7 +383,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                       ),
                                       SizedBox(width: 12),
                                       Text(
-                                        'Submitting...',
+                                        context.l10n.submitting,
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600,
@@ -384,7 +392,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                     ],
                                   )
                                   : Text(
-                                    'Submit',
+                                    context.l10n.submit,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -425,9 +433,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                     launchUrl(phoneUri);
                   },
                   icon: const Icon(Icons.phone, color: Colors.white, size: 20),
-                  label: const Text(
-                    'Call +222 12345678',
-                    style: TextStyle(
+                  label: Text(
+                    '${context.l10n.call} +222 12345678',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -453,7 +461,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                     Navigator.pop(context);
                   },
                   child: Text(
-                    'Cancel',
+                    context.l10n.cancel,
                     style: TextStyle(
                       color: AppColors.getTextColor(context),
                       fontSize: 16,
@@ -473,6 +481,31 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
         );
       },
     );
+  }
+
+  String _getLocalizedStatusText(String status) {
+    switch (status.toLowerCase()) {
+      case 'missing':
+        return context.l10n.missing;
+      case 'under_investigation':
+      case 'investigating':
+        return context.l10n.investigating;
+      case 'found':
+        return context.l10n.found;
+      default:
+        return status;
+    }
+  }
+
+  String _getLocalizedGender(String gender) {
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return context.l10n.male;
+      case 'female':
+        return context.l10n.female;
+      default:
+        return gender;
+    }
   }
 
   @override
@@ -499,7 +532,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
 
           return Center(
             child: Text(
-              'Case not found',
+              context.l10n.caseNotFound,
               style: TextStyle(color: AppColors.getTextColor(context)),
             ),
           );
@@ -603,7 +636,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                 const SizedBox(height: 26),
 
                                 Text(
-                                  'Case Information',
+                                  context.l10n.caseInformation,
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -664,7 +697,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Last seen date:',
+                                                  context
+                                                      .l10n
+                                                      .lastSeenDateLabel,
                                                   style: TextStyle(
                                                     fontSize: 14,
                                                     color:
@@ -721,7 +756,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Last seen location:',
+                                                    context
+                                                        .l10n
+                                                        .lastSeenLocationLabel,
                                                     style: TextStyle(
                                                       fontSize: 14,
                                                       color:
@@ -774,7 +811,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Description:',
+                                            context.l10n.descriptionLabel,
                                             style: TextStyle(
                                               fontSize: 15,
                                               color:
@@ -861,16 +898,16 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                                 context,
                               ),
                               content: Text(
-                                'Cannot submit report: Invalid case ID',
+                                context.l10n.cannotSubmitReport,
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
                           );
                         }
                       },
-                      child: const Text(
-                        'Leave an information',
-                        style: TextStyle(
+                      child: Text(
+                        context.l10n.leaveInformation,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -941,7 +978,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                 ),
               ),
               TextSpan(
-                text: '  years old',
+                text: '  ${context.l10n.yearsOld}',
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
@@ -973,7 +1010,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
       ),
       child: Center(
         child: Text(
-          gender,
+          _getLocalizedGender(gender),
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -1007,15 +1044,6 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
         dotColor = AppColors.getSecondaryTextColor(context);
     }
 
-    String displayStatus = status.replaceAll('_', ' ');
-    if (displayStatus == 'under investigation') {
-      displayStatus = 'Investigating';
-    } else {
-      displayStatus =
-          displayStatus.substring(0, 1).toUpperCase() +
-          displayStatus.substring(1);
-    }
-
     return Container(
       width: 150,
       height: 60,
@@ -1033,9 +1061,8 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
             decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
           ),
           const SizedBox(width: 8),
-
           Text(
-            displayStatus,
+            _getLocalizedStatusText(status),
             style: GoogleFonts.inter(
               fontSize: 17,
               fontWeight: FontWeight.bold,
@@ -1056,28 +1083,30 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
       case 'missing':
         backgroundColor = AppColors.getMissingRedBackground(context);
         iconColor = AppColors.getMissingRedColor(context);
-        message = 'Missing for ${caseData.daysMissing} days';
+        message =
+            '${context.l10n.missingFor} ${caseData.daysMissing} ${context.l10n.days}';
         break;
       case 'under_investigation':
         backgroundColor = AppColors.getInvestigatingYellowBackground(context);
         iconColor = AppColors.getInvestigatingYellowColor(context);
-        message = 'Investigating for ${caseData.daysMissing} days';
+        message =
+            '${context.l10n.investigatingFor} ${caseData.daysMissing} ${context.l10n.days}';
         break;
       case 'found':
         backgroundColor = AppColors.getFoundGreenBackground(context);
         iconColor = AppColors.getFoundGreenColor(context);
-        message = 'Found after ${caseData.daysMissing} days';
+        message =
+            '${context.l10n.foundAfter} ${caseData.daysMissing} ${context.l10n.days}';
         break;
       default:
         backgroundColor = AppColors.getDividerColor(context);
         iconColor = AppColors.getSecondaryTextColor(context);
-        message = 'Status: ${caseData.status.value}';
+        message = '${context.l10n.status}: ${caseData.status.value}';
     }
 
     return Container(
       height: 60,
       width: 248,
-      //padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(8),

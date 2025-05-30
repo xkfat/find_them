@@ -183,17 +183,6 @@ class NotificationCard extends StatelessWidget {
                   ),
                 ],
               ),
-              if (notification.user.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                Text(
-                  'From: ${notification.user}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.getSecondaryTextColor(context),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
             ],
           ),
         ),

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/themes/app_colors.dart';
 import '../../../logic/cubit/add_friend_cubit.dart';
 import 'package:find_them/data/models/user_search.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
 class AddFriendScreen extends StatefulWidget {
   const AddFriendScreen({super.key});
@@ -61,7 +62,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                 }
               },
               child: Text(
-                'OK',
+                context.l10n.ok,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -92,10 +93,9 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
       backgroundColor: AppColors.getBackgroundColor(context),
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        
         centerTitle: true,
         title: Text(
-          'Add friend',
+          context.l10n.addFriend,
           style: GoogleFonts.dmSans(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -121,7 +121,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'Search by username or phone number',
+                    hintText: context.l10n.searchByUsernameOrPhone,
                     hintStyle: TextStyle(
                       color: AppColors.getSecondaryTextColor(context),
                     ),
@@ -152,9 +152,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
 
                     if (state is AddFriendSearching)
                       Container(
-                        color: AppColors.getBackgroundColor(
-                          context,
-                        ),
+                        color: AppColors.getBackgroundColor(context),
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -162,7 +160,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                               CircularProgressIndicator(color: AppColors.teal),
                               const SizedBox(height: 16),
                               Text(
-                                'Searching users...',
+                                context.l10n.searchingUsers,
                                 style: GoogleFonts.inter(
                                   fontSize: 16,
                                   color: AppColors.getTextColor(context),
@@ -211,7 +209,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
           ),
           const SizedBox(height: 24),
           Text(
-            'Find friends',
+            context.l10n.findFriends,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -220,7 +218,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Search by username or phone number to find\npeople you know and connect with them.',
+            context.l10n.findFriendsMessage,
             style: GoogleFonts.inter(
               fontSize: 14,
               color: AppColors.getSecondaryTextColor(context),
@@ -256,7 +254,10 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
               context.read<AddFriendCubit>().resetState();
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.teal),
-            child: Text('Try Again', style: TextStyle(color: Colors.white)),
+            child: Text(
+              context.l10n.tryAgain,
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -276,7 +277,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No users found',
+              context.l10n.noUsersFound,
               style: GoogleFonts.inter(
                 fontSize: 16,
                 color: AppColors.getTextColor(context),
@@ -284,7 +285,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Try a different username or phone number',
+              context.l10n.tryDifferentSearch,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: AppColors.getSecondaryTextColor(context),
@@ -393,7 +394,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                 padding: EdgeInsets.zero,
               ),
               child: Text(
-                'Connect',
+                context.l10n.connect,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,

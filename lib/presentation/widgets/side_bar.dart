@@ -9,10 +9,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/themes/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:find_them/l10n/app_localizations.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
-extension LocalizationHelper on BuildContext {
-  AppLocalizations get l10n => AppLocalizations.of(this)!;
-}
+
 
 class SideBar extends StatefulWidget {
   const SideBar({super.key});
@@ -31,84 +30,27 @@ class _SideBarState extends State<SideBar> {
   }
 
   void _handleLogout() async {
-    final navigator = Navigator.of(context);
+    // Store the navigator context BEFORE any async operations
+    final navigatorContext = Navigator.of(context, rootNavigator: true);
 
-    navigator.pop();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        return Center(child: CircularProgressIndicator(color: AppColors.teal));
-      },
-    );
+    print('🔴 Logout started');
 
     try {
       final authService = AuthService();
-      final success = await authService.logout();
-
-      if (context.mounted) {
-        navigator.pop();
-      }
-
-      if (success) {
-        if (context.mounted) {
-          navigator.pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder:
-                  (context) => BlocProvider(
-                    create:
-                        (context) => AuthentificationCubit(
-                          AuthRepository(AuthService()),
-                        ),
-                    child: const LoginScreen(),
-                  ),
-            ),
-            (route) => false,
-          );
-        }
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                context.l10n.logoutFailed,
-                style: TextStyle(color: AppColors.getTextColor(context)),
-              ),
-              backgroundColor: AppColors.getInvestigatingYellowBackground(
-                context,
-              ),
-            ),
-          );
-        }
-      }
+      print('🔴 Calling logout service...');
+      await authService.logout();
+      print('🔴 Logout service completed');
     } catch (e) {
-      if (context.mounted) {
-        navigator.pop();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${context.l10n.errorLoggingOut}: ${e.toString()}',
-              style: TextStyle(color: AppColors.getTextColor(context)),
-            ),
-            backgroundColor: AppColors.getMissingRedBackground(context),
-          ),
-        );
-
-        navigator.pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder:
-                (context) => BlocProvider(
-                  create:
-                      (context) =>
-                          AuthentificationCubit(AuthRepository(AuthService())),
-                  child: const LoginScreen(),
-                ),
-          ),
-          (route) => false,
-        );
-      }
+      print('🔴 Logout error: $e');
     }
+
+    // Use the stored navigator context instead of widget context
+    print('🔴 Navigating to login using root navigator...');
+    navigatorContext.pushNamedAndRemoveUntil('/auth/login', (route) {
+      print('🔴 Removing route: ${route.settings.name}');
+      return false;
+    });
+    print('🔴 Navigation executed');
   }
 
   @override
