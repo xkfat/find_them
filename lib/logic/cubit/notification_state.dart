@@ -1,4 +1,3 @@
-// cubits/notification_state.dart
 
 part of 'notification_cubit.dart';
 
@@ -55,7 +54,6 @@ class NotificationEmpty extends NotificationState {
   List<Object?> get props => [filterType];
 }
 
-// Specific states for different operations
 class NotificationDeleting extends NotificationState {
   final int notificationId;
 

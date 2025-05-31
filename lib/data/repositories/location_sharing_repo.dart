@@ -54,14 +54,17 @@ class LocationSharingRepository {
     }
   }
 
-  Future<void> removeFriend(int friendId, {String? token}) async {
-    try {
-      final token = await getAuthToken();
-      return await _service.removeFriend(friendId, token: token);
-    } catch (e) {
-      throw Exception('Failed to remove friend: $e');
-    }
+Future<void> removeFriend(int friendId) async {
+  print('🟡 REPO: Starting removeFriend for friendId: $friendId');
+  try {
+    final token = await getAuthToken();
+    print('🟡 REPO: Got token, about to call service');
+    return await _service.removeFriend(friendId, token: token);
+  } catch (e) {
+    print('🟡 REPO: Error in removeFriend: $e');
+    throw Exception('Failed to remove friend: $e');
   }
+}
 
   Future<void> sendAlert(int friendId) async {
     try {

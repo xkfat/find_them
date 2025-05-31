@@ -1,4 +1,3 @@
-// cubits/notification_cubit.dart - Modified to work with post-auth FCM init
 import 'dart:async';
 import 'dart:developer';
 import 'package:find_them/data/models/notification.dart';
@@ -20,16 +19,12 @@ class NotificationCubit extends Cubit<NotificationState> {
 
   Future<void> _initializeService() async {
     try {
-      // Only do basic initialization here (no FCM)
-      // FCM initialization happens after auth in AuthService
       await _notificationService.initialize();
 
-      // Set up service callbacks
       _notificationService.onNotificationsUpdated = _handleNotificationsUpdated;
       _notificationService.onUnreadCountChanged = _handleUnreadCountChanged;
       _notificationService.onNewNotification = _handleNewNotification;
 
-      // Start periodic refresh (but only if fully initialized)
       _startPeriodicRefreshIfReady();
       
       log('✅ Notification Cubit - Basic initialization completed');
@@ -38,21 +33,17 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  // Start periodic refresh only if service is fully initialized
   void _startPeriodicRefreshIfReady() {
     _refreshTimer?.cancel();
     _refreshTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
       if (!isClosed && _notificationService.isFullyInitialized) {
-        // Only refresh if service is fully initialized (after auth)
         refreshNotifications();
       }
     });
   }
 
-  // Load notifications
   Future<void> loadNotifications({String? filterType}) async {
     try {
-      // Check if service is fully initialized
       if (!_notificationService.isFullyInitialized) {
         log('⚠️ Notification service not fully initialized, showing empty state');
         emit(NotificationEmpty(filterType: filterType));
@@ -80,10 +71,8 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  // Refresh notifications
   Future<void> refreshNotifications() async {
     try {
-      // Don't refresh if service not fully initialized
       if (!_notificationService.isFullyInitialized) {
         log('⚠️ Cannot refresh - notification service not fully initialized');
         return;
@@ -96,7 +85,6 @@ class NotificationCubit extends Cubit<NotificationState> {
 
       await _notificationService.refreshNotifications();
 
-      // The service callbacks will handle updating the state
     } catch (e) {
       log('❌ Error refreshing notifications: $e');
       if (state is NotificationRefreshing) {
@@ -118,7 +106,6 @@ Future<void> deleteNotification(int id) async {
       return;
     }
 
-    // Store current state
     final currentState = state;
     List<NotificationModel> currentNotifications = [];
     
@@ -133,7 +120,6 @@ Future<void> deleteNotification(int id) async {
     if (success) {
       log('✅ Notification $id deleted successfully');
       
-      // Immediately update UI by removing the notification from current list
       final updatedNotifications = currentNotifications
           .where((notification) => notification.id != id)
           .toList();
@@ -147,7 +133,6 @@ Future<void> deleteNotification(int id) async {
         ));
       }
       
-      // Also refresh from server to ensure consistency
       Future.delayed(const Duration(milliseconds: 100), () {
         if (!isClosed) {
           refreshNotifications();
@@ -158,7 +143,6 @@ Future<void> deleteNotification(int id) async {
       log('❌ Failed to delete notification $id');
       emit(const NotificationError('Failed to delete notification'));
       
-      // Restore previous state
       if (currentState is NotificationLoaded) {
         emit(currentState);
       } else {
@@ -169,12 +153,10 @@ Future<void> deleteNotification(int id) async {
     log('❌ Error deleting notification: $e');
     emit(NotificationError('Failed to delete notification: $e'));
     
-    // Reload to restore proper state
     await loadNotifications(filterType: _currentFilter);
   }
 }
 
-  // Clear all notifications
   Future<void> clearAllNotifications() async {
     try {
       if (!_notificationService.isFullyInitialized) {
@@ -201,16 +183,13 @@ Future<void> deleteNotification(int id) async {
     }
   }
 
-  // Filter notifications by type
   Future<void> filterNotifications(String? type) async {
     _currentFilter = type;
     await loadNotifications(filterType: type);
   }
 
-  // Handle service callbacks
   void _handleNotificationsUpdated(List<NotificationModel> notifications) {
     if (!isClosed) {
-      // Apply current filter if any
       List<NotificationModel> filteredNotifications = notifications;
       if (_currentFilter != null) {
         filteredNotifications =
@@ -241,7 +220,6 @@ Future<void> deleteNotification(int id) async {
 
   void _handleNewNotification(NotificationModel notification) {
     if (!isClosed) {
-      // Check if new notification matches current filter
       if (_currentFilter == null ||
           notification.notificationType == _currentFilter) {
         if (state is NotificationLoaded) {
@@ -258,7 +236,6 @@ Future<void> deleteNotification(int id) async {
             ),
           );
 
-          // After showing the new notification state, update to loaded state
           Future.delayed(const Duration(milliseconds: 2000), () {
             if (!isClosed) {
               emit(
@@ -270,7 +247,6 @@ Future<void> deleteNotification(int id) async {
             }
           });
         } else {
-          // If not in loaded state, just refresh
           loadNotifications(filterType: _currentFilter);
         }
       }
@@ -282,10 +258,8 @@ Future<void> deleteNotification(int id) async {
     _refreshTimer = null;
   }
 
-  // Check if service is ready for operations
   bool get isServiceReady => _notificationService.isFullyInitialized;
 
-  // FCM Token management (only works after auth)
   Future<void> updateFCMToken() async {
     try {
       if (!_notificationService.isFullyInitialized) {
@@ -312,7 +286,6 @@ Future<void> deleteNotification(int id) async {
 
   
 
-  // Get specific notification types
   Future<void> loadMissingPersonNotifications() async {
     await filterNotifications('missing_person');
   }
@@ -329,7 +302,6 @@ Future<void> deleteNotification(int id) async {
     await filterNotifications('case_update');
   }
 
-  // Navigation helper
   Map<String, dynamic>? getNavigationDataForNotification(
     NotificationModel notification,
   ) {

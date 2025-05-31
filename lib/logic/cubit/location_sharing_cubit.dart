@@ -44,11 +44,15 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
   }
 
   Future<void> removeFriend(int friendId) async {
+    print('🔴 CUBIT: Starting removeFriend for friendId: $friendId');
     try {
+      print('🔴 CUBIT: About to call repository.removeFriend');
       await _repository.removeFriend(friendId);
+      print('🔴 CUBIT: Repository call successful');
       emit(LocationSharingActionSuccess('Friend removed'));
       await loadLocationData();
     } catch (e) {
+      print('🔴 CUBIT: Error in removeFriend: $e');
       emit(LocationSharingError(e.toString()));
     }
   }
@@ -73,17 +77,14 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
     }
   }
 
-
   Future<void> toggleGlobalSharing(bool isSharing) async {
     try {
       emit(LocationSharingLoading());
       await _repository.toggleGlobalSharing(isSharing);
-      
-      final message = isSharing 
-          ? 'Location sharing enabled' 
-          : 'Location sharing disabled';
+
+      final message =
+          isSharing ? 'Location sharing enabled' : 'Location sharing disabled';
       emit(LocationSharingActionSuccess(message));
-      
     } catch (e) {
       emit(LocationSharingError(e.toString()));
     }
@@ -93,34 +94,38 @@ class LocationSharingCubit extends Cubit<LocationSharingState> {
     try {
       final currentState = state;
       if (currentState is LocationSharingLoaded) {
-        final updatedFriends = currentState.friends.map((friend) {
-          if (friend.friendId == friendId) {
-            return LocationSharingModel(
-              id: friend.id,
-              userId: friend.userId,
-              friendId: friend.friendId,
-              createdAt: friend.createdAt,
-              friendDetails: friend.friendDetails,
-              isSharing: friend.isSharing,
-              canSeeYou: canSeeMe,
-            );
-          }
-          return friend;
-        }).toList();
-        
-        emit(LocationSharingLoaded(
-          requests: currentState.requests,
-          friends: updatedFriends,
-        ));
+        final updatedFriends =
+            currentState.friends.map((friend) {
+              if (friend.friendId == friendId) {
+                return LocationSharingModel(
+                  id: friend.id,
+                  userId: friend.userId,
+                  friendId: friend.friendId,
+                  createdAt: friend.createdAt,
+                  friendDetails: friend.friendDetails,
+                  isSharing: friend.isSharing,
+                  canSeeYou: canSeeMe,
+                );
+              }
+              return friend;
+            }).toList();
+
+        emit(
+          LocationSharingLoaded(
+            requests: currentState.requests,
+            friends: updatedFriends,
+          ),
+        );
       }
 
       await _repository.toggleFriendSharing(friendId, canSeeMe);
-      
-      final message = canSeeMe 
-          ? 'Now sharing location with friend' 
-          : 'Stopped sharing location with friend';
+
+      final message =
+          canSeeMe
+              ? 'Now sharing location with friend'
+              : 'Stopped sharing location with friend';
       emit(LocationSharingActionSuccess(message));
-      
+
       await loadLocationData();
     } catch (e) {
       emit(LocationSharingError(e.toString()));

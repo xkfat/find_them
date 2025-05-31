@@ -23,7 +23,6 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
       if (responseDta["code"] == "200") {
         log("✅ Login successful: ${responseDta["access"]}");
 
-        // Emit success state - notifications are already initialized in AuthService
         emit(Authentificationloaded());
       } else if (responseDta["code"] == "401") {
         emit(Authentificationerreur(responseDta["msg"]));
@@ -43,7 +42,6 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
       if (isLoggedIn) {
         log("🔄 User already logged in, restoring session...");
         
-        // Restore notification service for existing session
         await _authRepository.restoreNotificationService();
         
         emit(Authentificationloaded());
@@ -61,7 +59,6 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
     try {
       log("🚪 Logging out user...");
       
-      // This will handle both server logout and notification cleanup
       await _authRepository.logout();
       
       emit(AuthentificationInitial());

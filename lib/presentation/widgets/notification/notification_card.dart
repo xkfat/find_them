@@ -23,7 +23,7 @@ class NotificationCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Dismissible(
-        key: Key('notification_${notification.id}'), // More specific key
+        key: Key('notification_${notification.id}'),
         direction: DismissDirection.endToStart,
         background: Container(
           decoration: BoxDecoration(
@@ -35,7 +35,6 @@ class NotificationCard extends StatelessWidget {
           child: const Icon(Icons.delete, color: Colors.white),
         ),
         onDismissed: (direction) {
-          // Show immediate feedback
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Notification deleted'),
@@ -44,13 +43,11 @@ class NotificationCard extends StatelessWidget {
             ),
           );
 
-          // Call the dismiss callback
           if (onDismiss != null) {
             onDismiss!();
           }
         },
         confirmDismiss: (direction) async {
-          // Optional: Show confirmation dialog for important notifications
           if (notification.notificationType == 'missing_person' ||
               notification.notificationType == 'location_alert') {
             return await showDialog<bool>(
@@ -96,13 +93,13 @@ class NotificationCard extends StatelessWidget {
                 ) ??
                 false;
           }
-          return true; // Allow dismiss for other notification types
+          return true; 
         },
         child: Card(
           elevation: 0,
           color:
               AppColors
-                  .lighterMint, // Using lighterMint for all cards as requested
+                  .lighterMint, 
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -239,7 +236,6 @@ class NotificationCard extends StatelessWidget {
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
-                  // Show confirmation for manual dismiss button
                   _showManualDismissConfirmation(context);
                 },
                 style: OutlinedButton.styleFrom(
@@ -271,7 +267,6 @@ class NotificationCard extends StatelessWidget {
   void _showManualDismissConfirmation(BuildContext context) {
     if (notification.notificationType == 'missing_person' ||
         notification.notificationType == 'location_alert') {
-      // Show confirmation for important notifications
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -313,7 +308,6 @@ class NotificationCard extends StatelessWidget {
         },
       );
     } else {
-      // Direct dismiss for other notifications
       if (onDismiss != null) {
         onDismiss!();
       }

@@ -14,17 +14,14 @@ class NotificationService {
   bool _isBasicInitialized = false;
   bool _isFullyInitialized = false;
 
-  // Callbacks for real-time updates
   Function(List<NotificationModel>)? onNotificationsUpdated;
   Function(int)? onUnreadCountChanged;
   Function(NotificationModel)? onNewNotification;
 
-  // Basic initialization (only local notifications, no FCM)
   Future<void> initialize() async {
     if (_isBasicInitialized) return;
 
     try {
-      // Initialize Firebase basic functionality
       await _firebaseService.initializeBasic();
 
       _isBasicInitialized = true;
@@ -34,7 +31,6 @@ class NotificationService {
     }
   }
 
-  // Full initialization after successful authentication
   Future<void> initializeAfterAuth() async {
     if (_isFullyInitialized) {
       log('🔄 Notification Service already fully initialized');
@@ -44,16 +40,12 @@ class NotificationService {
     try {
       log('🚀 Starting full notification service initialization after auth...');
 
-      // Initialize Firebase with authentication
       await _firebaseService.initializeWithAuth();
 
-      // Set up FCM token refresh callback only (Firebase Service handles notifications directly)
       _firebaseService.onTokenRefresh = _handleTokenRefresh;
 
-      // Get and sync FCM token with server
       await _syncFCMTokenWithServer();
 
-      // Subscribe to general topics
       await _firebaseService.subscribeToTopic('all_users');
 
       _isFullyInitialized = true;
@@ -64,7 +56,6 @@ class NotificationService {
     }
   }
 
-  // Sync FCM token with server
   Future<void> _syncFCMTokenWithServer() async {
     try {
       final token = await _firebaseService.getToken();
@@ -81,7 +72,6 @@ class NotificationService {
     }
   }
 
-  // Get all notifications
   Future<List<NotificationModel>> getNotifications() async {
     try {
       final notifications = await _repository.getNotifications();
@@ -93,7 +83,6 @@ class NotificationService {
     }
   }
 
-  // Get specific notification
   Future<NotificationModel?> getNotification(int id) async {
     try {
       return await _repository.getNotification(id);
@@ -103,7 +92,6 @@ class NotificationService {
     }
   }
 
-  // Delete notification
   Future<bool> deleteNotification(int id) async {
     try {
       log('🗑️ Attempting to delete notification $id');
@@ -123,7 +111,6 @@ class NotificationService {
     }
   }
 
-  // Clear all notifications
   Future<bool> clearAllNotifications() async {
     try {
       final success = await _repository.clearAllNotifications();
@@ -138,12 +125,10 @@ class NotificationService {
     }
   }
 
-  // Refresh notifications
   Future<void> refreshNotifications() async {
     await getNotifications();
   }
 
-  // Handle FCM token refresh
   Future<void> _handleTokenRefresh(String newToken) async {
     log('🔄 FCM Token refreshed, syncing with server...');
     try {
@@ -154,7 +139,6 @@ class NotificationService {
     }
   }
 
-  // Subscribe to topic (for admin broadcasts, etc.)
   Future<void> subscribeToTopic(String topic) async {
     if (!_isFullyInitialized) {
       log('⚠️ Cannot subscribe to topic - service not fully initialized');
@@ -163,17 +147,14 @@ class NotificationService {
     await _firebaseService.subscribeToTopic(topic);
   }
 
-  // Unsubscribe from topic
   Future<void> unsubscribeFromTopic(String topic) async {
     await _firebaseService.unsubscribeFromTopic(topic);
   }
 
-  // Clear local notifications
   Future<void> clearLocalNotifications() async {
     await _firebaseService.clearNotifications();
   }
 
-  // Remove FCM token (for logout)
   Future<void> removeFCMToken() async {
     try {
       await _repository.removeFCMToken();
@@ -183,7 +164,6 @@ class NotificationService {
     }
   }
 
-  // Check if user has FCM token registered
   Future<bool> hasFCMToken() async {
     try {
       final status = await _repository.checkFCMStatus();
@@ -194,30 +174,22 @@ class NotificationService {
     }
   }
 
-  // Get FCM token
   Future<String?> getFCMToken() async {
     return await _firebaseService.getToken();
   }
 
-  // Reset service (for logout)
   Future<void> reset() async {
     try {
-      // Remove FCM token from server
       await removeFCMToken();
 
-      // Clear local notifications
       await clearLocalNotifications();
 
-      // Unsubscribe from topics
       await unsubscribeFromTopic('all_users');
 
-      // Reset Firebase service
       _firebaseService.reset();
 
-      // Reset flags
       _isFullyInitialized = false;
 
-      // Clear callbacks
       onNotificationsUpdated = null;
       onUnreadCountChanged = null;
       onNewNotification = null;
@@ -228,13 +200,11 @@ class NotificationService {
     }
   }
 
-  // Dispose resources
   void dispose() {
     _firebaseService.dispose();
     log('🗑️ Notification Service disposed');
   }
 
-  // Check initialization status
   bool get isBasicInitialized => _isBasicInitialized;
   bool get isFullyInitialized => _isFullyInitialized;
 }

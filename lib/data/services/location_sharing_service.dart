@@ -11,7 +11,7 @@ class LocationSharingService {
   Future<List<LocationRequestModel>> getPendingRequests({String? token}) async {
     try {
       log('Fetching pending location requests');
-      
+
       final response = await http.get(
         Uri.parse('$baseUrl/api/location-sharing/requests/'),
         headers: {
@@ -27,7 +27,9 @@ class LocationSharingService {
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => LocationRequestModel.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to get pending requests: ${response.statusCode}');
+        throw Exception(
+          'Failed to get pending requests: ${response.statusCode}',
+        );
       }
     } catch (e) {
       log('Error getting pending requests: $e');
@@ -38,9 +40,9 @@ class LocationSharingService {
   Future<List<LocationSharingModel>> getFriends({String? token}) async {
     try {
       log('Fetching location sharing friends');
-      
+
       final response = await http.get(
-        Uri.parse('$baseUrl/api/location-sharing/friends/'),
+        Uri.parse('http://10.0.2.2:8000/api/location-sharing/friends/'),
         headers: {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
@@ -52,12 +54,15 @@ class LocationSharingService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        final friends = data.map((json) => LocationSharingModel.fromJson(json)).toList();
-        
+        final friends =
+            data.map((json) => LocationSharingModel.fromJson(json)).toList();
+
         for (var friend in friends) {
-          log('Friend ${friend.friendDetails.displayName}: canSeeYou = ${friend.canSeeYou}, isSharing = ${friend.isSharing}');
+          log(
+            'Friend ${friend.friendDetails.displayName}: canSeeYou = ${friend.canSeeYou}, isSharing = ${friend.isSharing}',
+          );
         }
-        
+
         return friends;
       } else {
         throw Exception('Failed to get friends: ${response.statusCode}');
@@ -68,12 +73,18 @@ class LocationSharingService {
     }
   }
 
-  Future<void> respondToRequest(int requestId, String response, {String? token}) async {
+  Future<void> respondToRequest(
+    int requestId,
+    String response, {
+    String? token,
+  }) async {
     try {
       log('Responding to request $requestId with $response');
-      
+
       final result = await http.post(
-        Uri.parse('$baseUrl/api/location-sharing/requests/$requestId/respond/'),
+        Uri.parse(
+          'http://10.0.2.2:8000/api/location-sharing/requests/$requestId/respond/',
+        ),
         headers: {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
@@ -95,23 +106,26 @@ class LocationSharingService {
 
   Future<void> removeFriend(int friendId, {String? token}) async {
     try {
-      log('Removing friend $friendId');
-      
+      log('🟢 SERVICE: Removing friend $friendId');
+
       final response = await http.delete(
-        Uri.parse('$baseUrl/api/location-sharing/friends/$friendId/remove/'),
+        Uri.parse(
+          'http://10.0.2.2:8000/api/location-sharing/friends/$friendId/remove/',
+        ),
         headers: {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
         },
       );
 
-      log('Remove friend status: ${response.statusCode}');
+      log('🟢 SERVICE: Remove friend status: ${response.statusCode}');
+      log('🟢 SERVICE: Remove friend response: ${response.body}');
 
       if (response.statusCode != 204) {
         throw Exception('Failed to remove friend: ${response.statusCode}');
       }
     } catch (e) {
-      log('Error removing friend: $e');
+      log('🟢 SERVICE: Error removing friend: $e');
       throw Exception('Error removing friend: $e');
     }
   }
@@ -119,9 +133,11 @@ class LocationSharingService {
   Future<void> sendAlert(int friendId, {String? token}) async {
     try {
       log('Sending alert to friend $friendId');
-      
+
       final response = await http.post(
-        Uri.parse('$baseUrl/api/location-sharing/friends/$friendId/alert/'),
+        Uri.parse(
+          'http://10.0.2.2:8000/api/location-sharing/friends/$friendId/alert/',
+        ),
         headers: {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
@@ -143,7 +159,7 @@ class LocationSharingService {
   Future<void> sendLocationRequest(String identifier, {String? token}) async {
     try {
       log('Sending location request to $identifier');
-      
+
       final response = await http.post(
         Uri.parse('$baseUrl/api/location-sharing/requests/send/'),
         headers: {
@@ -166,10 +182,13 @@ class LocationSharingService {
     }
   }
 
-  Future<List<UserSearchModel>> searchUsers(String query, {String? token}) async {
+  Future<List<UserSearchModel>> searchUsers(
+    String query, {
+    String? token,
+  }) async {
     try {
       log('Searching users with query: $query');
-      
+
       final response = await http.get(
         Uri.parse('$baseUrl/api/location-sharing/search-users/?q=$query'),
         headers: {
@@ -193,10 +212,13 @@ class LocationSharingService {
     }
   }
 
-  Future<Map<String, dynamic>> toggleGlobalSharing(bool isSharing, {String? token}) async {
+  Future<Map<String, dynamic>> toggleGlobalSharing(
+    bool isSharing, {
+    String? token,
+  }) async {
     try {
       log('Toggling global sharing to $isSharing');
-      
+
       final response = await http.put(
         Uri.parse('$baseUrl/api/location-sharing/settings/'),
         headers: {
@@ -212,7 +234,9 @@ class LocationSharingService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to toggle global sharing: ${response.statusCode}');
+        throw Exception(
+          'Failed to toggle global sharing: ${response.statusCode}',
+        );
       }
     } catch (e) {
       log('Error toggling global sharing: $e');
@@ -220,12 +244,18 @@ class LocationSharingService {
     }
   }
 
-  Future<Map<String, dynamic>> toggleFriendSharing(int friendId, bool canSeeMe, {String? token}) async {
+  Future<Map<String, dynamic>> toggleFriendSharing(
+    int friendId,
+    bool canSeeMe, {
+    String? token,
+  }) async {
     try {
       log('Toggling friend $friendId sharing to $canSeeMe');
-      
+
       final response = await http.put(
-        Uri.parse('$baseUrl/api/location-sharing/friends/$friendId/toggle-sharing/'),
+        Uri.parse(
+          '$baseUrl/api/location-sharing/friends/$friendId/toggle-sharing/',
+        ),
         headers: {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
@@ -239,7 +269,9 @@ class LocationSharingService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to toggle friend sharing: ${response.statusCode}');
+        throw Exception(
+          'Failed to toggle friend sharing: ${response.statusCode}',
+        );
       }
     } catch (e) {
       log('Error toggling friend sharing: $e');
@@ -250,7 +282,7 @@ class LocationSharingService {
   Future<Map<String, dynamic>> getSharingSettings({String? token}) async {
     try {
       log('Getting sharing settings');
-      
+
       final response = await http.get(
         Uri.parse('$baseUrl/api/location-sharing/settings/current/'),
         headers: {
@@ -265,7 +297,9 @@ class LocationSharingService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to get sharing settings: ${response.statusCode}');
+        throw Exception(
+          'Failed to get sharing settings: ${response.statusCode}',
+        );
       }
     } catch (e) {
       log('Error getting sharing settings: $e');

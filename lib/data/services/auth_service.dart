@@ -1,4 +1,3 @@
-// auth_service.dart - Complete implementation with post-auth FCM initialization
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -16,7 +15,6 @@ class AuthService {
   AuthService({ApiService? apiService})
     : _apiService = apiService ?? ApiService();
 
-  // Response handler for HTTP requests
   dynamic _response(http.Response response) {
     switch (response.statusCode) {
       case 200:
@@ -46,7 +44,6 @@ class AuthService {
     }
   }
 
-  /// Login method with post-auth notification initialization
   Future<dynamic> login(String username, String pwd) async {
     dynamic responseJson;
     try {
@@ -68,14 +65,12 @@ class AuthService {
       if (response.statusCode == 200 &&
           responseJson['access'] != null &&
           responseJson['refresh'] != null) {
-        // Save auth tokens first
         await _apiService.saveAuthTokens(
           accessToken: responseJson['access'],
           refreshToken: responseJson['refresh'],
           userData: responseJson['user'] ?? {},
         );
 
-        // Initialize notification service after successful login
         await _initializeNotificationsAfterAuth(username);
 
         log(
@@ -107,7 +102,6 @@ class AuthService {
     }
   }
 
-  /// Signup method with post-auth notification initialization
   Future<dynamic> signup({
     required String firstName,
     required String lastName,
@@ -150,14 +144,12 @@ class AuthService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (responseJson.containsKey('access') &&
             responseJson.containsKey('refresh')) {
-          // Save auth tokens first
           await _apiService.saveAuthTokens(
             accessToken: responseJson['access'],
             refreshToken: responseJson['refresh'],
             userData: responseJson['user'] ?? {},
           );
 
-          // Initialize notification service after successful signup
           await _initializeNotificationsAfterAuth(username);
 
           log(
@@ -196,7 +188,6 @@ class AuthService {
     }
   }
 
-  /// Delete account method with cleanup
   Future<Map<String, dynamic>> deleteAccount(String username) async {
     try {
       var response = await http.delete(
@@ -206,7 +197,6 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        // Clean up everything
         await _cleanupUserSession();
         log("✅ Account deleted and session cleaned up for: $username");
         return {'success': true};
@@ -219,7 +209,6 @@ class AuthService {
     }
   }
 
-  /// Logout method with complete cleanup
   Future<bool> logout() async {
     try {
       final accessToken = await _apiService.getAccessToken();
@@ -232,7 +221,6 @@ class AuthService {
       }
 
       try {
-        // Attempt server logout
         final response = await http
             .post(
               Uri.parse('http://10.0.2.2:8000/api/accounts/logout/'),
@@ -252,7 +240,6 @@ class AuthService {
           return true;
         }
 
-        // Handle token refresh if needed
         if (response.statusCode == 401) {
           log("🔄 Access token expired, attempting to refresh before logout");
           final refreshed = await _apiService.refreshToken();
@@ -278,7 +265,6 @@ class AuthService {
           }
         }
 
-        // Fallback - clean up locally even if server logout failed
         await _cleanupUserSession();
         log("⚠️ Server logout failed but local cleanup completed");
         return true;
@@ -300,39 +286,31 @@ class AuthService {
     }
   }
 
-  /// Initialize notification service AFTER successful authentication
   Future<void> _initializeNotificationsAfterAuth(String username) async {
     try {
       log("🚀 Initializing notifications after successful auth for: $username");
 
-      // First ensure basic initialization is done
       await _notificationService.initialize();
 
-      // Now do full initialization with FCM
       await _notificationService.initializeAfterAuth();
 
       log("✅ Notification service fully initialized for user: $username");
     } catch (e) {
       log("❌ Error initializing notifications after auth: $e");
-      // Don't throw - notification failure shouldn't prevent login/signup
     }
   }
 
-  /// Clean up user session including notifications
   Future<void> _cleanupUserSession() async {
     try {
       log("🧹 Starting user session cleanup...");
 
-      // Reset notification service (this will remove FCM token from server)
       await _notificationService.reset();
 
-      // Clear auth tokens
       await _apiService.clearAuthTokens();
 
       log("✅ User session cleanup completed");
     } catch (e) {
       log("❌ Error during session cleanup: $e");
-      // Still try to clear auth tokens even if notification cleanup fails
       try {
         await _apiService.clearAuthTokens();
         log("⚠️ Auth tokens cleared despite notification cleanup failure");
@@ -342,7 +320,6 @@ class AuthService {
     }
   }
 
-  /// Restore notification service for existing authenticated user (app startup)
   Future<void> restoreNotificationToken() async {
     try {
       final accessToken = await _apiService.getAccessToken();
@@ -350,10 +327,8 @@ class AuthService {
       if (accessToken != null) {
         log("🔄 Restoring notification service for existing session");
 
-        // Basic initialization first
         await _notificationService.initialize();
 
-        // Full initialization for existing auth
         await _initializeNotificationsAfterAuth("existing_user");
 
         log("✅ Notification service restored successfully");
@@ -363,17 +338,14 @@ class AuthService {
     }
   }
 
-  /// Get current FCM token
   Future<String?> getFCMToken() async {
     return await _notificationService.getFCMToken();
   }
 
-  /// Check if user has valid FCM token
   Future<bool> hasValidFCMToken() async {
     return await _notificationService.hasFCMToken();
   }
 
-  /// Manually sync FCM token with server (useful for token refresh)
   Future<void> syncFCMToken() async {
     try {
       await _notificationService.refreshNotifications();
@@ -383,27 +355,22 @@ class AuthService {
     }
   }
 
-  /// Check if user is logged in
   Future<bool> isLoggedIn() async {
     return await _apiService.hasToken();
   }
 
-  /// Get stored access token
   Future<String?> getToken() async {
     return await _apiService.getAccessToken();
   }
 
-  /// Get stored user data
   Future<Map<String, dynamic>?> getUserData() async {
     return await _apiService.getUserData();
   }
 
-  /// Refresh access token
   Future<bool> refreshToken() async {
     return await _apiService.refreshToken();
   }
 
-  /// Clear all stored auth data
   Future<void> clearAuthData() async {
     await _apiService.clearAuthTokens();
   }

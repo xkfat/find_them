@@ -28,7 +28,6 @@ class SocialAuthCubit extends Cubit<SocialAuthState> {
         return;
       }
 
-      // Check success condition
       if (result['success'] == true) {
         log("✅ Google Sign In: SUCCESS CONDITION MET!");
         log("✅ Google Sign In: About to emit SocialAuthSuccess");
@@ -39,7 +38,6 @@ class SocialAuthCubit extends Cubit<SocialAuthState> {
         log("✅ Google Sign In: SocialAuthSuccess has been emitted!");
         log("✅ Google Sign In: Current state is: ${state.runtimeType}");
 
-        // Verify state was set correctly
         if (state is SocialAuthSuccess) {
           log("✅ Google Sign In: CONFIRMED - State is SocialAuthSuccess");
         } else {

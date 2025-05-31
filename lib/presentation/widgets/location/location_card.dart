@@ -330,11 +330,18 @@ class LocationCards extends StatelessWidget {
                 color: AppColors.getSurfaceColor(context),
                 onSelected: (value) async {
                   if (value == 'remove') {
+                    print('🔴 REMOVE: Remove option selected!');
+                    print('🔴 REMOVE: friendId = ${friend.friendId}');
+                    print(
+                      '🔴 REMOVE: friendName = ${friend.friendDetails.displayName}',
+                    );
+
                     _showRemoveDialog(
                       context,
                       friend.friendId,
                       friend.friendDetails.displayName,
                     );
+                    print('🔴 REMOVE: _showRemoveDialog called');
                   } else if (value == 'share_location') {
                     try {
                       await context
@@ -514,9 +521,11 @@ class LocationCards extends StatelessWidget {
     int friendId,
     String friendName,
   ) {
+    final locationSharingCubit = context.read<LocationSharingCubit>();
+
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.getCardColor(context),
           shape: RoundedRectangleBorder(
@@ -539,7 +548,7 @@ class LocationCards extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 context.l10n.cancel,
                 style: GoogleFonts.inter(
@@ -551,13 +560,17 @@ class LocationCards extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
+                print('🔴 DIALOG: Remove button pressed - closing dialog');
+                Navigator.of(dialogContext).pop();
+
                 try {
-                  await context.read<LocationSharingCubit>().removeFriend(
-                    friendId,
+                  print(
+                    '🔴 DIALOG: Calling locationSharingCubit.removeFriend($friendId)',
                   );
+                  await locationSharingCubit.removeFriend(friendId);
+                  print('🔴 DIALOG: removeFriend completed successfully');
                 } catch (e) {
-                  //catch
+                  print('🔴 DIALOG: Error removing friend: $e');
                 }
               },
               child: Text(

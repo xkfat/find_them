@@ -38,7 +38,6 @@ class _LocationReportScreenState extends State<LocationReportScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize address with localized text
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _address = context.l10n.searchingYourLocation;

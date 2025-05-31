@@ -6,12 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-// Top-level function for background message handling
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('📱 Background message received: ${message.messageId}');
-  // Handle background message - you can store to local storage if needed
-  // Don't call Flutter UI methods here as the app might not be running
 }
 
 class FirebaseService {
@@ -28,20 +25,16 @@ class FirebaseService {
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
-  // Callbacks for handling notifications
   Function(NotificationModel)? onNotificationReceived;
   Function(NotificationModel)? onNotificationTapped;
   Function(String)? onTokenRefresh;
 
-  // Navigation callback for handling notification taps
   Function(Map<String, dynamic>)? onNavigationRequested;
 
-  // Basic initialization (permissions and local notifications only)
   Future<void> initializeBasic() async {
     if (_isInitialized) return;
 
     try {
-      // Only initialize local notifications
       await _initializeLocalNotifications();
       log(
         '✅ Firebase Service - Basic initialization completed (local notifications only)',
@@ -51,22 +44,17 @@ class FirebaseService {
     }
   }
 
-  // Full initialization after successful authentication
   Future<void> initializeWithAuth() async {
     try {
       log('🚀 Starting full Firebase Service initialization after auth...');
 
-      // Request permissions
       await _requestPermissions();
 
-      // Get FCM token
       await _getFCMToken();
 
-      // Set up message handlers (ONLY ONCE - this is the key fix)
       if (!_isInitialized) {
         _setupMessageHandlers();
 
-        // Listen for token refresh
         _firebaseMessaging.onTokenRefresh.listen((newToken) {
           log('🔄 FCM Token refreshed: ${newToken.substring(0, 20)}...');
           _fcmToken = newToken;
@@ -125,7 +113,6 @@ class FirebaseService {
       },
     );
 
-    // Create notification channel for Android
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       await _createNotificationChannel();
     }
@@ -164,7 +151,6 @@ class FirebaseService {
   void _setupMessageHandlers() {
     log('🔧 Setting up Firebase message handlers...');
 
-    // Handle foreground messages - SINGLE HANDLER
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       log('📱 Foreground FCM message received: ${message.messageId}');
       log('📱 Title: ${message.notification?.title}');
@@ -173,23 +159,18 @@ class FirebaseService {
       final notification = _createNotificationFromMessage(message);
       log('📱 New notification received: ${notification.title}');
 
-      // Show local notification when app is in foreground
       _showLocalNotification(message);
 
-      // Log the data for debugging
       log('📱 Data: ${message.data}');
 
-      // Notify listeners
       onNotificationReceived?.call(notification);
     });
 
-    // Handle message tapped when app is in background but not terminated
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       log('📱 Message tapped (background): ${message.messageId}');
       _handleMessageTap(message);
     });
 
-    // Handle message tapped when app is terminated and opened from notification
     _handleInitialMessage();
 
     log('✅ Firebase message handlers configured');
@@ -209,16 +190,13 @@ class FirebaseService {
     log('📱 Handling notification tap from Firebase message');
     final notification = _createNotificationFromMessage(message);
 
-    // Extract navigation data from message
     final navigationData = _extractNavigationData(message);
     log('🧭 Navigation data: $navigationData');
 
-    // Trigger navigation
     if (onNavigationRequested != null && navigationData.isNotEmpty) {
       onNavigationRequested!(navigationData);
     }
 
-    // Also notify other listeners
     onNotificationTapped?.call(notification);
   }
 
@@ -283,7 +261,6 @@ class FirebaseService {
   NotificationModel _createNotificationFromMessage(RemoteMessage message) {
     final data = Map<String, dynamic>.from(message.data);
 
-    // Add message content to data
     if (message.notification != null) {
       data['title'] = message.notification!.title ?? '';
       data['body'] = message.notification!.body ?? '';
@@ -327,12 +304,10 @@ class FirebaseService {
     log('📱 Local notification displayed: ${notification.title}');
   }
 
-  // Set navigation callback
   void setNavigationCallback(Function(Map<String, dynamic>) callback) {
     onNavigationRequested = callback;
   }
 
-  // Public methods
   Future<String?> getToken() async {
     if (!_isInitialized) {
       log(
@@ -373,7 +348,6 @@ class FirebaseService {
     log('🧹 Local notifications cleared');
   }
 
-  // Reset service (for logout)
   void reset() {
     _fcmToken = null;
     _isInitialized = false;
@@ -382,8 +356,6 @@ class FirebaseService {
     onTokenRefresh = null;
     onNavigationRequested = null;
 
-    // IMPORTANT: Clear any existing listeners to prevent duplicates
-    // Note: FCM listeners can't be directly cancelled, but we can track initialization
     log('🔄 Firebase Service reset');
   }
 

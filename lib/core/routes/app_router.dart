@@ -367,7 +367,7 @@ class AppRouter {
               (_) => BlocProvider(
                 create:
                     (context) => NotificationCubit(
-                      //
+                      
                       //NotificationRepository(NotificationService()),
                     )..loadNotifications(),
                 child: const NotificationsScreen(),

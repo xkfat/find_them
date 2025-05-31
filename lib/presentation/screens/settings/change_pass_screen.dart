@@ -83,7 +83,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your password has been changed successfully.', // Note: This specific message isn't in your .arb files
+                  'Your password has been changed successfully.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 14,
@@ -235,7 +235,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 _oldPasswordError = context.l10n.oldPasswordNotCorrect;
               } else if (errorMessage.toLowerCase().contains('new_password')) {
                 _newPasswordError =
-                    'Invalid new password'; // Could be localized if needed
+                    'Invalid new password'; 
               } else {
                 _showErrorDialog(errorMessage);
               }

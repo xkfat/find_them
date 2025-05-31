@@ -29,7 +29,6 @@ class _SideBarState extends State<SideBar> {
   }
 
   void _handleLogout() async {
-    // Store the navigator context BEFORE any async operations
     final navigatorContext = Navigator.of(context, rootNavigator: true);
 
     print('🔴 Logout started');
@@ -43,7 +42,6 @@ class _SideBarState extends State<SideBar> {
       print('🔴 Logout error: $e');
     }
 
-    // Navigate to onboarding and show signup options
     print('🔴 Navigating to onboarding with signup options...');
 
     navigatorContext.pushNamedAndRemoveUntil('/onboarding', (route) {
@@ -51,7 +49,6 @@ class _SideBarState extends State<SideBar> {
       return false;
     });
 
-    // Show signup options after a brief delay to ensure navigation is complete
     Future.delayed(const Duration(milliseconds: 500), () {
       if (navigatorContext.mounted) {
         showModalBottomSheet(

@@ -56,7 +56,6 @@ class _SignUpOptionsContentState extends State<_SignUpOptionsContent>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     log("🔄 App lifecycle state changed: $state");
 
-    // Always show loading when app resumes if auth is in progress
     if ((state == AppLifecycleState.resumed ||
             state == AppLifecycleState.inactive) &&
         _isAuthInProgress) {
@@ -75,13 +74,11 @@ class _SignUpOptionsContentState extends State<_SignUpOptionsContent>
       try {
         log("🚀 Starting Google Sign In process...");
 
-        // Set loading state immediately and persistently
         setState(() {
           _isLoading = true;
           _isAuthInProgress = true;
         });
 
-        // Add a small delay to ensure UI updates before external browser opens
         await Future.delayed(const Duration(milliseconds: 100));
 
         context.read<SocialAuthCubit>().signInWithGoogle();
@@ -103,13 +100,11 @@ class _SignUpOptionsContentState extends State<_SignUpOptionsContent>
       try {
         log("🚀 Starting Facebook Sign In process...");
 
-        // Set loading state immediately and persistently
         setState(() {
           _isLoading = true;
           _isAuthInProgress = true;
         });
 
-        // Add a small delay to ensure UI updates before external browser opens
         await Future.delayed(const Duration(milliseconds: 100));
 
         context.read<SocialAuthCubit>().signInWithFacebook();
@@ -136,19 +131,16 @@ class _SignUpOptionsContentState extends State<_SignUpOptionsContent>
             if (state is SocialAuthSuccess) {
               log("✅ BlocListener - Authentication successful!");
 
-              // Navigate using the safest possible approach
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (context.mounted) {
                   try {
                     log("🚀 Attempting navigation to /home");
 
-                    // Get the root navigator
                     final navigator = Navigator.of(
                       context,
                       rootNavigator: true,
                     );
 
-                    // Clear all routes and navigate to home
                     navigator.pushNamedAndRemoveUntil(
                       '/home',
                       (route) => false,
@@ -159,7 +151,6 @@ class _SignUpOptionsContentState extends State<_SignUpOptionsContent>
                     log("❌ Navigation error: $e");
                     log("❌ Stack trace: $stackTrace");
 
-                    // Fallback navigation
                     try {
                       Navigator.of(
                         context,
@@ -469,11 +460,10 @@ class _SignUpOptionsContentState extends State<_SignUpOptionsContent>
           ),
         ),
 
-        // Full-screen loading overlay that covers EVERYTHING
         if (_isLoading)
           Positioned.fill(
             child: Material(
-              color: Colors.black.withOpacity(0.8), // Darker overlay
+              color: Colors.black.withOpacity(0.8),
               child: Center(
                 child: Container(
                   width: 200,

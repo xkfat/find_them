@@ -1,4 +1,3 @@
-// models/notification_model.dart
 import 'package:find_them/data/models/location_sharing.dart';
 import 'package:flutter/material.dart';
 
@@ -38,7 +37,6 @@ class NotificationModel {
     );
   }
 
-  // Create from push notification payload
   factory NotificationModel.fromPushPayload(Map<String, dynamic> data) {
     return NotificationModel(
       id: int.tryParse(data['notification_id'] ?? '0') ?? 0,
@@ -51,7 +49,7 @@ class NotificationModel {
           _getModelFromType(data['notification_type'] ?? 'system'),
       message: data['message'] ?? data['body'] ?? 'New notification',
       notificationType: data['notification_type'] ?? 'system',
-      isRead: false, // Push notifications are always unread initially
+      isRead: false, 
       dateCreated: DateTime.now(),
     );
   }
@@ -108,7 +106,6 @@ class NotificationModel {
     );
   }
 
-  // Enhanced getters for UI
   String get title {
     switch (notificationType) {
       case 'missing_person':
@@ -162,7 +159,6 @@ class NotificationModel {
     }
   }
 
-  // Navigation helper - determines which screen to navigate to
   String get navigationRoute {
     switch (notificationType) {
       case 'missing_person':
@@ -180,7 +176,6 @@ class NotificationModel {
     }
   }
 
-  // Get navigation arguments
   Map<String, dynamic>? get navigationArguments {
     if (targetId != null) {
       switch (notificationType) {

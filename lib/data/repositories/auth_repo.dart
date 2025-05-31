@@ -84,7 +84,6 @@ class AuthRepository {
     }
   }
 
-  /// Restore notification service for existing authenticated users
   Future<void> restoreNotificationService() async {
     try {
       log("🔄 Repository: Restoring notification service");
@@ -92,21 +91,17 @@ class AuthRepository {
       log("✅ Repository: Notification service restored");
     } catch (e) {
       log("❌ Repository: Error restoring notification service - $e");
-      // Don't throw - this shouldn't prevent app from working
     }
   }
 
-  /// Get current FCM token
   Future<String?> getFCMToken() async {
     return await _authService.getFCMToken();
   }
 
-  /// Check if user has valid FCM token
   Future<bool> hasValidFCMToken() async {
     return await _authService.hasValidFCMToken();
   }
 
-  /// Manually sync FCM token
   Future<void> syncFCMToken() async {
     await _authService.syncFCMToken();
   }

@@ -43,7 +43,6 @@ class SignUpCubit extends Cubit<SignUpState> {
             responseData.containsKey("access")) {
           log("✅ Success detected - signup completed with tokens");
           
-          // Notifications are already initialized in AuthService after successful signup
           emit(SignUploaded());
           return;
         }

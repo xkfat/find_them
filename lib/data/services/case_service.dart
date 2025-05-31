@@ -193,19 +193,15 @@ class CaseService {
     }
   }
 
-  // Helper method to safely decode UTF-8 response
   String _decodeResponse(http.Response response) {
     try {
-      // First try to decode as UTF-8 from bytes
       return utf8.decode(response.bodyBytes);
     } catch (e) {
       log("UTF-8 decoding failed, falling back to body string: $e");
-      // Fallback to response.body if UTF-8 decoding fails
       return response.body;
     }
   }
 
-  // Helper method to safely parse JSON with UTF-8 support
   Map<String, dynamic> _parseJsonResponse(http.Response response) {
     try {
       final decodedBody = _decodeResponse(response);
