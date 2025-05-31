@@ -1,4 +1,4 @@
-// repositories/notification_repository.dart - Modified for post-auth FCM sync
+// repositories/notification_repository.dart - Modified for UTF-8 support
 import 'dart:convert';
 import 'dart:developer';
 import 'package:find_them/data/models/notification.dart';
@@ -13,18 +13,43 @@ class NotificationRepository {
   Future<Map<String, String>> get _headers async {
     final token = await _apiService.getAccessToken();
     return {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json; charset=utf-8', // Added charset=utf-8
+      'Accept': 'application/json; charset=utf-8', // Added Accept header
+      'Accept-Charset': 'utf-8', // Added Accept-Charset
       'Authorization': 'Bearer $token',
     };
   }
 
-  // Get all notifications for current user
+  // Helper method to safely decode UTF-8 response
+  String _decodeResponse(http.Response response) {
+    try {
+      // Use utf8.decode with bodyBytes for proper UTF-8 handling
+      return utf8.decode(response.bodyBytes);
+    } catch (e) {
+      log("UTF-8 decoding failed, falling back to body string: $e");
+      return response.body;
+    }
+  }
+
+  // Helper method to safely parse JSON with UTF-8 support
+  dynamic _parseJsonResponse(http.Response response) {
+    try {
+      final decodedBody = _decodeResponse(response);
+      return json.decode(decodedBody);
+    } catch (e) {
+      log("JSON parsing error: $e");
+      throw Exception('Failed to parse server response');
+    }
+  }
+
+  // Get all notifications for current user - FIXED FOR UTF-8
   Future<List<NotificationModel>> getNotifications({String? type}) async {
     try {
       String url = 'http://10.0.2.2:8000/api/notifications/';
 
       if (type != null) {
-        url += '?type=$type';
+        // Encode the type parameter for UTF-8 safety
+        url += '?type=${Uri.encodeComponent(type)}';
       }
 
       final response = await _apiService.authenticatedRequest(() async {
@@ -33,7 +58,8 @@ class NotificationRepository {
       });
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        // Use UTF-8 safe parsing instead of json.decode(response.body)
+        final data = _parseJsonResponse(response);
         final notifications = data['notifications'] as List? ?? data as List;
 
         return notifications
@@ -48,7 +74,7 @@ class NotificationRepository {
     }
   }
 
-  // Get specific notification
+  // Get specific notification - FIXED FOR UTF-8
   Future<NotificationModel> getNotification(int id) async {
     try {
       final response = await _apiService.authenticatedRequest(() async {
@@ -60,7 +86,8 @@ class NotificationRepository {
       });
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        // Use UTF-8 safe parsing instead of json.decode(response.body)
+        final data = _parseJsonResponse(response);
         return NotificationModel.fromJson(data);
       } else {
         throw Exception('Failed to load notification: ${response.statusCode}');
@@ -107,7 +134,7 @@ class NotificationRepository {
     }
   }
 
-  // Sync FCM token with server (called after successful auth)
+  // Sync FCM token with server (called after successful auth) - FIXED FOR UTF-8
   Future<bool> syncFCMTokenWithServer(String fcmToken) async {
     try {
       log('🔄 Syncing FCM token with Django server...');
@@ -115,8 +142,10 @@ class NotificationRepository {
 
       final response = await _apiService.authenticatedRequest(() async {
         final headers = await _headers;
-        log('🔑 Authorization header: ${headers['Authorization']?.substring(0, 30)}...');
-        
+        log(
+          '🔑 Authorization header: ${headers['Authorization']?.substring(0, 30)}...',
+        );
+
         return http.post(
           Uri.parse('http://10.0.2.2:8000/api/accounts/update-fcm-token/'),
           headers: headers,
@@ -125,7 +154,8 @@ class NotificationRepository {
       });
 
       log('📨 Django response status: ${response.statusCode}');
-      log('📨 Django response body: ${response.body}');
+      // Use UTF-8 safe decoding for logging
+      log('📨 Django response body: ${_decodeResponse(response)}');
 
       if (response.statusCode == 200) {
         log('✅ FCM token synced with Django successfully');
@@ -144,7 +174,7 @@ class NotificationRepository {
   Future<bool> removeFCMToken() async {
     try {
       log('🗑️ Removing FCM token from server...');
-      
+
       final response = await _apiService.authenticatedRequest(() async {
         final headers = await _headers;
         return http.delete(
@@ -154,7 +184,7 @@ class NotificationRepository {
       });
 
       log('📨 Remove FCM token response: ${response.statusCode}');
-      
+
       if (response.statusCode == 200 || response.statusCode == 204) {
         log('✅ FCM token removed from server successfully');
         return true;
@@ -168,7 +198,7 @@ class NotificationRepository {
     }
   }
 
-  // Check FCM status
+  // Check FCM status - FIXED FOR UTF-8
   Future<Map<String, dynamic>> checkFCMStatus() async {
     try {
       final response = await _apiService.authenticatedRequest(() async {
@@ -180,7 +210,8 @@ class NotificationRepository {
       });
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        // Use UTF-8 safe parsing instead of json.decode(response.body)
+        return _parseJsonResponse(response);
       } else {
         return {'has_fcm_token': false};
       }

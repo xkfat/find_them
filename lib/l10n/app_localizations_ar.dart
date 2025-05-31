@@ -647,7 +647,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get days => 'أيام';
 
   @override
-  String get caseInformation => 'معلومات الحالة';
+  String get caseInformation => 'معلومات القضية';
 
   @override
   String get lastSeenDateLabel => 'تاريخ آخر مشاهدة:';

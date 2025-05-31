@@ -4,14 +4,13 @@ import 'package:find_them/data/services/auth_service.dart';
 import 'package:find_them/logic/cubit/authentification_cubit.dart';
 import 'package:find_them/logic/cubit/profile_cubit.dart';
 import 'package:find_them/presentation/screens/auth/login_screen.dart';
+import 'package:find_them/presentation/widgets/signup_options_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/themes/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:find_them/l10n/app_localizations.dart';
 import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
-
-
 
 class SideBar extends StatefulWidget {
   const SideBar({super.key});
@@ -44,13 +43,27 @@ class _SideBarState extends State<SideBar> {
       print('🔴 Logout error: $e');
     }
 
-    // Use the stored navigator context instead of widget context
-    print('🔴 Navigating to login using root navigator...');
-    navigatorContext.pushNamedAndRemoveUntil('/auth/login', (route) {
+    // Navigate to onboarding and show signup options
+    print('🔴 Navigating to onboarding with signup options...');
+
+    navigatorContext.pushNamedAndRemoveUntil('/onboarding', (route) {
       print('🔴 Removing route: ${route.settings.name}');
       return false;
     });
-    print('🔴 Navigation executed');
+
+    // Show signup options after a brief delay to ensure navigation is complete
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (navigatorContext.mounted) {
+        showModalBottomSheet(
+          context: navigatorContext.context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => const SignUpOptions(fromSkip: true),
+        );
+      }
+    });
+
+    print('🔴 Navigation and signup options display executed');
   }
 
   @override

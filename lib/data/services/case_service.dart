@@ -37,17 +37,20 @@ class CaseService {
     try {
       final queryParams = <String, String>{};
       if (nameOrLocation != null && nameOrLocation.isNotEmpty) {
-        queryParams['name_or_location'] = nameOrLocation;
+        queryParams['name_or_location'] = Uri.encodeComponent(nameOrLocation);
       } else {
-        if (name != null && name.isNotEmpty) queryParams['name'] = name;
+        if (name != null && name.isNotEmpty)
+          queryParams['name'] = Uri.encodeComponent(name);
         if (lastSeenLocation != null && lastSeenLocation.isNotEmpty) {
-          queryParams['location'] = lastSeenLocation;
+          queryParams['location'] = Uri.encodeComponent(lastSeenLocation);
         }
       }
       if (ageMin != null) queryParams['age_min'] = ageMin.toString();
       if (ageMax != null) queryParams['age_max'] = ageMax.toString();
-      if (gender != null && gender.isNotEmpty) queryParams['gender'] = gender;
-      if (status != null && status.isNotEmpty) queryParams['status'] = status;
+      if (gender != null && gender.isNotEmpty)
+        queryParams['gender'] = Uri.encodeComponent(gender);
+      if (status != null && status.isNotEmpty)
+        queryParams['status'] = Uri.encodeComponent(status);
       if (startDate != null) queryParams['date_reported_start'] = startDate;
       if (endDate != null) queryParams['date_reported_end'] = endDate;
 
@@ -57,7 +60,7 @@ class CaseService {
       final response = await _httpClient.get(uri, headers: _headers);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
+        final Map<String, dynamic> responseData = _parseJsonResponse(response);
         final List<dynamic> results = responseData['results'] ?? [];
         return results.map((json) => Case.fromJson(json)).toList();
       } else {
@@ -76,7 +79,8 @@ class CaseService {
       );
 
       if (response.statusCode == 200) {
-        return Case.fromJson(json.decode(response.body));
+        final responseData = _parseJsonResponse(response);
+        return Case.fromJson(responseData);
       } else {
         throw Exception('Failed to load case: ${response.statusCode}');
       }
@@ -111,6 +115,9 @@ class CaseService {
       if (token != null) {
         request.headers['Authorization'] = 'Bearer $token';
       }
+      request.headers['Accept'] = 'application/json; charset=utf-8';
+      request.headers['Accept-Charset'] = 'utf-8';
+
       request.fields['first_name'] = firstName;
       request.fields['last_name'] = lastName;
       request.fields['age'] = age.toString();
@@ -146,14 +153,14 @@ class CaseService {
       var response = await http.Response.fromStream(streamedResponse);
 
       log("Submit case response status: ${response.statusCode}");
-      log("Submit case response body: ${response.body}");
+      log("Submit case response body: ${_decodeResponse(response)}");
 
       Map<String, dynamic> responseJson;
       try {
-        responseJson = json.decode(response.body);
+        responseJson = _parseJsonResponse(response);
       } catch (e) {
         log("Error parsing JSON: $e");
-        responseJson = {"message": response.body};
+        responseJson = {"message": _decodeResponse(response)};
       }
 
       switch (response.statusCode) {
@@ -183,6 +190,29 @@ class CaseService {
     } catch (e) {
       log("Unexpected error: $e");
       throw Failure(message: "An unexpected error occurred");
+    }
+  }
+
+  // Helper method to safely decode UTF-8 response
+  String _decodeResponse(http.Response response) {
+    try {
+      // First try to decode as UTF-8 from bytes
+      return utf8.decode(response.bodyBytes);
+    } catch (e) {
+      log("UTF-8 decoding failed, falling back to body string: $e");
+      // Fallback to response.body if UTF-8 decoding fails
+      return response.body;
+    }
+  }
+
+  // Helper method to safely parse JSON with UTF-8 support
+  Map<String, dynamic> _parseJsonResponse(http.Response response) {
+    try {
+      final decodedBody = _decodeResponse(response);
+      return json.decode(decodedBody) as Map<String, dynamic>;
+    } catch (e) {
+      log("JSON parsing error: $e");
+      throw Exception('Failed to parse server response');
     }
   }
 }

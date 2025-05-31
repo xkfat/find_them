@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:find_them/data/services/api_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -8,6 +9,7 @@ import 'package:http/http.dart' as http;
 class SocialAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final ApiService _apiService = ApiService();
 
   Future<Map<String, dynamic>> signInWithGoogle() async {
     try {
@@ -37,8 +39,9 @@ class SocialAuthService {
         'username': googleUser.email.split('@').first,
       };
 
-      bool serverAuth = await _authenticateWithServer(userData);
-      return {'success': serverAuth, 'user': userData};
+      Map<String, dynamic> result = await _authenticateWithServer(userData);
+      return result;
+      //return {'success': serverAuth, 'user': userData};
     } catch (e) {
       log("Google Sign In Error: $e");
       return {'success': false, 'message': e.toString()};
@@ -76,8 +79,11 @@ class SocialAuthService {
                   : 'fb_${facebookUserData['id'] ?? ''}',
         };
 
-        bool serverAuth = await _authenticateWithServer(userData);
-        return {'success': serverAuth, 'user': userData};
+        Map<String, dynamic> authResult = await _authenticateWithServer(
+          userData,
+        );
+        //return {'success': serverAuth, 'user': userData};
+        return authResult;
       }
 
       return {'success': false, 'message': 'Facebook sign in failed'};
@@ -87,7 +93,9 @@ class SocialAuthService {
     }
   }
 
-  Future<bool> _authenticateWithServer(Map<String, dynamic> userData) async {
+  Future<Map<String, dynamic>> _authenticateWithServer(
+    Map<String, dynamic> userData,
+  ) async {
     try {
       Map<String, dynamic> authData = {
         'id_token': userData['id_token'] ?? userData['access_token'],
@@ -108,32 +116,53 @@ class SocialAuthService {
       log("Server response code: ${response.statusCode}");
       log("Server response body: ${response.body}");
 
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Map<String, dynamic> responseData = json.decode(response.body);
+
+        await _apiService.saveAuthTokens(
+          accessToken: responseData['token'],
+          refreshToken: responseData['refresh_token'],
+          userData: responseData['user'],
+        );
+
+        log("✅ Social auth tokens saved successfully");
+
+        return {
+          'success': true,
+          'user': userData,
+          'server_response': responseData,
+        };
+      } else {
+        return {
+          'success': false,
+          'message': 'Server authentication failed: ${response.statusCode}',
+        };
+      }
     } catch (e) {
       log("Server Authentication Error: $e");
-      return false;
+      return {'success': false, 'message': 'Authentication error: $e'};
     }
   }
 
-Future<bool> updateUserPhone(String phoneNumber, String token) async {
-  try {
-    final response = await http.patch(
-      Uri.parse('http://10.0.2.2:8000/api/accounts/profile/'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({'phone_number': phoneNumber}),
-    );
+  Future<bool> updateUserPhone(String phoneNumber, String token) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('http://10.0.2.2:8000/api/accounts/profile/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({'phone_number': phoneNumber}),
+      );
 
-    log("Update phone response: ${response.statusCode} - ${response.body}");
-    
-    return response.statusCode == 200;
-  } catch (e) {
-    log("Error updating phone: $e");
-    return false;
+      log("Update phone response: ${response.statusCode} - ${response.body}");
+
+      return response.statusCode == 200;
+    } catch (e) {
+      log("Error updating phone: $e");
+      return false;
+    }
   }
-}
 
   Future<void> signOut() async {
     await _auth.signOut();
