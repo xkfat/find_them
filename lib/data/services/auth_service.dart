@@ -5,12 +5,14 @@ import 'dart:io';
 import 'package:find_them/data/dataprovider/exception.dart';
 import 'package:find_them/data/services/api_service.dart';
 import 'package:find_them/data/services/notification_service.dart';
+import 'package:find_them/data/services/prefrences_service.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
   final ApiService _apiService;
   final NotificationService _notificationService = NotificationService();
+  final ProfilePreferencesService _preferencesService = ProfilePreferencesService();
 
   AuthService({ApiService? apiService})
     : _apiService = apiService ?? ApiService();
@@ -26,10 +28,10 @@ class AuthService {
       case 205:
         return response;
       case 201:
-        String res = json.decode(response.body);
-        var responseJson = json.decode(res);
-        log("success response: $responseJson");
-        return responseJson;
+     String myres = utf8.decode(response.bodyBytes);
+      var responseJson = json.decode(myres);
+      log("success response: $responseJson");
+      return responseJson;
       case 400:
         throw BadRequestException(response.body.toString());
       case 401:
@@ -235,6 +237,8 @@ class AuthService {
         log("📡 Logout response status: ${response.statusCode}");
 
         if (response.statusCode == 200 || response.statusCode == 204) {
+          await _preferencesService.clearCachedPreferences();
+
           await _cleanupUserSession();
           log("✅ Server logout successful - session cleaned up");
           return true;
@@ -374,4 +378,6 @@ class AuthService {
   Future<void> clearAuthData() async {
     await _apiService.clearAuthTokens();
   }
+
+  
 }

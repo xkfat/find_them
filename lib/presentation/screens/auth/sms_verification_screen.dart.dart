@@ -28,10 +28,13 @@ class SmsVerificationScreen extends StatefulWidget {
 
 class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
   final List<TextEditingController> _controllers = List.generate(
-    4,
+    6, // Changed from 4 to 6 digits
     (_) => TextEditingController(),
   );
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(
+    6,
+    (_) => FocusNode(),
+  ); // Changed from 4 to 6
   bool _showError = false;
   String _errorMessage = 'Wrong code, please try again';
   bool _showSuccess = false;
@@ -44,7 +47,8 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
   void initState() {
     super.initState();
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 6; i++) {
+      // Changed from 4 to 6
       _focusNodes[i].addListener(() {
         setState(() {});
       });
@@ -137,22 +141,23 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
     if (widget.signUpData != null) {
       bool? shouldDelete = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Go back to signup?'),
-          content: const Text(
-            'Your account was created but not verified. Going back will delete this account and you\'ll need to sign up again.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Stay here'),
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Go back to signup?'),
+              content: const Text(
+                'Your account was created but not verified. Going back will delete this account and you\'ll need to sign up again.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Stay here'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Go back'),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Go back'),
-            ),
-          ],
-        ),
       );
 
       if (shouldDelete == true) {
@@ -203,8 +208,9 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
   }
 
   Widget _buildVerificationScreen(SmsVerificationState state) {
-    bool isLoading = state is SmsVerificationLoading || 
-                     state is SmsVerificationAccountDeletionLoading;
+    bool isLoading =
+        state is SmsVerificationLoading ||
+        state is SmsVerificationAccountDeletionLoading;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -242,7 +248,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'Please enter the 4 digit code sent to ${widget.phoneNumber}',
+                    'Please enter the 6 digit code sent to ${widget.phoneNumber}', // Updated text for 6 digits
                     style: GoogleFonts.roboto(
                       fontSize: 18,
                       color: AppColors.black,
@@ -250,28 +256,32 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                   ),
                   const SizedBox(height: 40),
 
+                  // 6 digit input fields with adjusted sizing to fit screen
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      4,
+                      6, // 6 digits
                       (index) => Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
+                          horizontal: 4.0, // Reduced padding to fit 6 digits
                         ),
                         child: SizedBox(
-                          width: 71,
-                          height: 71,
+                          width: 48, // Reduced width to fit 6 digits nicely
+                          height: 56, // Reduced height proportionally
                           child: Container(
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: _showError
-                                    ? Colors.red
-                                    : (_focusNodes[index].hasFocus
-                                        ? AppColors.teal
-                                        : AppColors.grey),
+                                color:
+                                    _showError
+                                        ? Colors.red
+                                        : (_focusNodes[index].hasFocus
+                                            ? AppColors.teal
+                                            : AppColors.grey),
                                 width: 1.7,
                               ),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(
+                                12,
+                              ), // Smaller radius
                             ),
                             child: Center(
                               child: TextFormField(
@@ -280,11 +290,12 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                                 keyboardType: TextInputType.number,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 20, // Smaller font to fit
                                   fontWeight: FontWeight.bold,
-                                  color: _showError
-                                      ? AppColors.missingRed
-                                      : AppColors.darkGrey,
+                                  color:
+                                      _showError
+                                          ? AppColors.missingRed
+                                          : AppColors.darkGrey,
                                 ),
                                 maxLength: 1,
                                 decoration: const InputDecoration(
@@ -303,7 +314,8 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                                 ],
                                 enabled: !isLoading,
                                 onChanged: (value) {
-                                  if (value.isNotEmpty && index < 3) {
+                                  if (value.isNotEmpty && index < 5) {
+                                    // Changed from 3 to 5
                                     FocusScope.of(
                                       context,
                                     ).requestFocus(_focusNodes[index + 1]);
@@ -315,7 +327,8 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                                     });
                                   }
 
-                                  if (index == 3 && value.isNotEmpty) {
+                                  if (index == 5 && value.isNotEmpty) {
+                                    // Changed from 3 to 5
                                     if (_controllers.every(
                                       (c) => c.text.isNotEmpty,
                                     )) {
@@ -339,15 +352,16 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                   const SizedBox(height: 26),
 
                   Center(
-                    child: _showError
-                        ? Text(
-                            _errorMessage,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: Colors.red,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
+                    child:
+                        _showError
+                            ? Text(
+                              _errorMessage,
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                color: Colors.red,
+                              ),
+                            )
+                            : const SizedBox.shrink(),
                   ),
 
                   const SizedBox(height: 50),
@@ -365,23 +379,24 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                             borderRadius: BorderRadius.circular(50),
                           ),
                         ),
-                        child: isLoading
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 3,
+                        child:
+                            isLoading
+                                ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 3,
+                                  ),
+                                )
+                                : Text(
+                                  'Verify Code',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              )
-                            : Text(
-                                'Verify Code',
-                                style: GoogleFonts.inter(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
                       ),
                     ),
                   ),
@@ -413,9 +428,8 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                         ),
                         const SizedBox(width: 12),
                         TextButton(
-                          onPressed: (_canResend && !isLoading)
-                              ? _resendCode
-                              : null,
+                          onPressed:
+                              (_canResend && !isLoading) ? _resendCode : null,
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
                             minimumSize: Size.zero,
@@ -426,9 +440,10 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: (_canResend && !isLoading)
-                                  ? AppColors.teal
-                                  : AppColors.grey,
+                              color:
+                                  (_canResend && !isLoading)
+                                      ? AppColors.teal
+                                      : AppColors.grey,
                             ),
                           ),
                         ),
@@ -487,11 +502,13 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                 onPressed: () {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
-                      builder: (context) => BlocProvider<CaseCubit>(
-                        create: (context) =>
-                            CaseCubit(CaseRepository(CaseService())),
-                        child: const HomeScreen(),
-                      ),
+                      builder:
+                          (context) => BlocProvider<CaseCubit>(
+                            create:
+                                (context) =>
+                                    CaseCubit(CaseRepository(CaseService())),
+                            child: const HomeScreen(),
+                          ),
                     ),
                     (route) => false,
                   );

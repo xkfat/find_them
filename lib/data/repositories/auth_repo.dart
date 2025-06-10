@@ -105,4 +105,5 @@ class AuthRepository {
   Future<void> syncFCMToken() async {
     await _authService.syncFCMToken();
   }
+ 
 }

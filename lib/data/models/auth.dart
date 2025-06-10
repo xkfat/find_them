@@ -59,6 +59,7 @@ class SignUpData {
   final String firstName;
   final String lastName;
   final String phoneNumber;
+  final String? firebaseUid;
   
   SignUpData({
     required this.username,
@@ -68,10 +69,11 @@ class SignUpData {
     required this.firstName,
     required this.lastName,
     required this.phoneNumber,
+    this.firebaseUid,
   });
   
   Map<String, dynamic> toJson() {
-    return {
+    final Map<String, dynamic> data = {
       'username': username,
       'password': password,
       'password2': passwordConfirmation,
@@ -80,5 +82,36 @@ class SignUpData {
       'last_name': lastName,
       'phone_number': phoneNumber,
     };
+    
+    // Include Firebase UID if available
+    if (firebaseUid != null) {
+      data['firebase_uid'] = firebaseUid;
+    }
+    
+    return data;
   }
+  
+  // Helper method to create a copy with updated firebaseUid
+  SignUpData copyWith({
+    String? username,
+    String? password,
+    String? passwordConfirmation,
+    String? email,
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    String? firebaseUid,
+  }) {
+    return SignUpData(
+      username: username ?? this.username,
+      password: password ?? this.password,
+      passwordConfirmation: passwordConfirmation ?? this.passwordConfirmation,
+      email: email ?? this.email,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      firebaseUid: firebaseUid ?? this.firebaseUid,
+    );
+  }
+
 }

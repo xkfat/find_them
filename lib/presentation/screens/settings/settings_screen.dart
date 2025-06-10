@@ -1,5 +1,7 @@
 import 'dart:developer';
+import 'package:find_them/data/services/prefrences_service.dart';
 import 'package:find_them/presentation/widgets/language_dropdown.dart';
+import 'package:find_them/data/models/enum.dart' as AppEnum;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
@@ -12,7 +14,6 @@ import 'package:find_them/data/repositories/location_sharing_repo.dart';
 import 'package:find_them/data/services/location_sharing_service.dart';
 import 'package:find_them/l10n/app_localizations.dart';
 import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
-
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -33,6 +34,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool locationPermissionEnabled = false;
   bool locationSharingEnabled = false;
   String selectedLanguage = 'English';
+  bool isDarkMode = false;
+  bool _isUpdatingLanguage = false;
+  bool _isUpdatingTheme = false;
 
   final List<String> languages = ['English', 'العربية', 'Français'];
 
@@ -43,6 +47,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   };
 
   late LocationSharingCubit _locationSharingCubit;
+  final ProfilePreferencesService _preferencesService =
+      ProfilePreferencesService();
 
   @override
   void initState() {
@@ -54,6 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _checkNotificationPermission();
     _loadLocationSharingSettings();
     _setCurrentLanguage();
+    _setCurrentTheme();
   }
 
   @override
@@ -77,6 +84,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             default:
               selectedLanguage = 'English';
           }
+        });
+      }
+    });
+  }
+
+  void _setCurrentTheme() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          isDarkMode = Theme.of(context).brightness == Brightness.dark;
         });
       }
     });
@@ -120,6 +137,137 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await openAppSettings();
     await Future.delayed(const Duration(seconds: 1));
     _checkNotificationPermission();
+  }
+
+  // Updated language change handler with server sync
+  Future<void> _handleLanguageChange(String newLanguage) async {
+    if (_isUpdatingLanguage) return;
+
+    setState(() {
+      _isUpdatingLanguage = true;
+      selectedLanguage = newLanguage;
+    });
+
+    final languageCode = languageCodes[newLanguage] ?? 'en';
+
+    // Convert to Language enum
+    AppEnum.Language language;
+    switch (languageCode) {
+      case 'fr':
+        language = AppEnum.Language.french;
+        break;
+      case 'ar':
+        language = AppEnum.Language.arabic;
+        break;
+      default:
+        language = AppEnum.Language.english;
+    }
+
+    try {
+      // Check if user is logged in
+      if (await _preferencesService.isUserLoggedIn()) {
+        // Update server
+        final success = await _preferencesService.updateLanguagePreference(
+          language,
+        );
+
+        if (success) {
+          // Update app language
+          widget.changeLanguage(languageCode);
+
+          _showDialog('Language updated to ${language.displayName}', true);
+        } else {
+          // Revert UI change if server update failed
+          setState(() {
+            selectedLanguage = _getPreviousLanguage();
+          });
+
+          _showDialog('Failed to update language preference', false);
+        }
+      } else {
+        // User not logged in, just update locally
+        widget.changeLanguage(languageCode);
+
+        _showDialog(
+          'Language changed to ${language.displayName} (will sync when you log in)',
+          true,
+        );
+      }
+    } catch (e) {
+      log('Error updating language: $e');
+
+      // Revert UI change
+      setState(() {
+        selectedLanguage = _getPreviousLanguage();
+      });
+
+      _showDialog('Error updating language preference', false);
+    } finally {
+      setState(() {
+        _isUpdatingLanguage = false;
+      });
+    }
+  }
+
+  // Updated theme toggle handler with server sync
+  Future<void> _handleThemeToggle(bool newIsDarkMode) async {
+    if (_isUpdatingTheme) return;
+
+    setState(() {
+      _isUpdatingTheme = true;
+    });
+
+    final theme = newIsDarkMode ? AppEnum.Theme.dark : AppEnum.Theme.light;
+
+    try {
+      // Check if user is logged in
+      if (await _preferencesService.isUserLoggedIn()) {
+        // Update server
+        final success = await _preferencesService.updateThemePreference(theme);
+
+        if (success) {
+          // Update app theme
+          widget.toggleTheme();
+          setState(() {
+            isDarkMode = newIsDarkMode;
+          });
+
+          _showDialog('Theme updated to ${theme.value} mode', true);
+        } else {
+          _showDialog('Failed to update theme preference', false);
+        }
+      } else {
+        // User not logged in, just update locally
+        widget.toggleTheme();
+        setState(() {
+          isDarkMode = newIsDarkMode;
+        });
+
+        _showDialog(
+          'Theme changed to ${theme.value} mode (will sync when you log in)',
+          true,
+        );
+      }
+    } catch (e) {
+      log('Error updating theme: $e');
+      _showDialog('Error updating theme preference', false);
+    } finally {
+      setState(() {
+        _isUpdatingTheme = false;
+      });
+    }
+  }
+
+  String _getPreviousLanguage() {
+    final currentLocale = Localizations.localeOf(context);
+    switch (currentLocale.languageCode) {
+      case 'ar':
+        return 'العربية';
+      case 'fr':
+        return 'Français';
+      default:
+        return 'English';
+    }
   }
 
   void _showDialog(String message, bool isSuccess) {
@@ -276,6 +424,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                       ),
                       const SizedBox(height: 22),
+
+                      // Updated Language Selection with loading state
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Row(
@@ -289,23 +439,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 color: AppColors.getTextColor(context),
                               ),
                             ),
-                            LanguageDropdown(
-                              selectedLanguage: selectedLanguage,
-                              languages: languages,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  selectedLanguage = newValue;
-                                });
-
-                                final languageCode =
-                                    languageCodes[newValue] ?? 'en';
-
-                                widget.changeLanguage(languageCode);
-                              },
-                            ),
+                            if (_isUpdatingLanguage)
+                              const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            else
+                              LanguageDropdown(
+                                selectedLanguage: selectedLanguage,
+                                languages: languages,
+                                onChanged: _handleLanguageChange,
+                              ),
                           ],
                         ),
                       ),
+
                       const SizedBox(height: 22),
                       _buildToggleOption(
                         context.l10n.notifications,
@@ -315,13 +466,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                       ),
                       const SizedBox(height: 22),
-                      _buildToggleOption(
+
+                      // Updated Dark Mode Toggle with loading state
+                      _buildToggleOptionWithLoading(
                         context.l10n.darkMode,
-                        Theme.of(context).brightness == Brightness.dark,
-                        onChanged: (value) {
-                          widget.toggleTheme();
-                        },
+                        isDarkMode,
+                        _isUpdatingTheme,
+                        onChanged: _handleThemeToggle,
                       ),
+
                       const SizedBox(height: 22),
                       _buildToggleOption(
                         context.l10n.locationPermission,
@@ -401,6 +554,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           Toggle(value: value, onChanged: onChanged),
+        ],
+      ),
+    );
+  }
+
+  // New widget for toggle with loading state
+  Widget _buildToggleOptionWithLoading(
+    String title,
+    bool value,
+    bool isLoading, {
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.rubik(
+              fontSize: 18,
+              fontWeight: FontWeight.normal,
+              color: AppColors.getTextColor(context),
+            ),
+          ),
+          if (isLoading)
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            Toggle(value: value, onChanged: onChanged),
         ],
       ),
     );
