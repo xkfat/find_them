@@ -11,26 +11,44 @@ part 'authentification_state.dart';
 class AuthentificationCubit extends Cubit<AuthentificationState> {
   final AuthRepository _authRepository;
   final NotificationService _notificationService = NotificationService();
-    final ProfilePreferencesService _preferencesService = ProfilePreferencesService();
-
+  final ProfilePreferencesService _preferencesService =
+      ProfilePreferencesService();
 
   AuthentificationCubit(this._authRepository)
     : super(AuthentificationInitial());
+
   Future<void> login(String username, String password) async {
     emit(AuthentificationLoading());
-    
+
     try {
       var responseData = await _authRepository.login(username, password);
-      
+
+      log("📡 Cubit received response: $responseData");
+
       if (responseData != null) {
-        emit(Authentificationloaded());
-        
-        await _preferencesService.clearCachedPreferences();
-        await _syncPreferencesAfterLogin();
+        // Check if login was successful by looking for tokens
+        if (responseData.containsKey('access') &&
+            responseData.containsKey('refresh')) {
+          // Success - user has tokens
+          log("✅ Login successful - tokens found");
+          emit(Authentificationloaded());
+
+          await _preferencesService.clearCachedPreferences();
+          await _syncPreferencesAfterLogin();
+        } else if (responseData.containsKey('msg')) {
+          // Failed login - show the error message from Django
+          log("❌ Login failed - showing error message");
+          emit(Authentificationerreur(responseData['msg']));
+        } else {
+          // Unexpected response format
+          log("❌ Unexpected response format");
+          emit(Authentificationerreur("Login failed - unexpected response"));
+        }
       } else {
-        emit(Authentificationerreur("Login failed"));
+        emit(Authentificationerreur("Login failed - no response"));
       }
     } catch (e) {
+      log("❌ Exception in login cubit: $e");
       emit(Authentificationerreur("Login error: $e"));
     }
   }
@@ -40,16 +58,15 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
     try {
       // Load user preferences from server
       final serverPrefs = await _preferencesService.loadPreferences();
-      
+
       // Notify main app to update UI with server preferences
       // You can use a global event bus or callback for this
-      
+
       log('✅ Preferences synced after login: $serverPrefs');
     } catch (e) {
       log('❌ Failed to sync preferences after login: $e');
     }
   }
-
 
   Future<void> checkAuthStatus() async {
     emit(AuthentificationLoading());
@@ -57,9 +74,9 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
       final isLoggedIn = await _authRepository.isLoggedIn();
       if (isLoggedIn) {
         log("🔄 User already logged in, restoring session...");
-        
+
         await _authRepository.restoreNotificationService();
-        
+
         emit(Authentificationloaded());
       } else {
         emit(AuthentificationInitial());
@@ -74,9 +91,9 @@ class AuthentificationCubit extends Cubit<AuthentificationState> {
     emit(AuthentificationLoading());
     try {
       log("🚪 Logging out user...");
-      
+
       await _authRepository.logout();
-      
+
       emit(AuthentificationInitial());
       log("✅ Logout completed successfully");
     } catch (e) {

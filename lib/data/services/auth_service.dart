@@ -12,7 +12,8 @@ import 'package:http/http.dart' as http;
 class AuthService {
   final ApiService _apiService;
   final NotificationService _notificationService = NotificationService();
-  final ProfilePreferencesService _preferencesService = ProfilePreferencesService();
+  final ProfilePreferencesService _preferencesService =
+      ProfilePreferencesService();
 
   AuthService({ApiService? apiService})
     : _apiService = apiService ?? ApiService();
@@ -28,10 +29,10 @@ class AuthService {
       case 205:
         return response;
       case 201:
-     String myres = utf8.decode(response.bodyBytes);
-      var responseJson = json.decode(myres);
-      log("success response: $responseJson");
-      return responseJson;
+        String myres = utf8.decode(response.bodyBytes);
+        var responseJson = json.decode(myres);
+        log("success response: $responseJson");
+        return responseJson;
       case 400:
         throw BadRequestException(response.body.toString());
       case 401:
@@ -47,7 +48,6 @@ class AuthService {
   }
 
   Future<dynamic> login(String username, String pwd) async {
-    dynamic responseJson;
     try {
       log("🔐 Attempting login for: $username");
 
@@ -62,45 +62,65 @@ class AuthService {
       log("📡 Login response status: ${response.statusCode}");
       log("📡 Login response body: ${response.body}");
 
-      responseJson = _response(response);
-
-      if (response.statusCode == 200 &&
-          responseJson['access'] != null &&
-          responseJson['refresh'] != null) {
-        await _apiService.saveAuthTokens(
-          accessToken: responseJson['access'],
-          refreshToken: responseJson['refresh'],
-          userData: responseJson['user'] ?? {},
-        );
-
-        await _initializeNotificationsAfterAuth(username);
-
-        log(
-          "✅ Login successful and notifications initialized for user: $username",
-        );
+      // Parse the response
+      Map<String, dynamic> responseJson;
+      try {
+        responseJson = json.decode(response.body);
+      } catch (e) {
+        log("❌ Error parsing JSON: $e");
+        return {"error": "Invalid response from server"};
       }
-      return responseJson;
-    } on BadRequestException {
-      log("❌ Bad request (400)");
-      throw Failure();
-    } on TimeoutException {
-      log("❌ Request timeout");
-      throw Failure();
-    } on SocketException {
-      log("❌ Socket exception - network error");
-      throw Failure();
-    } on ClientException {
-      log("❌ Client exception");
-      throw Failure();
-    } on UnauthorisedException {
-      log("❌ Unauthorized (401/403)");
-      throw Failure(code: 1);
-    } on NotFoundException {
-      log("❌ Not found (404)");
-      throw Failure();
-    } on FetchDataException {
-      log("❌ Fetch data exception");
-      throw Failure(message: "Error fetching data");
+
+      // Handle different status codes
+      switch (response.statusCode) {
+        case 200:
+          // Success - check if tokens exist
+          if (responseJson.containsKey('access') &&
+              responseJson.containsKey('refresh')) {
+            await _apiService.saveAuthTokens(
+              accessToken: responseJson['access'],
+              refreshToken: responseJson['refresh'],
+              userData: responseJson['user'] ?? {},
+            );
+
+            await _initializeNotificationsAfterAuth(username);
+
+            log(
+              "✅ Login successful and notifications initialized for user: $username",
+            );
+          }
+          return responseJson;
+
+        case 400:
+          // Validation error
+          log("❌ Bad request (400)");
+          return responseJson; // Return the error message from Django
+
+        case 401:
+          // Wrong credentials
+          log("❌ Unauthorized (401)");
+          return responseJson; // Return the error message from Django
+
+        case 403:
+          log("❌ Forbidden (403)");
+          return {"msg": "Access forbidden"};
+
+        default:
+          log("❌ Unexpected status: ${response.statusCode}");
+          return {"msg": "Login failed with status: ${response.statusCode}"};
+      }
+    } on SocketException catch (e) {
+      log("❌ Socket exception - network error: $e");
+      return {"msg": "Network error: Check your internet connection"};
+    } on TimeoutException catch (e) {
+      log("❌ Request timeout: $e");
+      return {"msg": "Connection timed out"};
+    } on ClientException catch (e) {
+      log("❌ Client exception: $e");
+      return {"msg": "Client error: ${e.message}"};
+    } catch (e) {
+      log("❌ Unexpected error: $e");
+      return {"msg": "An unexpected error occurred"};
     }
   }
 
@@ -114,79 +134,32 @@ class AuthService {
     required String passwordConfirmation,
   }) async {
     try {
-      log("🔐 Attempting signup for: $username");
+      log("🔐 Simple signup test for: $username");
 
-      var response = await http
-          .post(
-            Uri.parse('http://10.0.2.2:8000/api/accounts/signup/'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              "first_name": firstName,
-              "last_name": lastName,
-              "username": username,
-              "email": email,
-              "phone_number": phoneNumber,
-              "password": password,
-              "password2": passwordConfirmation,
-            }),
-          )
-          .timeout(Duration(seconds: 60));
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:8000/api/accounts/signup/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "first_name": firstName,
+          "last_name": lastName,
+          "username": username,
+          "email": email,
+          "phone_number": phoneNumber,
+          "password": password,
+          "password2": passwordConfirmation,
+        }),
+      );
 
-      log("📡 Signup response status: ${response.statusCode}");
-      log("📡 Signup response body: ${response.body}");
-
-      Map<String, dynamic> responseJson;
-      try {
-        responseJson = json.decode(response.body);
-      } catch (e) {
-        log("❌ Error parsing JSON: $e");
-        responseJson = {"message": response.body};
-      }
+      log("📡 Response: ${response.statusCode}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (responseJson.containsKey('access') &&
-            responseJson.containsKey('refresh')) {
-          await _apiService.saveAuthTokens(
-            accessToken: responseJson['access'],
-            refreshToken: responseJson['refresh'],
-            userData: responseJson['user'] ?? {},
-          );
-
-          await _initializeNotificationsAfterAuth(username);
-
-          log(
-            "✅ Signup successful and notifications initialized for user: $username",
-          );
-        }
+        return json.decode(response.body);
+      } else {
+        return {"error": "Signup failed", "status": response.statusCode};
       }
-
-      switch (response.statusCode) {
-        case 200:
-        case 201:
-          return responseJson;
-        case 400:
-          return responseJson;
-        case 401:
-        case 403:
-          throw UnauthorisedException("Authentication failed");
-        case 404:
-          throw NotFoundException("Endpoint not found");
-        case 500:
-        default:
-          throw FetchDataException("Server error: ${response.statusCode}");
-      }
-    } on SocketException catch (e) {
-      log("❌ Socket Exception: $e");
-      throw Failure(message: "Network error: Check your internet connection");
-    } on TimeoutException catch (e) {
-      log("❌ Timeout Exception: $e");
-      throw Failure(message: "Connection timed out");
-    } on ClientException catch (e) {
-      log("❌ Client Exception: $e");
-      throw Failure(message: "Client error: ${e.message}");
     } catch (e) {
-      log("❌ Unexpected error: $e");
-      throw Failure(message: "An unexpected error occurred");
+      log("❌ Error: $e");
+      return {"error": e.toString()};
     }
   }
 
@@ -378,6 +351,4 @@ class AuthService {
   Future<void> clearAuthData() async {
     await _apiService.clearAuthTokens();
   }
-
-  
 }
