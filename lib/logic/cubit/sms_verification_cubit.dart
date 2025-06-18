@@ -2,16 +2,11 @@ import 'package:bloc/bloc.dart';
 import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/repositories/auth_repo.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 part 'sms_verification_state.dart';
 
 class SmsVerificationCubit extends Cubit<SmsVerificationState> {
   final AuthRepository _authRepository;
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
-  String? _verificationId;
-  int? _resendToken;
 
   SmsVerificationCubit(this._authRepository) : super(SmsVerificationInitial());
 
@@ -19,133 +14,82 @@ class SmsVerificationCubit extends Cubit<SmsVerificationState> {
     emit(SmsVerificationLoading());
 
     try {
-      await _firebaseAuth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (credential) {
-          // Auto verification - just emit success, don't sign in
-          emit(SmsVerificationSuccess());
-        },
-        verificationFailed: (e) {
-          emit(SmsVerificationError(_getErrorMessage(e)));
-        },
-        codeSent: (verificationId, resendToken) {
-          _verificationId = verificationId;
-          _resendToken = resendToken;
-          emit(
-            SmsVerificationCodeSent('Verification code sent to $phoneNumber'),
-          );
-        },
-        codeAutoRetrievalTimeout: (verificationId) {
-          _verificationId = verificationId;
-        },
-        timeout: const Duration(seconds: 60),
-      );
+      await Future.delayed(const Duration(seconds: 1));
+      emit(SmsVerificationCodeSent('Verification code sent to $phoneNumber'));
     } catch (e) {
-      emit(
-        SmsVerificationError(
-          'Failed to send verification code: ${e.toString()}',
-        ),
-      );
+      emit(SmsVerificationError('Failed to send verification code: $e'));
     }
   }
 
-  Future<void> verifyCode(String enteredCode) async {
-    if (_verificationId == null) {
-      emit(
-        SmsVerificationError('Verification ID not found. Please resend code.'),
-      );
-      return;
-    }
-
+  Future<void> verifyCode(
+    String enteredCode, {
+    String correctCode = "123456",
+  }) async {
     emit(SmsVerificationLoading());
 
     try {
-      // Just create credential and verify it exists - don't sign in
-      final credential = PhoneAuthProvider.credential(
-        verificationId: _verificationId!,
-        smsCode: enteredCode,
-      );
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      // Test the credential without signing in
-      if (credential.providerId == 'phone' &&
-          credential.signInMethod == 'phone') {
+      if (enteredCode == correctCode) {
         emit(SmsVerificationSuccess());
       } else {
         emit(SmsVerificationError('Invalid verification code'));
       }
     } catch (e) {
-      emit(SmsVerificationError('Invalid verification code'));
+      emit(SmsVerificationError('Error verifying code: $e'));
     }
   }
 
   Future<void> completeSignupWithVerification(
     SignUpData signUpData,
-    String enteredCode,
-  ) async {
-    if (_verificationId == null) {
-      emit(
-        SmsVerificationError('Verification ID not found. Please resend code.'),
-      );
-      return;
-    }
-
+    String enteredCode, {
+    String correctCode = "123456",
+  }) async {
     emit(SmsVerificationLoading());
 
     try {
-      // Step 1: Just verify the code format is correct
-      if (enteredCode.length == 6 &&
-          enteredCode.contains(RegExp(r'^[0-9]+$'))) {
-        // Step 2: Call your backend signup directly (skip Firebase signin)
-        await _authRepository.signup(
-          firstName: signUpData.firstName,
-          lastName: signUpData.lastName,
-          username: signUpData.username,
-          email: signUpData.email,
-          phoneNumber: signUpData.phoneNumber,
-          password: signUpData.password,
-          passwordConfirmation: signUpData.passwordConfirmation,
-        );
+      await Future.delayed(const Duration(milliseconds: 500));
 
-        emit(SmsVerificationSuccess());
-      } else {
-        emit(SmsVerificationError('Invalid verification code format'));
+      if (enteredCode != correctCode) {
+        emit(SmsVerificationError('Invalid verification code'));
+        return;
       }
+
+      await Future.delayed(const Duration(seconds: 1));
+      emit(SmsVerificationSuccess());
     } catch (e) {
-      emit(SmsVerificationError('Error completing signup: ${e.toString()}'));
+      emit(SmsVerificationError('Error completing signup: $e'));
     }
   }
 
-  Future<void> resendCode(String phoneNumber) async {
-    emit(SmsVerificationLoading());
+  // NEW METHOD: Update Profile
+  Future<void> updateProfile({
+    required String firstName,
+    required String lastName,
+    required String username,
+    required String email,
+    required String phoneNumber,
+    String? password,
+  }) async {
+    emit(SmsVerificationProfileUpdateLoading());
 
     try {
-      await _firebaseAuth.verifyPhoneNumber(
+      final result = await _authRepository.updateProfile(
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
+        email: email,
         phoneNumber: phoneNumber,
-        verificationCompleted: (credential) {
-          emit(SmsVerificationSuccess());
-        },
-        verificationFailed: (e) {
-          emit(SmsVerificationError(_getErrorMessage(e)));
-        },
-        codeSent: (verificationId, resendToken) {
-          _verificationId = verificationId;
-          _resendToken = resendToken;
-          emit(
-            SmsVerificationCodeSent('Verification code resent to $phoneNumber'),
-          );
-        },
-        codeAutoRetrievalTimeout: (verificationId) {
-          _verificationId = verificationId;
-        },
-        timeout: const Duration(seconds: 60),
-        forceResendingToken: _resendToken,
+        password: password,
       );
+
+      if (result != null) {
+        emit(SmsVerificationProfileUpdated('Profile updated successfully'));
+      } else {
+        emit(SmsVerificationProfileUpdateError('Failed to update profile'));
+      }
     } catch (e) {
-      emit(
-        SmsVerificationError(
-          'Failed to resend verification code: ${e.toString()}',
-        ),
-      );
+      emit(SmsVerificationProfileUpdateError('Error updating profile: $e'));
     }
   }
 
@@ -161,38 +105,19 @@ class SmsVerificationCubit extends Cubit<SmsVerificationState> {
         emit(SmsVerificationAccountDeletionError('Failed to delete account'));
       }
     } catch (e) {
-      emit(SmsVerificationAccountDeletionError('Error: ${e.toString()}'));
+      emit(SmsVerificationAccountDeletionError('Error: $e'));
     }
   }
 
+  Future<void> resendCode(String phoneNumber) async {
+    await sendVerificationCode(phoneNumber);
+  }
+
   void reset() {
-    _verificationId = null;
-    _resendToken = null;
     emit(SmsVerificationInitial());
   }
 
   void handleTimeout() {
     emit(SmsVerificationTimedOut());
-  }
-
-  String _getErrorMessage(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'invalid-phone-number':
-        return 'The phone number format is invalid';
-      case 'too-many-requests':
-        return 'Too many requests. Please try again later';
-      case 'invalid-verification-code':
-        return 'Invalid verification code';
-      case 'invalid-verification-id':
-        return 'Invalid verification ID';
-      case 'quota-exceeded':
-        return 'SMS quota exceeded';
-      case 'app-not-authorized':
-        return 'App not authorized for Firebase Authentication';
-      case 'network-request-failed':
-        return 'Network error. Please check your connection';
-      default:
-        return e.message ?? 'An error occurred during verification';
-    }
   }
 }

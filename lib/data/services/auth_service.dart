@@ -184,6 +184,63 @@ class AuthService {
     }
   }
 
+Future<dynamic> updateProfile({
+    required String firstName,
+    required String lastName,
+    required String username,
+    required String email,
+    required String phoneNumber,
+    String? password,
+  }) async {
+    try {
+      log("🔄 Attempting to update profile for: $username");
+
+      // Get the current access token
+      final accessToken = await _apiService.getAccessToken();
+      
+      if (accessToken == null) {
+        throw Exception('No access token available');
+      }
+
+      final requestBody = {
+        "first_name": firstName,
+        "last_name": lastName,
+        "username": username,
+        "email": email,
+        "phone_number": phoneNumber,
+      };
+
+      // Only add password if provided
+      if (password != null && password.isNotEmpty) {
+        requestBody["password"] = password;
+      }
+
+      final response = await http.patch(
+        Uri.parse('http://10.0.2.2:8000/api/accounts/profile/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(requestBody),
+      ).timeout(Duration(seconds: 60));
+
+      log("📡 Profile update response status: ${response.statusCode}");
+      log("📡 Profile update response body: ${response.body}");
+
+      dynamic responseJson = _response(response);
+
+      if (response.statusCode == 200) {
+        log("✅ Profile updated successfully for: $username");
+        return responseJson;
+      } else {
+        throw Exception('Profile update failed');
+      }
+    } catch (e) {
+      log("❌ Profile update error: $e");
+      rethrow;
+    }
+  }
+
   Future<bool> logout() async {
     try {
       final accessToken = await _apiService.getAccessToken();

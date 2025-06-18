@@ -108,4 +108,7 @@ class SignUpCubit extends Cubit<SignUpState> {
       emit(SignUperreur("An unexpected error occurred. Please try again."));
     }
   }
+
+
+  
 }

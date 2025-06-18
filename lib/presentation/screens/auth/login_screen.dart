@@ -19,9 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _isLoading = false;
   bool _obscurePassword = true;
-  // String? _errorMessage;
-  final _usernameError = false;
-  final _passwordError = false;
+  bool _showError = false;
 
   @override
   void initState() {
@@ -171,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SizedBox(height: 28),
+                        const SizedBox(height: 28),
                         Text(
                           'Welcome back!',
                           style: GoogleFonts.lato(
@@ -188,8 +186,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.black87,
                           ),
                         ),
-                        SizedBox(height: 40),
+                        const SizedBox(height: 40),
 
+                        // Username Field
                         Container(
                           width: 308,
                           height: 84,
@@ -197,8 +196,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(50),
                             border:
-                                _usernameError
-                                    ? Border.all(color: Colors.red, width: 1)
+                                _showError
+                                    ? Border.all(
+                                      color: Colors.red,
+                                      width: 1,
+                                    ) // Changed to 1
                                     : null,
                           ),
                           child: Theme(
@@ -227,7 +229,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     child: Icon(
                                       Icons.person_outline,
-                                      color: AppColors.darkGreen,
+                                      color:
+                                          _showError
+                                              ? Colors.red
+                                              : AppColors.darkGreen,
                                       size: 24,
                                     ),
                                   ),
@@ -237,7 +242,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   errorBorder: InputBorder.none,
                                   disabledBorder: InputBorder.none,
                                   focusedErrorBorder: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
+                                  contentPadding: const EdgeInsets.symmetric(
                                     vertical: 0,
                                     horizontal: 20,
                                   ),
@@ -254,24 +259,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
 
-                        if (_usernameError)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4, left: 16),
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Wrong username',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          ),
+                        const SizedBox(height: 25),
 
-                        SizedBox(height: _usernameError ? 20 : 25),
-                        SizedBox(height: 10),
-
+                        // Password Field
                         Container(
                           width: 308,
                           height: 84,
@@ -279,8 +269,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(50),
                             border:
-                                _passwordError
-                                    ? Border.all(color: Colors.red, width: 1)
+                                _showError
+                                    ? Border.all(
+                                      color: Colors.red,
+                                      width: 1,
+                                    ) // Changed to 1
                                     : null,
                           ),
                           child: Theme(
@@ -310,7 +303,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     child: Icon(
                                       Icons.lock_outline,
-                                      color: AppColors.darkGreen,
+                                      color:
+                                          _showError
+                                              ? Colors.red
+                                              : AppColors.darkGreen,
                                       size: 24,
                                     ),
                                   ),
@@ -319,7 +315,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                       _obscurePassword
                                           ? Icons.visibility_off
                                           : Icons.visibility,
-                                      color: AppColors.darkGreen,
+                                      color:
+                                          _showError
+                                              ? Colors.red
+                                              : AppColors.darkGreen,
                                     ),
                                     onPressed: _togglePasswordVisibility,
                                   ),
@@ -329,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   errorBorder: InputBorder.none,
                                   disabledBorder: InputBorder.none,
                                   focusedErrorBorder: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
+                                  contentPadding: const EdgeInsets.symmetric(
                                     vertical: 0,
                                     horizontal: 20,
                                   ),
@@ -346,22 +345,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
 
-                        if (_passwordError)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4, left: 16),
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Wrong password',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                        SizedBox(height: _passwordError ? 20 : 40),
+                        const SizedBox(
+                          height: 20,
+                        ), // Added more space after error message
 
                         BlocConsumer<
                           AuthentificationCubit,
@@ -369,16 +355,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         >(
                           listener: (context, state) {
                             if (state is Authentificationloaded) {
+                              setState(() {
+                                _showError = false;
+                              });
                               Navigator.pushNamed(context, '/home');
                             }
                             if (state is Authentificationerreur) {
-                              log("jjhjhjhgfd");
+                              setState(() {
+                                _showError = true;
+                              });
                               _showErrorDialog(state.msg);
                             }
                           },
                           builder: (context, state) {
                             return state is AuthentificationLoading
-                                ? CircularProgressIndicator()
+                                ? const CircularProgressIndicator()
                                 : SizedBox(
                                   width: 200,
                                   height: 60,
@@ -393,7 +384,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     child:
                                         _isLoading
-                                            ? CircularProgressIndicator(
+                                            ? const CircularProgressIndicator(
                                               color: Colors.white,
                                               strokeWidth: 3,
                                             )
@@ -409,7 +400,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 );
                           },
                         ),
-                        SizedBox(height: 25),
+                        const SizedBox(height: 25),
 
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -437,7 +428,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 54),
+                        const SizedBox(height: 54),
                       ],
                     ),
                   ),

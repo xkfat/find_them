@@ -180,9 +180,9 @@ class _SignUpOptionsContentState extends State<_SignUpOptionsContent>
             }
           },
           child: DraggableScrollableSheet(
-            initialChildSize: 0.85,
-            minChildSize: 0.7,
-            maxChildSize: 0.95,
+            initialChildSize: 0.6,
+            minChildSize: 0.6,
+            maxChildSize: 0.9,
             builder: (context, scrollController) {
               return Container(
                 decoration: const BoxDecoration(

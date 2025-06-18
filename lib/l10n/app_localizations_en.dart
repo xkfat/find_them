@@ -660,14 +660,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get descriptionLabel => 'Description:';
 
   @override
-  String get leaveInformation => 'Leave an information';
+  String get leaveInformation => 'Report Sighting';
 
   @override
   String get pleaseProvideInformation =>
       'Please provide any information you have about this missing person, and help us find other people loved ones.';
 
   @override
-  String get writeMessageHere => 'Write your message here...';
+  String get writeMessageHere => 'Write the information you know here...';
 
   @override
   String get submit => 'Submit';

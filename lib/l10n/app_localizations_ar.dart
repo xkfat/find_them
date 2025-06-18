@@ -659,14 +659,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get descriptionLabel => 'الوصف:';
 
   @override
-  String get leaveInformation => 'اترك معلومة';
+  String get leaveInformation => 'أبلغ عن رؤية';
 
   @override
   String get pleaseProvideInformation =>
       'يرجى تقديم أي معلومات لديك حول هذا الشخص المفقود، وساعدنا في العثور على أحباء الآخرين.';
 
   @override
-  String get writeMessageHere => 'اكتب رسالتك هنا...';
+  String get writeMessageHere => 'اكتب المعلومات التي تعرفها هنا...';
 
   @override
   String get submit => 'إرسال';

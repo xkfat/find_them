@@ -1369,7 +1369,7 @@ abstract class AppLocalizations {
   /// No description provided for @leaveInformation.
   ///
   /// In en, this message translates to:
-  /// **'Leave an information'**
+  /// **'Report Sighting'**
   String get leaveInformation;
 
   /// No description provided for @pleaseProvideInformation.
@@ -1381,7 +1381,7 @@ abstract class AppLocalizations {
   /// No description provided for @writeMessageHere.
   ///
   /// In en, this message translates to:
-  /// **'Write your message here...'**
+  /// **'Write the information you know here...'**
   String get writeMessageHere;
 
   /// No description provided for @submit.

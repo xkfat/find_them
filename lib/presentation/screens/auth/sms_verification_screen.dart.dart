@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:find_them/data/models/auth.dart';
 import 'package:find_them/data/repositories/case_repo.dart';
@@ -137,35 +138,12 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
     });
   }
 
-  void _goBack() async {
+  void _goBack() {
     if (widget.signUpData != null) {
-      bool? shouldDelete = await showDialog<bool>(
-        context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text('Go back to signup?'),
-              content: const Text(
-                'Your account was created but not verified. Going back will delete this account and you\'ll need to sign up again.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Stay here'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Go back'),
-                ),
-              ],
-            ),
-      );
-
-      if (shouldDelete == true) {
-        context.read<SmsVerificationCubit>().deleteAccount(
-          widget.signUpData!.username,
-        );
-      }
+      // Navigate back with the signup data so user can modify
+      Navigator.of(context).pop(widget.signUpData);
     } else {
+      // Regular back navigation
       Navigator.of(context).pop();
     }
   }
@@ -191,8 +169,14 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
               backgroundColor: AppColors.teal,
             ),
           );
-        } else if (state is SmsVerificationAccountDeleted) {
-          Navigator.of(context).pop();
+        } else if (state is SmsVerificationProfileUpdated) {
+          // Profile updated successfully, navigate back with updated data
+          Navigator.of(context).pop(widget.signUpData);
+        } else if (state is SmsVerificationProfileUpdateError) {
+          setState(() {
+            _showError = true;
+            _errorMessage = state.error;
+          });
         } else if (state is SmsVerificationTimedOut) {
           setState(() {
             _canResend = true;

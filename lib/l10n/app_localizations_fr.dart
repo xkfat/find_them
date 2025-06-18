@@ -680,14 +680,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get descriptionLabel => 'Description :';
 
   @override
-  String get leaveInformation => 'Laisser une information';
+  String get leaveInformation => 'Signaler une observation';
 
   @override
   String get pleaseProvideInformation =>
       'Veuillez fournir toute information que vous avez sur cette personne disparue, et aidez-nous à retrouver les proches d\'autres personnes.';
 
   @override
-  String get writeMessageHere => 'Écrivez votre message ici...';
+  String get writeMessageHere =>
+      'Écrivez les informations que vous connaissez ici...';
 
   @override
   String get submit => 'Soumettre';

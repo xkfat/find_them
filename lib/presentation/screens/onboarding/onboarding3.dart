@@ -21,7 +21,7 @@ class Onboarding3Screen extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 60),
+        const SizedBox(height: 80),
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 41),

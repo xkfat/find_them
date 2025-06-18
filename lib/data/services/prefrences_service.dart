@@ -15,7 +15,7 @@ class ProfilePreferencesService {
   Future<User?> getUserProfile() async {
     try {
       final token = await _apiService.getAccessToken();
-      
+
       final response = await http.get(
         Uri.parse('$baseUrl/profile/'),
         headers: {
@@ -40,7 +40,7 @@ class ProfilePreferencesService {
   Future<bool> updateLanguagePreference(Language language) async {
     try {
       final token = await _apiService.getAccessToken();
-      
+
       final response = await http.patch(
         Uri.parse('$baseUrl/profile/'),
         headers: {
@@ -70,7 +70,7 @@ class ProfilePreferencesService {
   Future<bool> updateThemePreference(Theme theme) async {
     try {
       final token = await _apiService.getAccessToken();
-      
+
       final response = await http.patch(
         Uri.parse('$baseUrl/profile/'),
         headers: {
@@ -100,17 +100,14 @@ class ProfilePreferencesService {
   Future<bool> updateBothPreferences(Language language, Theme theme) async {
     try {
       final token = await _apiService.getAccessToken();
-      
+
       final response = await http.patch(
         Uri.parse('$baseUrl/profile/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({
-          'language': language.value,
-          'theme': theme.value,
-        }),
+        body: jsonEncode({'language': language.value, 'theme': theme.value}),
       );
 
       if (response.statusCode == 200) {
@@ -146,11 +143,8 @@ class ProfilePreferencesService {
         // Cache the server preferences locally
         await _cacheLanguage(user.language);
         await _cacheTheme(user.theme);
-        
-        return {
-          'language': user.language.value,
-          'theme': user.theme.value,
-        };
+
+        return {'language': user.language.value, 'theme': user.theme.value};
       } else {
         // Fallback to cached preferences
         return await getCachedPreferences();

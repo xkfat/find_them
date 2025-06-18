@@ -83,6 +83,34 @@ class AuthRepository {
       return false;
     }
   }
+  // Add this method to your AuthRepository class:
+ Future<dynamic> updateProfile({
+    required String firstName,
+    required String lastName,
+    required String username,
+    required String email,
+    required String phoneNumber,
+    String? password,
+  }) async {
+    try {
+      log("🔄 Repository: Attempting to update profile for: $username");
+      
+      final result = await _authService.updateProfile(
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
+        email: email,
+        phoneNumber: phoneNumber,
+        password: password,
+      );
+
+      log("✅ Repository: Profile updated successfully for: $username");
+      return result;
+    } catch (e) {
+      log("❌ Repository: Profile update failed for $username - $e");
+      rethrow;
+    }
+  }
 
   Future<void> restoreNotificationService() async {
     try {
