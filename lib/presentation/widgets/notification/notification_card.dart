@@ -35,71 +35,18 @@ class NotificationCard extends StatelessWidget {
           child: const Icon(Icons.delete, color: Colors.white),
         ),
         onDismissed: (direction) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Notification deleted'),
-              duration: const Duration(seconds: 2),
-              backgroundColor: AppColors.teal,
-            ),
-          );
-
+          // 🔥 FIX: No snackbar - instant silent dismiss
           if (onDismiss != null) {
             onDismiss!();
           }
         },
         confirmDismiss: (direction) async {
-          if (notification.notificationType == 'missing_person' ||
-              notification.notificationType == 'location_alert') {
-            return await showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      backgroundColor: AppColors.getSurfaceColor(context),
-                      title: Text(
-                        'Delete Notification',
-                        style: TextStyle(
-                          color: AppColors.getTextColor(context),
-                        ),
-                      ),
-                      content: Text(
-                        'Are you sure you want to delete this ${notification.title.toLowerCase()}?',
-                        style: TextStyle(
-                          color: AppColors.getTextColor(context),
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(false),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: AppColors.getSecondaryTextColor(context),
-                            ),
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => Navigator.of(context).pop(true),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.getMissingRedColor(
-                              context,
-                            ),
-                            foregroundColor: AppColors.white,
-                          ),
-                          child: const Text('Delete'),
-                        ),
-                      ],
-                    );
-                  },
-                ) ??
-                false;
-          }
-          return true; 
+          // 🔥 FIX: No confirmation dialogs - instant dismiss for all notifications
+          return true; // Always allow immediate dismissal
         },
         child: Card(
           elevation: 0,
-          color:
-              AppColors
-                  .lighterMint, 
+          color: AppColors.lighterMint,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -118,12 +65,9 @@ class NotificationCard extends StatelessWidget {
                     _buildHeader(context),
                     const SizedBox(height: 12),
                     _buildMessage(context),
-                    if (onAction != null && actionText != null ||
-                        onDismiss != null)
-                      const SizedBox(height: 16),
-                    if (onAction != null && actionText != null ||
-                        onDismiss != null)
-                      _buildActions(context),
+                    // 🔥 ALWAYS show actions for case_update notifications
+                    if (_shouldShowActions()) const SizedBox(height: 16),
+                    if (_shouldShowActions()) _buildActions(context),
                   ],
                 ),
               ),
@@ -134,10 +78,21 @@ class NotificationCard extends StatelessWidget {
     );
   }
 
+  // 🔥 NEW: Determine if actions should be shown
+  bool _shouldShowActions() {
+    // Always show actions for case_update notifications
+    if (notification.notificationType == 'case_update') {
+      return true;
+    }
+    // Show actions if provided for other types
+    return (onAction != null && actionText != null) || onDismiss != null;
+  }
+
   Widget _buildHeader(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 🔥 RESTORED: Original icon design with teal background and opacity
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -151,6 +106,7 @@ class NotificationCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 🔥 RESTORED: Original header layout with timeAgo and isRead indicator
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,6 +132,18 @@ class NotificationCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      // 🔥 RESTORED: Original unread indicator position and style
+                      if (!notification.isRead) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: AppColors.teal,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ],
@@ -208,10 +176,15 @@ class NotificationCard extends StatelessWidget {
       padding: const EdgeInsets.only(left: 44),
       child: Row(
         children: [
-          if (onAction != null && actionText != null)
+          // 🔥 NEW: Special handling for case_update notifications
+          if (notification.notificationType == 'case_update') ...[
+            // View Details Button for case updates
             Expanded(
               child: ElevatedButton(
-                onPressed: onAction,
+                onPressed: () {
+                  // Navigate to submitted cases screen
+                  Navigator.pushNamed(context, '/submitted-cases');
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.teal,
                   foregroundColor: Colors.white,
@@ -221,22 +194,21 @@ class NotificationCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   elevation: 0,
                 ),
-                child: Text(
-                  actionText!,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: const Text(
+                  'View Details',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                 ),
               ),
             ),
-          if (onAction != null && actionText != null && onDismiss != null)
             const SizedBox(width: 12),
-          if (onDismiss != null)
+            // Dismiss Button for case updates
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
-                  _showManualDismissConfirmation(context);
+                  // 🔥 FIX: Immediate dismiss without confirmation
+                  if (onDismiss != null) {
+                    onDismiss!();
+                  }
                 },
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
@@ -259,58 +231,65 @@ class NotificationCard extends StatelessWidget {
                 ),
               ),
             ),
-        ],
-      ),
-    );
-  }
-
-  void _showManualDismissConfirmation(BuildContext context) {
-    if (notification.notificationType == 'missing_person' ||
-        notification.notificationType == 'location_alert') {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: AppColors.getSurfaceColor(context),
-            title: Text(
-              'Dismiss Notification',
-              style: TextStyle(color: AppColors.getTextColor(context)),
-            ),
-            content: Text(
-              'Are you sure you want to dismiss this ${notification.title.toLowerCase()}?',
-              style: TextStyle(color: AppColors.getTextColor(context)),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                    color: AppColors.getSecondaryTextColor(context),
+          ] else ...[
+            // 🔥 EXISTING: Regular action buttons for other notification types
+            if (onAction != null && actionText != null)
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: onAction,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.teal,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    actionText!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  if (onDismiss != null) {
-                    onDismiss!();
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.getMissingRedColor(context),
-                  foregroundColor: AppColors.white,
+            if (onAction != null && actionText != null && onDismiss != null)
+              const SizedBox(width: 12),
+            if (onDismiss != null)
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    // 🔥 FIX: Immediate dismiss without confirmation
+                    if (onDismiss != null) {
+                      onDismiss!();
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: AppColors.getSecondaryTextColor(
+                        context,
+                      ).withOpacity(0.3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  child: Text(
+                    'Dismiss',
+                    style: TextStyle(
+                      color: AppColors.getSecondaryTextColor(context),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
-                child: const Text('Dismiss'),
               ),
-            ],
-          );
-        },
-      );
-    } else {
-      if (onDismiss != null) {
-        onDismiss!();
-      }
-    }
+          ],
+        ],
+      ),
+    );
   }
 }

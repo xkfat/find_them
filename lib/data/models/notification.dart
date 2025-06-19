@@ -8,6 +8,7 @@ class NotificationModel {
   final String? targetModel;
   final String message;
   final String notificationType;
+  final String? pushTitle;
   final bool isRead;
   final DateTime dateCreated;
   final LocationSharingModel? friendData;
@@ -17,6 +18,7 @@ class NotificationModel {
     required this.user,
     this.targetId,
     this.targetModel,
+    this.pushTitle,
     required this.message,
     required this.notificationType,
     required this.isRead,
@@ -49,7 +51,7 @@ class NotificationModel {
           _getModelFromType(data['notification_type'] ?? 'system'),
       message: data['message'] ?? data['body'] ?? 'New notification',
       notificationType: data['notification_type'] ?? 'system',
-      isRead: false, 
+      isRead: false,
       dateCreated: DateTime.now(),
     );
   }
@@ -107,6 +109,12 @@ class NotificationModel {
   }
 
   String get title {
+    // 🔥 Use push title if available, otherwise use default based on type
+    if (pushTitle != null && pushTitle!.isNotEmpty) {
+      return pushTitle!; // Use admin's custom title
+    }
+
+    // Fall back to default titles based on type
     switch (notificationType) {
       case 'missing_person':
         return 'New Missing Person';
@@ -116,6 +124,10 @@ class NotificationModel {
         return 'Location Sharing Accepted';
       case 'location_alert':
         return 'Location Sharing Alert';
+      case 'case_update':
+        return 'Case Update';
+      case 'report':
+        return 'New Report';
       case 'system':
       default:
         return 'FindThem Notification';

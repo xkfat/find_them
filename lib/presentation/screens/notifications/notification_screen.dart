@@ -13,6 +13,9 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  // 🔥 NEW: Track locally dismissed notifications for immediate UI updates
+  final Set<int> _dismissedNotifications = {};
+
   @override
   void initState() {
     super.initState();
@@ -45,31 +48,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ),
         centerTitle: true,
-        /*
-        actions: [
-          BlocBuilder<NotificationCubit, NotificationState>(
-            builder: (context, state) {
-              final cubit = context.read<NotificationCubit>();
-              if (cubit.isServiceReady &&
-                  state is NotificationLoaded &&
-                  state.notifications.isNotEmpty) {
-                return TextButton(
-                  onPressed: () => _showClearAllDialog(),
-                  child: Text(
-                    'Clear All',
-                    style: TextStyle(
-                      color: AppColors.teal,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-        ], 
-        */
       ),
       body: BlocConsumer<NotificationCubit, NotificationState>(
         listener: (context, state) {
@@ -110,30 +88,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       color: AppColors.getTextColor(context),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'You need to be logged in to receive notifications',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.getSecondaryTextColor(context),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/auth/login',
-                        (route) => false,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.teal,
-                      foregroundColor: AppColors.white,
-                    ),
-                    child: const Text('Go to Login'),
-                  ),
                 ],
               ),
             );
@@ -141,7 +95,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
           if (state is NotificationLoading) {
             return Center(
-              child: CircularProgressIndicator(color: AppColors.teal),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: AppColors.teal),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading notifications...',
+                    style: TextStyle(color: AppColors.getTextColor(context)),
+                  ),
+                ],
+              ),
             );
           }
 
@@ -153,7 +117,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   Icon(
                     Icons.error_outline,
                     size: 64,
-                    color: AppColors.getSecondaryTextColor(context),
+                    color: AppColors.getMissingRedColor(context),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -189,7 +153,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           }
 
           if (state is NotificationLoaded) {
-            if (state.notifications.isEmpty) {
+            // 🔥 NEW: Filter out locally dismissed notifications
+            final visibleNotifications =
+                state.notifications
+                    .where(
+                      (notification) =>
+                          !_dismissedNotifications.contains(notification.id),
+                    )
+                    .toList();
+
+            if (visibleNotifications.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -222,20 +195,27 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
             return RefreshIndicator(
               onRefresh: () async {
+                // 🔥 NEW: Clear dismissed list on refresh
+                _dismissedNotifications.clear();
                 context.read<NotificationCubit>().refreshNotifications();
               },
               color: AppColors.teal,
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: state.notifications.length,
+                itemCount: visibleNotifications.length,
                 itemBuilder: (context, index) {
-                  final notification = state.notifications[index];
+                  final notification = visibleNotifications[index];
                   return NotificationCard(
                     notification: notification,
                     onTap: () {
                       _handleNotificationTap(context, notification);
                     },
+
                     onDismiss: () {
+                      setState(() {
+                        _dismissedNotifications.add(notification.id);
+                      });
+
                       context.read<NotificationCubit>().deleteNotification(
                         notification.id,
                       );
@@ -383,48 +363,4 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return null;
     }
   }
-
-  /*
-  void _showClearAllDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.getSurfaceColor(context),
-          title: Text(
-            'Clear All Notifications',
-            style: TextStyle(color: AppColors.getTextColor(context)),
-          ),
-          content: Text(
-            'Are you sure you want to clear all notifications? This action cannot be undone.',
-            style: TextStyle(color: AppColors.getTextColor(context)),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: AppColors.getSecondaryTextColor(context),
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                context.read<NotificationCubit>().clearAllNotifications();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.teal,
-                foregroundColor: AppColors.white,
-              ),
-              child: const Text('Clear All'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  */
 }

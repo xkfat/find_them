@@ -1,4 +1,3 @@
-
 part of 'notification_cubit.dart';
 
 sealed class NotificationState extends Equatable {
@@ -16,10 +15,7 @@ class NotificationLoaded extends NotificationState {
   final List<NotificationModel> notifications;
   final String? filterType;
 
-  const NotificationLoaded({
-    required this.notifications,
-    this.filterType,
-  });
+  const NotificationLoaded({required this.notifications, this.filterType});
 
   NotificationLoaded copyWith({
     List<NotificationModel>? notifications,
