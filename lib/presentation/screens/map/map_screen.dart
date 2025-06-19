@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:find_them/core/constants/themes/app_colors.dart';
 import 'package:find_them/data/models/case.dart';
@@ -40,6 +41,10 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   bool _shouldFocusOnUser = false;
   int? _focusUserId;
 
+  // Performance optimizations with debouncing
+  Timer? _markerUpdateTimer;
+  bool _isUpdatingMarkers = false;
+
   @override
   void initState() {
     super.initState();
@@ -68,6 +73,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
+    _markerUpdateTimer?.cancel();
     CustomMarkerHelper.clearCache();
     super.dispose();
   }
@@ -80,21 +86,37 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
         context.read<MapCubit>().stopAutomaticUpdates();
         CustomMarkerHelper.clearCache();
         break;
-
       case AppLifecycleState.resumed:
         log('App resumed - resuming location updates');
         context.read<MapCubit>().resumeAutomaticUpdates();
         context.read<MapCubit>().refreshMapData();
         break;
-
       case AppLifecycleState.detached:
         log('App detached - stopping all updates');
         context.read<MapCubit>().stopAutomaticUpdates();
         break;
-
       default:
         break;
     }
+  }
+
+  // Debounced marker updates for better performance
+  Future<void> _updateMarkersDebounced({
+    List<Case>? cases,
+    List<UserLocationModel>? friendsLocations,
+    List<LocationSharingModel>? friends,
+    Position? currentPosition,
+  }) async {
+    _markerUpdateTimer?.cancel();
+
+    _markerUpdateTimer = Timer(const Duration(milliseconds: 150), () {
+      _updateMarkers(
+        cases: cases,
+        friendsLocations: friendsLocations,
+        friends: friends,
+        currentPosition: currentPosition,
+      );
+    });
   }
 
   Future<void> _updateMarkers({
@@ -103,194 +125,217 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
     List<LocationSharingModel>? friends,
     Position? currentPosition,
   }) async {
+    if (_isUpdatingMarkers) return;
+
+    _isUpdatingMarkers = true;
     log('MapScreen: Updating markers...');
     log('Cases count: ${cases?.length ?? 0}');
     log('Friends locations count: ${friendsLocations?.length ?? 0}');
     log('Friends count: ${friends?.length ?? 0}');
     log('Current position: $currentPosition');
 
-    final Set<Marker> newMarkers = {};
+    try {
+      final Set<Marker> newMarkers = {};
 
-    if (currentPosition != null && !_shouldFocusOnUser) {
-      _initialCameraPosition = CameraPosition(
-        target: LatLng(currentPosition.latitude, currentPosition.longitude),
-        zoom: 15,
-      );
-
-      if (_mapController != null) {
-        _mapController!.animateCamera(
-          CameraUpdate.newCameraPosition(_initialCameraPosition),
+      // Update camera position if needed
+      if (currentPosition != null && !_shouldFocusOnUser) {
+        _initialCameraPosition = CameraPosition(
+          target: LatLng(currentPosition.latitude, currentPosition.longitude),
+          zoom: 15,
         );
-      }
-    }
 
-    final casesToShow = cases ?? _filteredCases;
-    log('Cases to show: ${casesToShow.length}');
-
-    for (final case_ in casesToShow) {
-      log(
-        'Processing case: ${case_.fullName}, lat: ${case_.latitude}, lng: ${case_.longitude}',
-      );
-
-      if (case_.latitude != null &&
-          case_.longitude != null &&
-          _shouldShowCaseMarker()) {
-        log('Adding case marker: ${case_.fullName}');
-
-        try {
-          final customIcon = await CustomMarkerHelper.createCaseMarker(
-            imageUrl: case_.photo,
-            status: case_.status.value,
-          );
-
-          newMarkers.add(
-            Marker(
-              markerId: MarkerId('case_${case_.id}'),
-              position: LatLng(case_.latitude!, case_.longitude!),
-              icon: customIcon,
-              infoWindow: InfoWindow(
-                title: case_.fullName,
-                snippet:
-                    '${_getStatusText(case_.status.value)} • ${context.l10n.tapForDetails}',
-              ),
-              onTap: () => _onCaseMarkerTapped(case_),
-            ),
-          );
-        } catch (e) {
-          log('Error creating case marker, using fallback: $e');
-          newMarkers.add(
-            Marker(
-              markerId: MarkerId('case_${case_.id}'),
-              position: LatLng(case_.latitude!, case_.longitude!),
-              icon: _getCaseMarkerIcon(case_.status.value),
-              infoWindow: InfoWindow(
-                title: case_.fullName,
-                snippet:
-                    '${_getStatusText(case_.status.value)} • ${context.l10n.tapForDetails}',
-              ),
-              onTap: () => _onCaseMarkerTapped(case_),
-            ),
+        if (_mapController != null) {
+          _mapController!.animateCamera(
+            CameraUpdate.newCameraPosition(_initialCameraPosition),
           );
         }
       }
-    }
 
-    final friendsLocationsToShow =
-        friendsLocations ?? _filteredFriendsLocations;
-    log('Friends locations to show: ${friendsLocationsToShow.length}');
+      final casesToShow = cases ?? _filteredCases;
+      log('Cases to show: ${casesToShow.length}');
 
-    UserLocationModel? targetUserLocation;
+      UserLocationModel? targetUserLocation;
 
-    for (final friendLocation in friendsLocationsToShow) {
-      log(
-        'Processing friend location: ${friendLocation.username}, lat: ${friendLocation.latitude}, lng: ${friendLocation.longitude}, freshness: ${friendLocation.freshness}',
-      );
-
-      if (_shouldFocusOnUser && _focusUserId == friendLocation.user) {
-        targetUserLocation = friendLocation;
-        log('Found target user location: ${friendLocation.username}');
-      }
-
-      if (_shouldShowUserMarker()) {
-        final friendDetails = friends?.firstWhere(
-          (friend) => friend.friendId == friendLocation.user,
-          orElse:
-              () => LocationSharingModel(
-                id: 0,
-                userId: 0,
-                friendId: friendLocation.user,
-                createdAt: DateTime.now(),
-                friendDetails: UserBasicInfo(
-                  id: friendLocation.user,
-                  username: friendLocation.username,
-                  firstName: '',
-                  lastName: '',
-                  email: '',
-                ),
-                isSharing: friendLocation.isSharing,
-                canSeeYou: false,
-              ),
-        );
-
+      // Process cases
+      for (final case_ in casesToShow) {
         log(
-          'Adding friend marker: ${friendDetails?.friendDetails.displayName ?? friendLocation.username} (${friendLocation.freshness})',
+          'Processing case: ${case_.fullName}, lat: ${case_.latitude}, lng: ${case_.longitude}',
         );
 
-        try {
-          final customIcon =
-              await CustomMarkerHelper.createUserMarkerWithLiveIndicator(
-                imageUrl: friendDetails?.friendDetails.profilePhoto ?? '',
-                locationData: friendLocation,
-              );
+        if (case_.latitude != null &&
+            case_.longitude != null &&
+            _shouldShowCaseMarker()) {
+          log('Adding case marker: ${case_.fullName}');
 
-          newMarkers.add(
-            Marker(
-              markerId: MarkerId('friend_${friendLocation.user}'),
-              position: LatLng(
-                friendLocation.latitude,
-                friendLocation.longitude,
+          try {
+            final customIcon = await CustomMarkerHelper.createCaseMarker(
+              imageUrl: case_.photo,
+              status: case_.status.value,
+            );
+
+            newMarkers.add(
+              Marker(
+                markerId: MarkerId('case_${case_.id}'),
+                position: LatLng(case_.latitude!, case_.longitude!),
+                icon: customIcon,
+                anchor: const Offset(
+                  0.5,
+                  1.0,
+                ), // Important for proper positioning
+                infoWindow: InfoWindow(
+                  title: case_.fullName,
+                  snippet:
+                      '${_getStatusText(case_.status.value)} • ${context.l10n.tapForDetails}',
+                ),
+                onTap: () => _onCaseMarkerTapped(case_),
               ),
-              icon: customIcon,
-              infoWindow: InfoWindow(
-                title:
-                    friendDetails?.friendDetails.displayName ??
-                    friendLocation.username,
-                snippet:
-                    '${friendLocation.displayText} • ${context.l10n.tapForDetails}',
+            );
+          } catch (e) {
+            log('Error creating case marker, using fallback: $e');
+            newMarkers.add(
+              Marker(
+                markerId: MarkerId('case_${case_.id}'),
+                position: LatLng(case_.latitude!, case_.longitude!),
+                icon: _getCaseMarkerIcon(case_.status.value),
+                infoWindow: InfoWindow(
+                  title: case_.fullName,
+                  snippet:
+                      '${_getStatusText(case_.status.value)} • ${context.l10n.tapForDetails}',
+                ),
+                onTap: () => _onCaseMarkerTapped(case_),
               ),
-              onTap:
-                  () =>
-                      friendDetails != null
-                          ? _onUserMarkerTapped(friendDetails, friendLocation)
-                          : null,
-            ),
-          );
-        } catch (e) {
-          log('Error creating user marker, using fallback: $e');
-          newMarkers.add(
-            Marker(
-              markerId: MarkerId('friend_${friendLocation.user}'),
-              position: LatLng(
-                friendLocation.latitude,
-                friendLocation.longitude,
-              ),
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                friendLocation.isLive ? 120.0 : 195.0,
-              ),
-              infoWindow: InfoWindow(
-                title:
-                    friendDetails?.friendDetails.displayName ??
-                    friendLocation.username,
-                snippet:
-                    '${friendLocation.displayText} • ${context.l10n.tapForDetails}',
-              ),
-              onTap:
-                  () =>
-                      friendDetails != null
-                          ? _onUserMarkerTapped(friendDetails, friendLocation)
-                          : null,
-            ),
-          );
+            );
+          }
         }
       }
-    }
 
-    log('Total markers created: ${newMarkers.length}');
-    log('Marker cache size: ${CustomMarkerHelper.getCacheSize()}');
+      // Process friends locations
+      final friendsLocationsToShow =
+          friendsLocations ?? _filteredFriendsLocations;
+      log('Friends locations to show: ${friendsLocationsToShow.length}');
 
-    setState(() {
-      _markers.clear();
-      _markers.addAll(newMarkers);
-    });
+      for (final friendLocation in friendsLocationsToShow) {
+        log(
+          'Processing friend location: ${friendLocation.username}, lat: ${friendLocation.latitude}, lng: ${friendLocation.longitude}, freshness: ${friendLocation.freshness}',
+        );
 
-    log('Markers updated in state: ${_markers.length}');
+        if (_shouldFocusOnUser && _focusUserId == friendLocation.user) {
+          targetUserLocation = friendLocation;
+          log('Found target user location: ${friendLocation.username}');
+        }
 
-    if (_shouldFocusOnUser &&
-        targetUserLocation != null &&
-        _mapController != null) {
-      log('Focusing on target user: ${targetUserLocation.username}');
-      await _focusOnUserLocation(targetUserLocation);
-      _shouldFocusOnUser = false;
+        if (_shouldShowUserMarker()) {
+          final friendDetails = friends?.firstWhere(
+            (friend) => friend.friendId == friendLocation.user,
+            orElse:
+                () => LocationSharingModel(
+                  id: 0,
+                  userId: 0,
+                  friendId: friendLocation.user,
+                  createdAt: DateTime.now(),
+                  friendDetails: UserBasicInfo(
+                    id: friendLocation.user,
+                    username: friendLocation.username,
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                  ),
+                  isSharing: friendLocation.isSharing,
+                  canSeeYou: false,
+                ),
+          );
+
+          log(
+            'Adding friend marker: ${friendDetails?.friendDetails.displayName ?? friendLocation.username} (${friendLocation.freshness})',
+          );
+
+          try {
+            final customIcon =
+                await CustomMarkerHelper.createUserMarkerWithLiveIndicator(
+                  imageUrl: friendDetails?.friendDetails.profilePhoto ?? '',
+                  locationData: friendLocation,
+                );
+
+            newMarkers.add(
+              Marker(
+                markerId: MarkerId('friend_${friendLocation.user}'),
+                position: LatLng(
+                  friendLocation.latitude,
+                  friendLocation.longitude,
+                ),
+                icon: customIcon,
+                anchor: const Offset(
+                  0.5,
+                  1.0,
+                ), // Important for proper positioning
+                infoWindow: InfoWindow(
+                  title:
+                      friendDetails?.friendDetails.displayName ??
+                      friendLocation.username,
+                  snippet:
+                      '${friendLocation.displayText} • ${context.l10n.tapForDetails}',
+                ),
+                onTap:
+                    () =>
+                        friendDetails != null
+                            ? _onUserMarkerTapped(friendDetails, friendLocation)
+                            : null,
+              ),
+            );
+          } catch (e) {
+            log('Error creating user marker, using fallback: $e');
+            newMarkers.add(
+              Marker(
+                markerId: MarkerId('friend_${friendLocation.user}'),
+                position: LatLng(
+                  friendLocation.latitude,
+                  friendLocation.longitude,
+                ),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                  friendLocation.isLive ? 120.0 : 195.0,
+                ),
+                infoWindow: InfoWindow(
+                  title:
+                      friendDetails?.friendDetails.displayName ??
+                      friendLocation.username,
+                  snippet:
+                      '${friendLocation.displayText} • ${context.l10n.tapForDetails}',
+                ),
+                onTap:
+                    () =>
+                        friendDetails != null
+                            ? _onUserMarkerTapped(friendDetails, friendLocation)
+                            : null,
+              ),
+            );
+          }
+        }
+      }
+
+      log('Total markers created: ${newMarkers.length}');
+      log('Marker cache size: ${CustomMarkerHelper.getCacheSize()}');
+
+      if (mounted) {
+        setState(() {
+          _markers.clear();
+          _markers.addAll(newMarkers);
+        });
+      }
+
+      log('Markers updated in state: ${_markers.length}');
+
+      // Handle focus on user if needed
+      if (_shouldFocusOnUser &&
+          targetUserLocation != null &&
+          _mapController != null) {
+        log('Focusing on target user: ${targetUserLocation.username}');
+        await _focusOnUserLocation(targetUserLocation);
+        _shouldFocusOnUser = false;
+      }
+    } catch (e) {
+      log('❌ Error updating markers: $e');
+    } finally {
+      _isUpdatingMarkers = false;
     }
   }
 
@@ -451,7 +496,6 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                   ],
                 ),
                 const SizedBox(height: 16),
-
                 Text(
                   friend.friendDetails.displayName,
                   style: GoogleFonts.inter(
@@ -462,7 +506,6 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 4),
-
                 Text(
                   '@${friend.friendDetails.username}',
                   style: GoogleFonts.inter(
@@ -472,7 +515,6 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -495,16 +537,13 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 _buildInfoRow(
                   context,
                   locationData.isLive
                       ? context.l10n.liveLocation
                       : context.l10n.recentLocation,
                 ),
-
                 const SizedBox(height: 20),
-
                 Row(
                   children: [
                     Expanded(
