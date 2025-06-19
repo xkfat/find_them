@@ -11,11 +11,19 @@ import 'package:http/http.dart' as http;
 
 class CustomMarkerHelper {
   static final Map<String, BitmapDescriptor> _cache = {};
-  // ignore: unused_field
-  static const int _maxImageSize = 300;
-  static const double _markerSize = 160;
-  static const double _borderWidth = 10.0;
-  static const double _shadowOffset = 2.0;
+
+  // Pin marker dimensions (matching original size)
+  static const double _markerWidth =
+      160.0; // Width of the pin (matching original _markerSize)
+  static const double _markerHeight =
+      200.0; // Total height including point (proportional)
+  static const double _circleRadius =
+      70.0; // Radius of the photo circle (larger)
+  static const double _borderWidth =
+      10.0; // Border thickness (matching original)
+  static const double _pinPointHeight =
+      40.0; // Height of the triangle point (proportional)
+  static const double _shadowOffset = 2.0; // Shadow offset (same)
 
   static Future<BitmapDescriptor> createUserMarkerWithLiveIndicator({
     required String imageUrl,
@@ -58,7 +66,7 @@ class CustomMarkerHelper {
       final marker = await _createPhotoMarker(
         imageUrl: imageUrl,
         fallbackImagePath: fallbackImagePath ?? 'assets/images/profile.png',
-        borderColor: AppColors.teal,
+        borderColor: AppColors.teal, // Keep Flutter colors
         cacheKey: cacheKey,
         markerType: 'user',
       );
@@ -110,6 +118,7 @@ class CustomMarkerHelper {
     }
   }
 
+  // Keep your existing Flutter colors (don't change this)
   static Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'missing':
@@ -124,6 +133,62 @@ class CustomMarkerHelper {
     }
   }
 
+  // Draw the pin shape (circle + triangle point)
+  static void _drawPinShape(
+    Canvas canvas,
+    Paint paint,
+    Color borderColor,
+    double centerX,
+    double centerY,
+  ) {
+    // Draw shadow for the entire pin
+    paint.color = Colors.black.withOpacity(0.3);
+    canvas.drawCircle(
+      Offset(centerX + _shadowOffset, centerY + _shadowOffset),
+      _circleRadius + _borderWidth,
+      paint,
+    );
+
+    // Draw shadow triangle point (larger)
+    final shadowTrianglePath =
+        Path()
+          ..moveTo(
+            centerX - 24 + _shadowOffset,
+            centerY + _circleRadius + _shadowOffset,
+          )
+          ..lineTo(
+            centerX + _shadowOffset,
+            centerY + _circleRadius + _pinPointHeight + _shadowOffset,
+          )
+          ..lineTo(
+            centerX + 24 + _shadowOffset,
+            centerY + _circleRadius + _shadowOffset,
+          )
+          ..close();
+    canvas.drawPath(shadowTrianglePath, paint);
+
+    // Draw colored border circle
+    paint.color = borderColor;
+    canvas.drawCircle(
+      Offset(centerX, centerY),
+      _circleRadius + _borderWidth,
+      paint,
+    );
+
+    // Draw triangle point (pin bottom) - larger
+    final trianglePath =
+        Path()
+          ..moveTo(centerX - 24, centerY + _circleRadius)
+          ..lineTo(centerX, centerY + _circleRadius + _pinPointHeight)
+          ..lineTo(centerX + 24, centerY + _circleRadius)
+          ..close();
+    canvas.drawPath(trianglePath, paint);
+
+    // Draw white inner circle
+    paint.color = Colors.white;
+    canvas.drawCircle(Offset(centerX, centerY), _circleRadius, paint);
+  }
+
   static Future<BitmapDescriptor> _createFallbackUserMarker(
     UserLocationModel locationData,
   ) async {
@@ -131,46 +196,38 @@ class CustomMarkerHelper {
     final canvas = Canvas(recorder);
     final paint = Paint()..isAntiAlias = true;
 
-    const double size = _markerSize;
-    const double borderWidth = _borderWidth;
-    const double shadowOffset = _shadowOffset;
-
     final borderColor = _getLiveIndicatorColor(locationData.freshness);
+    final centerX = _markerWidth / 2;
+    final centerY =
+        _circleRadius + _borderWidth + 10; // Add some top padding (larger)
 
-    paint.color = Colors.black;
+    // Draw pin shape
+    _drawPinShape(canvas, paint, borderColor, centerX, centerY);
+
+    // Draw inner colored circle for fallback
+    paint.color = borderColor;
     canvas.drawCircle(
-      Offset(size / 2 + shadowOffset, size / 2 + shadowOffset),
-      size / 2,
+      Offset(centerX, centerY),
+      _circleRadius - _borderWidth,
       paint,
     );
 
-    paint.color = borderColor;
-    canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint);
+    // Add live indicator
+    if (locationData.isLive) {
+      // White background (larger indicator)
+      paint.color = Colors.white;
+      canvas.drawCircle(Offset(centerX + 30, centerY - 30), 12, paint);
 
-    paint.color = Colors.white;
-    canvas.drawCircle(
-      Offset(size / 2, size / 2),
-      size / 2 - borderWidth,
-      paint,
-    );
-
-    paint.color = borderColor;
-    canvas.drawCircle(
-      Offset(size / 2, size / 2),
-      (size / 2) - (borderWidth * 2),
-      paint,
-    );
-
-    paint.color = borderColor;
-    canvas.drawCircle(Offset(size - 15, 15), 8, paint);
-
-    paint.color = Colors.white;
-    paint.style = PaintingStyle.stroke;
-    paint.strokeWidth = 2;
-    canvas.drawCircle(Offset(size - 15, 15), 8, paint);
+      // Green live dot (larger)
+      paint.color = Colors.green;
+      canvas.drawCircle(Offset(centerX + 30, centerY - 30), 10, paint);
+    }
 
     final picture = recorder.endRecording();
-    final img = await picture.toImage(size.toInt(), size.toInt());
+    final img = await picture.toImage(
+      _markerWidth.toInt(),
+      _markerHeight.toInt(),
+    );
     final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
     final pngBytes = byteData!.buffer.asUint8List();
 
@@ -185,36 +242,26 @@ class CustomMarkerHelper {
     final canvas = Canvas(recorder);
     final paint = Paint()..isAntiAlias = true;
 
-    paint.color = Colors.black;
-    canvas.drawCircle(
-      Offset(_markerSize / 2 + _shadowOffset, _markerSize / 2 + _shadowOffset),
-      _markerSize / 2,
-      paint,
-    );
+    final centerX = _markerWidth / 2;
+    final centerY =
+        _circleRadius + _borderWidth + 10; // Add some top padding (larger)
 
+    // Draw pin shape
+    _drawPinShape(canvas, paint, color, centerX, centerY);
+
+    // Draw inner colored circle for fallback
     paint.color = color;
     canvas.drawCircle(
-      Offset(_markerSize / 2, _markerSize / 2),
-      _markerSize / 2,
-      paint,
-    );
-
-    paint.color = Colors.white;
-    canvas.drawCircle(
-      Offset(_markerSize / 2, _markerSize / 2),
-      _markerSize / 2 - _borderWidth,
-      paint,
-    );
-
-    paint.color = color;
-    canvas.drawCircle(
-      Offset(_markerSize / 2, _markerSize / 2),
-      (_markerSize / 2) - (_borderWidth * 2),
+      Offset(centerX, centerY),
+      _circleRadius - _borderWidth,
       paint,
     );
 
     final picture = recorder.endRecording();
-    final img = await picture.toImage(_markerSize.toInt(), _markerSize.toInt());
+    final img = await picture.toImage(
+      _markerWidth.toInt(),
+      _markerHeight.toInt(),
+    );
     final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
     final pngBytes = byteData!.buffer.asUint8List();
 
@@ -284,81 +331,48 @@ class CustomMarkerHelper {
     String imageUrl,
     String fallbackPath,
   ) async {
-    Uint8List? imageBytes;
+    Uint8List? imageData;
 
+    // Try to load from network first
     try {
-      if (imageUrl.isNotEmpty && imageUrl.startsWith('http')) {
-        log('Loading image from: $imageUrl');
-        final response = await http
-            .get(Uri.parse(imageUrl))
-            .timeout(const Duration(seconds: 5));
-
+      if (imageUrl.isNotEmpty) {
+        final response = await http.get(Uri.parse(imageUrl));
         if (response.statusCode == 200) {
-          imageBytes = response.bodyBytes;
-          log('Network image loaded, size: ${imageBytes.length} bytes');
+          imageData = response.bodyBytes;
         }
       }
     } catch (e) {
       log('Failed to load network image: $e');
     }
 
-    if (imageBytes == null) {
+    // Fallback to asset image
+    if (imageData == null) {
       try {
-        final ByteData data = await rootBundle.load(fallbackPath);
-        imageBytes = data.buffer.asUint8List();
-        log('Fallback image loaded, size: ${imageBytes.length} bytes');
+        final assetData = await rootBundle.load(fallbackPath);
+        imageData = assetData.buffer.asUint8List();
       } catch (e) {
-        log('Failed to load fallback image: $e');
+        log('Failed to load asset image: $e');
         return null;
       }
     }
 
+    if (imageData == null) return null;
+
     try {
-      final Completer<ui.Image> completer = Completer();
-      ui.decodeImageFromList(imageBytes, (ui.Image img) {
-        completer.complete(img);
-      });
-
-      final originalImage = await completer.future;
-      final resizedImage = await _resizeImageToSquare(originalImage);
-      originalImage.dispose();
-
-      return resizedImage;
+      final ui.Codec codec = await ui.instantiateImageCodec(
+        imageData,
+        targetWidth: (_circleRadius * 2 - _borderWidth * 2).toInt(),
+        targetHeight: (_circleRadius * 2 - _borderWidth * 2).toInt(),
+      );
+      final ui.FrameInfo frameInfo = await codec.getNextFrame();
+      return frameInfo.image;
     } catch (e) {
-      log('Error decoding/resizing image: $e');
+      log('Failed to decode image: $e');
       return null;
     }
   }
 
-  static Future<ui.Image> _resizeImageToSquare(ui.Image image) async {
-    const int targetSize = 200;
-
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-
-    final srcRect = Rect.fromLTWH(
-      0,
-      0,
-      image.width.toDouble(),
-      image.height.toDouble(),
-    );
-    final dstRect = Rect.fromLTWH(
-      0,
-      0,
-      targetSize.toDouble(),
-      targetSize.toDouble(),
-    );
-
-    canvas.drawImageRect(image, srcRect, dstRect, Paint());
-
-    final picture = recorder.endRecording();
-    final resizedImage = await picture.toImage(targetSize, targetSize);
-    picture.dispose();
-
-    log('Image resized to consistent ${targetSize}x${targetSize}');
-    return resizedImage;
-  }
-
+  // Draw photo marker with pin shape and live indicator
   static Future<BitmapDescriptor> _drawPhotoMarkerWithLiveIndicator(
     ui.Image image,
     UserLocationModel locationData,
@@ -367,75 +381,57 @@ class CustomMarkerHelper {
     final canvas = Canvas(recorder);
     final paint = Paint()..isAntiAlias = true;
 
-    const double size = _markerSize;
-    const double borderWidth = _borderWidth;
-    const double shadowOffset = _shadowOffset;
-
     final borderColor = _getLiveIndicatorColor(locationData.freshness);
+    final centerX = _markerWidth / 2;
+    final centerY =
+        _circleRadius + _borderWidth + 10; // Add some top padding (larger)
 
-    paint.color = Colors.black;
-    canvas.drawCircle(
-      Offset(size / 2 + shadowOffset, size / 2 + shadowOffset),
-      size / 2,
-      paint,
-    );
+    // Draw pin shape
+    _drawPinShape(canvas, paint, borderColor, centerX, centerY);
 
-    paint.color = borderColor;
-    canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint);
-
-    paint.color = Colors.white;
-    canvas.drawCircle(
-      Offset(size / 2, size / 2),
-      size / 2 - borderWidth,
-      paint,
-    );
-
-    final imageSize = size - (borderWidth * 2) - 4;
-    final imageOffset = (size - imageSize) / 2;
-
+    // Clip and draw the circular image
+    final imageRadius = _circleRadius - (_borderWidth / 2);
     canvas.save();
     canvas.clipRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(imageOffset, imageOffset, imageSize, imageSize),
-        Radius.circular(imageSize / 2),
+        Rect.fromCenter(
+          center: Offset(centerX, centerY),
+          width: imageRadius * 2,
+          height: imageRadius * 2,
+        ),
+        Radius.circular(imageRadius),
       ),
     );
 
     canvas.drawImageRect(
       image,
       Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
-      Rect.fromLTWH(imageOffset, imageOffset, imageSize, imageSize),
+      Rect.fromCenter(
+        center: Offset(centerX, centerY),
+        width: imageRadius * 2,
+        height: imageRadius * 2,
+      ),
       Paint(),
     );
 
     canvas.restore();
 
-    paint.color = borderColor;
-    paint.style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(size - 20, 20), 12, paint);
-
-    paint.color = Colors.white;
-    paint.style = PaintingStyle.stroke;
-    paint.strokeWidth = 3;
-    canvas.drawCircle(Offset(size - 20, 20), 12, paint);
-
-    paint.style = PaintingStyle.fill;
+    // Add live indicator
     if (locationData.isLive) {
+      // White background (larger indicator)
       paint.color = Colors.white;
-      canvas.drawCircle(Offset(size - 20, 20), 6, paint);
-    } else {
-      paint.color = Colors.white;
-      paint.strokeWidth = 2;
-      paint.style = PaintingStyle.stroke;
-      canvas.drawCircle(Offset(size - 20, 20), 5, paint);
+      canvas.drawCircle(Offset(centerX + 30, centerY - 30), 12, paint);
 
-      paint.style = PaintingStyle.fill;
-      canvas.drawLine(Offset(size - 20, 20), Offset(size - 20, 16), paint);
-      canvas.drawLine(Offset(size - 20, 20), Offset(size - 17, 20), paint);
+      // Green live dot (larger)
+      paint.color = Colors.green;
+      canvas.drawCircle(Offset(centerX + 30, centerY - 30), 10, paint);
     }
 
     final picture = recorder.endRecording();
-    final img = await picture.toImage(size.toInt(), size.toInt());
+    final img = await picture.toImage(
+      _markerWidth.toInt(),
+      _markerHeight.toInt(),
+    );
     final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
     final pngBytes = byteData!.buffer.asUint8List();
 
@@ -445,6 +441,7 @@ class CustomMarkerHelper {
     return BitmapDescriptor.fromBytes(pngBytes);
   }
 
+  // Draw photo marker with pin shape
   static Future<BitmapDescriptor> _drawPhotoMarker(
     ui.Image image,
     Color borderColor,
@@ -453,49 +450,45 @@ class CustomMarkerHelper {
     final canvas = Canvas(recorder);
     final paint = Paint()..isAntiAlias = true;
 
-    const double size = _markerSize;
-    const double borderWidth = _borderWidth;
-    const double shadowOffset = _shadowOffset;
+    final centerX = _markerWidth / 2;
+    final centerY =
+        _circleRadius + _borderWidth + 10; // Add some top padding (larger)
 
-    paint.color = Colors.black;
-    canvas.drawCircle(
-      Offset(size / 2 + shadowOffset, size / 2 + shadowOffset),
-      size / 2,
-      paint,
-    );
+    // Draw pin shape
+    _drawPinShape(canvas, paint, borderColor, centerX, centerY);
 
-    paint.color = borderColor;
-    canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint);
-
-    paint.color = Colors.white;
-    canvas.drawCircle(
-      Offset(size / 2, size / 2),
-      size / 2 - borderWidth,
-      paint,
-    );
-
-    final imageSize = size - (borderWidth * 2) - 4;
-    final imageOffset = (size - imageSize) / 2;
-
+    // Clip and draw the circular image
+    final imageRadius = _circleRadius - (_borderWidth / 2);
     canvas.save();
     canvas.clipRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(imageOffset, imageOffset, imageSize, imageSize),
-        Radius.circular(imageSize / 2),
+        Rect.fromCenter(
+          center: Offset(centerX, centerY),
+          width: imageRadius * 2,
+          height: imageRadius * 2,
+        ),
+        Radius.circular(imageRadius),
       ),
     );
 
     canvas.drawImageRect(
       image,
       Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
-      Rect.fromLTWH(imageOffset, imageOffset, imageSize, imageSize),
+      Rect.fromCenter(
+        center: Offset(centerX, centerY),
+        width: imageRadius * 2,
+        height: imageRadius * 2,
+      ),
       Paint(),
     );
 
     canvas.restore();
 
     final picture = recorder.endRecording();
-    final img = await picture.toImage(size.toInt(), size.toInt());
+    final img = await picture.toImage(
+      _markerWidth.toInt(),
+      _markerHeight.toInt(),
+    );
     final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
     final pngBytes = byteData!.buffer.asUint8List();
 
