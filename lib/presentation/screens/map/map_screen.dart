@@ -902,8 +902,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
     return ElevatedButton(
       onPressed: () => _filterMarkers(label),
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            isSelected ? AppColors.getPrimaryColor(context) : AppColors.teal,
+        backgroundColor: isSelected ? AppColors.darkGreen : AppColors.teal,
         foregroundColor: AppColors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(vertical: 12),

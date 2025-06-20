@@ -20,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _isLoading = false;
   bool _obscurePassword = true;
   bool _showError = false;
+  String? _errorMessage; // Add this for the error text
 
   @override
   void initState() {
@@ -345,9 +346,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
 
-                        const SizedBox(
-                          height: 20,
-                        ), // Added more space after error message
+                        // Error Message - Add this section
+                        if (_showError && _errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 8),
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+
+                        SizedBox(
+                          height: _showError ? 16 : 20,
+                        ), // Adjust spacing based on error visibility
 
                         BlocConsumer<
                           AuthentificationCubit,
@@ -357,12 +371,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (state is Authentificationloaded) {
                               setState(() {
                                 _showError = false;
+                                _errorMessage = null;
                               });
                               Navigator.pushNamed(context, '/home');
                             }
                             if (state is Authentificationerreur) {
                               setState(() {
                                 _showError = true;
+                                _errorMessage = 'Wrong username or password';
                               });
                               _showErrorDialog(state.msg);
                             }

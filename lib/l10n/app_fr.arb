@@ -75,7 +75,7 @@
   "lastSeenLocation": "Lieu de dernière observation",
   "enterLocation": "Entrez le lieu : zone, quartier, ville, rue...",
   "selectLocationOnMap": "Sélectionner le lieu de dernière observation sur la carte (optionnel)",
-  "tapToSelectLocation": "Appuyez pour sélectionner l'emplacement sur la carte",
+  "tapToSelectLocation": "Appuyez pour sélectionner le dernier lieu aperçu sur la carte",
   "photo": "Photo",
   "choosePhoto": "Choisir une photo",
   "noPhotoChosen": "Aucune photo choisie",
@@ -91,7 +91,8 @@
   "pleaseSelectDate": "Veuillez sélectionner une date",
   "pleaseEnterLocation": "Veuillez entrer un lieu",
   "pleaseEnterDescription": "Veuillez fournir une description",
-  
+  "notifications"  : "Notifications",
+
   "setLocation": "Définir la localisation",
   "searchForLocation": "Rechercher un lieu",
   "selectLocation": "Sélectionner la localisation",

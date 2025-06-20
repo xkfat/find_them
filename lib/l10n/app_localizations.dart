@@ -511,7 +511,7 @@ abstract class AppLocalizations {
   /// No description provided for @tapToSelectLocation.
   ///
   /// In en, this message translates to:
-  /// **'Tap to select location on map'**
+  /// **'Tap to select last seen location on map'**
   String get tapToSelectLocation;
 
   /// No description provided for @photo.
@@ -604,6 +604,12 @@ abstract class AppLocalizations {
   /// **'Please provide a description'**
   String get pleaseEnterDescription;
 
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
   /// No description provided for @setLocation.
   ///
   /// In en, this message translates to:
@@ -619,7 +625,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectLocation.
   ///
   /// In en, this message translates to:
-  /// **'Select Location'**
+  /// **'Select last seen location'**
   String get selectLocation;
 
   /// No description provided for @saveLocation.
@@ -657,12 +663,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change language'**
   String get changeLanguage;
-
-  /// No description provided for @notifications.
-  ///
-  /// In en, this message translates to:
-  /// **'Notifications'**
-  String get notifications;
 
   /// No description provided for @darkMode.
   ///

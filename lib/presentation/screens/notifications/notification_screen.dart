@@ -1,9 +1,11 @@
 import 'package:find_them/data/models/notification.dart';
 import 'package:find_them/logic/cubit/notification_cubit.dart';
+import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 import 'package:find_them/presentation/widgets/notification/notification_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:find_them/core/constants/themes/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -40,11 +42,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Notifications',
-          style: TextStyle(
-            color: AppColors.getTextColor(context),
+          context.l10n.notifications, 
+          style: GoogleFonts.dmSans(
             fontSize: 18,
             fontWeight: FontWeight.w600,
+            color: AppColors.getTextColor(context),
           ),
         ),
         centerTitle: true,

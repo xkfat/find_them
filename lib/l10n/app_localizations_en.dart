@@ -217,7 +217,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Select last seen location on map (optional)';
 
   @override
-  String get tapToSelectLocation => 'Tap to select location on map';
+  String get tapToSelectLocation => 'Tap to select last seen location on map';
 
   @override
   String get photo => 'Photo';
@@ -266,13 +266,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseEnterDescription => 'Please provide a description';
 
   @override
+  String get notifications => 'Notifications';
+
+  @override
   String get setLocation => 'Set Location';
 
   @override
   String get searchForLocation => 'Search for a location';
 
   @override
-  String get selectLocation => 'Select Location';
+  String get selectLocation => 'Select last seen location';
 
   @override
   String get saveLocation => 'Save Location';
@@ -292,9 +295,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get changeLanguage => 'Change language';
-
-  @override
-  String get notifications => 'Notifications';
 
   @override
   String get darkMode => 'Dark mode';

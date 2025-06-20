@@ -13,7 +13,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:find_them/l10n/app_localizations.dart';
 import 'package:find_them/presentation/helpers/localisation_extenstion.dart';
 
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -60,11 +59,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text(
           context.l10n.profile,
           style: GoogleFonts.dmSans(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
             color: AppColors.getTextColor(context),
           ),
         ),
+
         centerTitle: true,
         elevation: 0,
         backgroundColor: AppColors.getBackgroundColor(context),

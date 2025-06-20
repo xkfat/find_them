@@ -78,7 +78,7 @@
   "lastSeenLocation": "Last seen location",
   "enterLocation": "Enter location: zone, area, city, street...",
   "selectLocationOnMap": "Select last seen location on map (optional)",
-  "tapToSelectLocation": "Tap to select location on map",
+  "tapToSelectLocation": "Tap to select last seen location on map",
   "photo": "Photo",
   "choosePhoto": "Choose photo",
   "noPhotoChosen": "No photo Chosen",
@@ -94,10 +94,10 @@
   "pleaseSelectDate": "Please select a date",
   "pleaseEnterLocation": "Please enter a location",
   "pleaseEnterDescription": "Please provide a description",
-  
+  "notifications"  : "Notifications",
   "setLocation": "Set Location",
   "searchForLocation": "Search for a location",
-  "selectLocation": "Select Location",
+  "selectLocation": "Select last seen location",
   "saveLocation": "Save Location",
   
   "reportSuccessMessage": "We will look into your information as soon as possible.",

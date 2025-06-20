@@ -15,11 +15,11 @@ class ReportSuccessScreen extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
+              mainAxisAlignment:
+                  MainAxisAlignment.center, // Center everything vertically
+              crossAxisAlignment:
+                  CrossAxisAlignment.center, // Center everything horizontally
               children: [
-                const SizedBox(height: 40),
-
-                const Spacer(flex: 2),
-
                 Container(
                   width: 80,
                   height: 80,
@@ -79,9 +79,6 @@ class ReportSuccessScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                const Spacer(flex: 3),
-                const SizedBox(height: 24),
               ],
             ),
           ),

@@ -217,7 +217,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختر مكان آخر مشاهدة على الخريطة (اختياري)';
 
   @override
-  String get tapToSelectLocation => 'اضغط لتحديد الموقع على الخريطة';
+  String get tapToSelectLocation => 'اضغط لتحديد موقع آخر ظهور على الخريطة';
 
   @override
   String get photo => 'الصورة';
@@ -265,6 +265,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pleaseEnterDescription => 'يرجى تقديم وصف';
 
   @override
+  String get notifications => 'الإشعارات';
+
+  @override
   String get setLocation => 'تحديد الموقع';
 
   @override
@@ -290,9 +293,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get changeLanguage => 'تغيير اللغة';
-
-  @override
-  String get notifications => 'الإشعارات';
 
   @override
   String get darkMode => 'الوضع الليلي';

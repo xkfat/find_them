@@ -159,200 +159,230 @@ class _Report3ScreenState extends State<Report3Screen> {
             );
           }
         },
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          children: [
+            // Content area - NO scrolling
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildStepCircle(1, false, isCompleted: true),
-                      _buildStepLine(true),
-                      _buildStepCircle(2, false, isCompleted: true),
-                      _buildStepLine(true),
-                      _buildStepCircle(3, true),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-
-                  Center(
-                    child: Text(
-                      context.l10n.additionalInformation,
-                      style: GoogleFonts.inter(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.getTextColor(context),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildStepCircle(1, false, isCompleted: true),
+                          _buildStepLine(true),
+                          _buildStepCircle(2, false, isCompleted: true),
+                          _buildStepLine(true),
+                          _buildStepCircle(3, true),
+                        ],
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-                  Text(
-                    context.l10n.photo,
-                    style: TextStyle(color: AppColors.getTextColor(context)),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: _showPhotoError ? Colors.red : AppColors.teal,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        TextButton(
-                          onPressed: _pickImage,
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.teal,
-                          ),
-                          child: Text(
-                            context.l10n.choosePhoto,
-                            style: TextStyle(color: AppColors.teal),
+                      Center(
+                        child: Text(
+                          context.l10n.additionalInformation,
+                          style: GoogleFonts.inter(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.getTextColor(context),
                           ),
                         ),
-                        Expanded(
+                      ),
+                      const SizedBox(height: 32),
+
+                      Text(
+                        context.l10n.photo,
+                        style: TextStyle(
+                          color: AppColors.getTextColor(context),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color:
+                                _showPhotoError ? Colors.red : AppColors.teal,
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            TextButton(
+                              onPressed: _pickImage,
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.teal,
+                              ),
+                              child: Text(
+                                context.l10n.choosePhoto,
+                                style: TextStyle(color: AppColors.teal),
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                _selectedImage != null
+                                    ? _selectedImage!.path.split('/').last
+                                    : context.l10n.noPhotoChosen,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.getTextColor(context),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (_showPhotoError)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0, left: 12.0),
                           child: Text(
-                            _selectedImage != null
-                                ? _selectedImage!.path.split('/').last
-                                : context.l10n.noPhotoChosen,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: AppColors.getTextColor(context),
+                            context.l10n.pleaseSelectPhoto,
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                        ),
+                      const SizedBox(height: 24),
+
+                      Text(
+                        context.l10n.contactPhoneNumber,
+                        style: TextStyle(
+                          color: AppColors.getTextColor(context),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          hintText: context.l10n.enterYourPhoneNumber,
+                          filled: true,
+                          fillColor: AppColors.getSurfaceColor(context),
+                          hintStyle: TextStyle(
+                            color: AppColors.getSecondaryTextColor(context),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: AppColors.getDividerColor(context),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: AppColors.getDividerColor(context),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  if (_showPhotoError)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0, left: 12.0),
-                      child: Text(
-                        context.l10n.pleaseSelectPhoto,
-                        style: TextStyle(color: Colors.red, fontSize: 12),
+                        style: TextStyle(
+                          color: AppColors.getTextColor(context),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return context.l10n.enterPhoneNumber;
+                          }
+                          return null;
+                        },
                       ),
-                    ),
-                  const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                  Text(
-                    context.l10n.contactPhoneNumber,
-                    style: TextStyle(color: AppColors.getTextColor(context)),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      hintText: context.l10n.enterYourPhoneNumber,
-                      filled: true,
-                      fillColor: AppColors.getSurfaceColor(context),
-                      hintStyle: TextStyle(
-                        color: AppColors.getSecondaryTextColor(context),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                          color: AppColors.getDividerColor(context),
+                      Text(
+                        context.l10n.description,
+                        style: TextStyle(
+                          color: AppColors.getTextColor(context),
                         ),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                          color: AppColors.getDividerColor(context),
-                        ),
-                      ),
-                    ),
-                    style: TextStyle(color: AppColors.getTextColor(context)),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return context.l10n.enterPhoneNumber;
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
+                      const SizedBox(height: 8),
 
-                  Text(
-                    context.l10n.description,
-                    style: TextStyle(color: AppColors.getTextColor(context)),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _descriptionController,
-                    maxLines: 5,
-                    decoration: InputDecoration(
-                      hintText: context.l10n.provideDetails,
-                      filled: true,
-                      fillColor: AppColors.getSurfaceColor(context),
-                      hintStyle: TextStyle(
-                        color: AppColors.getSecondaryTextColor(context),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                          color: AppColors.getDividerColor(context),
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                          color: AppColors.getDividerColor(context),
-                        ),
-                      ),
-                    ),
-                    style: TextStyle(color: AppColors.getTextColor(context)),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return context.l10n.pleaseEnterDescription;
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 40),
-
-                  Center(
-                    child: SizedBox(
-                      width: 248,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isSubmitting ? null : _submitReport,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.darkGreen,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      // FIXED: Expanded description field that fills remaining space
+                      Expanded(
+                        child: TextFormField(
+                          controller: _descriptionController,
+                          maxLines: null, // Allow unlimited lines
+                          expands: true, // Fill the available space
+                          textAlignVertical:
+                              TextAlignVertical.top, // Start text at top
+                          decoration: InputDecoration(
+                            hintText: context.l10n.provideDetails,
+                            filled: true,
+                            fillColor: AppColors.getSurfaceColor(context),
+                            hintStyle: TextStyle(
+                              color: AppColors.getSecondaryTextColor(context),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(
+                                color: AppColors.getDividerColor(context),
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(
+                                color: AppColors.getDividerColor(context),
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.all(
+                              16,
+                            ), // Better padding
                           ),
+                          style: TextStyle(
+                            color: AppColors.getTextColor(context),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return context.l10n.pleaseEnterDescription;
+                            }
+                            return null;
+                          },
                         ),
-                        child:
-                            _isSubmitting
-                                ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                                : Text(
-                                  context.l10n.submitReport,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                  ),
-                                ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+
+            // Fixed button area at bottom - SAME POSITION as other screens
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+              color: AppColors.getSurfaceColor(context),
+              child: Center(
+                child: SizedBox(
+                  width: 248,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _isSubmitting ? null : _submitReport,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.darkGreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child:
+                        _isSubmitting
+                            ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                            : Text(
+                              context.l10n.submitReport,
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: Padding(

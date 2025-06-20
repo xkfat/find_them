@@ -103,6 +103,11 @@ class SocialAuthService {
         'email': userData['email'],
         'name': userData['display_name'],
         'phone_number': userData['phone_number'] ?? '',
+        'photo_url': userData['photo_url'] ?? '', // ✅ Add this line!
+        'first_name':
+            userData['first_name'] ?? '', // ✅ Also add these for completeness
+        'last_name': userData['last_name'] ?? '',
+        'username': userData['username'] ?? '',
       };
 
       log("Sending to server: ${json.encode(authData)}");

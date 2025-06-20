@@ -223,7 +223,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tapToSelectLocation =>
-      'Appuyez pour sélectionner l\'emplacement sur la carte';
+      'Appuyez pour sélectionner le dernier lieu aperçu sur la carte';
 
   @override
   String get photo => 'Photo';
@@ -272,6 +272,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pleaseEnterDescription => 'Veuillez fournir une description';
 
   @override
+  String get notifications => 'Notifications';
+
+  @override
   String get setLocation => 'Définir la localisation';
 
   @override
@@ -298,9 +301,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get changeLanguage => 'Changer la langue';
-
-  @override
-  String get notifications => 'Notifications';
 
   @override
   String get darkMode => 'Mode sombre';

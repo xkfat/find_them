@@ -92,7 +92,7 @@
   "lastSeenLocation": "مكان آخر مشاهدة",
   "enterLocation": "أدخل الموقع: المنطقة، الحي، المدينة، الشارع...",
   "selectLocationOnMap": "اختر مكان آخر مشاهدة على الخريطة (اختياري)",
-  "tapToSelectLocation": "اضغط لتحديد الموقع على الخريطة",
+  "tapToSelectLocation": "اضغط لتحديد موقع آخر ظهور على الخريطة",
   "photo": "الصورة",
   "choosePhoto": "اختر صورة",
   "noPhotoChosen": "لم يتم اختيار صورة",
@@ -108,7 +108,8 @@
   "pleaseSelectDate": "يرجى اختيار تاريخ",
   "pleaseEnterLocation": "يرجى إدخال موقع",
   "pleaseEnterDescription": "يرجى تقديم وصف",
-  
+  "notifications": "الإشعارات",
+
   "setLocation": "تحديد الموقع",
   "searchForLocation": "البحث عن موقع",
   "selectLocation": "اختيار الموقع",
