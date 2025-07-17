@@ -269,12 +269,11 @@ class _SideBarState extends State<SideBar> {
           title: Text(
             title,
             style: GoogleFonts.dmSans(
-              // Changed from inter to dmSans
-              fontSize: 18, // Reduced from 18 to 16
+              fontSize: 18, 
               fontWeight:
                   isSelected
                       ? FontWeight.w600
-                      : FontWeight.w500, // Changed weights
+                      : FontWeight.w500, 
               color:
                   isSelected ? AppColors.teal : AppColors.getTextColor(context),
             ),

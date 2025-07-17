@@ -288,11 +288,13 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           AppColors.getInvestigatingYellowColor(context),
                         ),
                         const SizedBox(height: 8),
+                        /*
                         _buildStatusChip(
                           'found',
                           context.l10n.found,
                           AppColors.getFoundGreenColor(context),
                         ),
+                        */
                       ],
                     ),
 
